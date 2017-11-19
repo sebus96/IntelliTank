@@ -1,8 +1,5 @@
 package intellitank;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.text.DecimalFormat;
 //hallo
 import controller.GasStationController;
@@ -48,7 +45,7 @@ public class IntelliTank extends Application {
      
         gsc = new GasStationController();
         //Create the foundation: borderPane -> Scrollpane -> Canvas
-        primaryStage.setTitle("IntelliTank");
+        primaryStage.setTitle("Bla bla blubb");
         BorderPane border = new BorderPane();
         ScrollPane sp = new ScrollPane();
         border.setCenter(sp);
