@@ -45,7 +45,7 @@ public class IntelliTank extends Application {
      
         gsc = new GasStationController();
         //Create the foundation: borderPane -> Scrollpane -> Canvas
-        primaryStage.setTitle("Bla 6blubb");
+        primaryStage.setTitle("Bla 6bluewefbb");
         BorderPane border = new BorderPane();
         ScrollPane sp = new ScrollPane();
         border.setCenter(sp);
