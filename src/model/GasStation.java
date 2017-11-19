@@ -1,8 +1,8 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class GasStation {
 	private int id;
@@ -74,6 +74,24 @@ public class GasStation {
 
 	public double getLatitude() {
 		return latitude;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param d Date for which the price is needed
+	 * @return the price at the specified date
+	 */
+	public int getProjectedPrice(Date d) {
+		int prevPrice = -1;
+		for(Price p: this.projectedPrices) {
+			if(p.getTime().after(d)) {
+				return prevPrice;
+			}
+			prevPrice = p.getPrice();
+			
+		}
+		return prevPrice;
 	}
 
     /**
