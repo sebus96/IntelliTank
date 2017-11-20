@@ -93,6 +93,17 @@ public class GasStation {
 		}
 		return prevPrice;
 	}
+        public int getHistoricPrice(Date d) {
+		int prevPrice = -1;
+		for(Price p: this.historicPrices) {
+			if(p.getTime().after(d)) {
+				return prevPrice;
+			}
+			prevPrice = p.getPrice();
+			
+		}
+		return prevPrice;
+	}
 
     /**
      * @return the historicPrices

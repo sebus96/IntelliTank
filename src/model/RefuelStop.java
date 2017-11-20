@@ -9,7 +9,7 @@ public class RefuelStop {
         //Variables below are needed for the Fixed Path Gas Station Problem
         private RefuelStop prevStation;
         private RefuelStop nextStation;
-        private boolean isBreakPoint;
+        private boolean breakPoint;
 	
 	public RefuelStop(GasStation station, Date time){
 		this.station = station;
@@ -23,7 +23,12 @@ public class RefuelStop {
 	public GasStation getStation() {
 		return station;
 	}
-
+        public boolean isBreakPoint() {
+		return breakPoint;
+	}
+        public void setBreakPoint(boolean bp) {
+		this.breakPoint = bp;
+	}
     /**
      * @return the prevStation
      */
@@ -50,19 +55,5 @@ public class RefuelStop {
      */
     public void setNextStation(RefuelStop nextStation) {
         this.nextStation = nextStation;
-    }
-
-    /**
-     * @return the isBreakPoint
-     */
-    public boolean isIsBreakPoint() {
-        return isBreakPoint;
-    }
-
-    /**
-     * @param isBreakPoint the isBreakPoint to set
-     */
-    public void setIsBreakPoint(boolean isBreakPoint) {
-        this.isBreakPoint = isBreakPoint;
     }
 }
