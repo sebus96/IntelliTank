@@ -12,6 +12,8 @@ import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -90,8 +92,19 @@ public class IntelliTank extends Application {
 //        datei.getItems().addAll(add1);
         
     	Menu hilfe = new Menu("Hilfe");
-    	MenuItem add2 = new MenuItem("Mitwirkende");
-    	hilfe.getItems().addAll(add2);
+    	MenuItem itemHilfe = new MenuItem("Mitwirkende");
+    	hilfe.getItems().addAll(itemHilfe);
+    	itemHilfe.setOnAction(new EventHandler<ActionEvent>() {
+    		@Override
+    		public void handle(ActionEvent arg0) {
+    			Alert alert = new Alert(AlertType.INFORMATION);
+    			alert.setTitle("Mitwirkende");
+    			alert.setHeaderText(null);
+    			alert.setContentText("Dieses Projekt wurde von Sebastian Drath, Axel Claassen und Burak Kadioglu entwickelt.");
+
+    			alert.showAndWait();
+    		}
+		});
     	
         bar.getMenus().addAll(datei, hilfe);
     	border.setTop(bar);
@@ -113,7 +126,6 @@ public class IntelliTank extends Application {
 			
 			@Override
 			public void handle(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 		        displayRoute();
 			}
 		});
