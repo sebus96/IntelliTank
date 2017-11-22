@@ -1,4 +1,4 @@
-package intellitank;
+package view;
 
 import java.text.DecimalFormat;
 
@@ -67,7 +67,8 @@ public class IntelliTank extends Application {
         displayNavigationBar(vbox,border);
         displayRoute();
         displayMenubar(bar, border);
-
+        Image icon = new Image("/img/gas-station.png");
+        primaryStage.getIcons().add(icon);
         primaryStage.show();
     }
 
