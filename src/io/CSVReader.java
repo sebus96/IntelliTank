@@ -16,7 +16,7 @@ import java.util.Map;
 import model.GasStation;
 import model.Price;
 import model.Route;
-import intellitank.IntelliTank;
+import view.IntelliTank;
 
 public class CSVReader {
 	

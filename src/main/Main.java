@@ -1,7 +1,7 @@
 package main;
 
 import controller.GasStationController;
-import intellitank.IntelliTank;
+import view.IntelliTank;
 
 public class Main {
 
