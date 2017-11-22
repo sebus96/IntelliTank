@@ -32,8 +32,8 @@ public class Route {
 	public void addRouteElement(GasStation station, Date time) {
 		route.add(new RefuelStop(station, time));
 	}
-	
+	/*
 	public List<RefuelStop> getRoute() {
 		return route;
-	}
+	}*/
 }

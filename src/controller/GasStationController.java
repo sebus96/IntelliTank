@@ -1,6 +1,5 @@
 package controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import io.CSVReader;
@@ -10,10 +9,13 @@ import model.Route;
 public class GasStationController {
 	private Map<Integer, GasStation> allStations;
 	private Route route;
+	private PredictionUnit prediction;
 	
 	public GasStationController() {
 		allStations = CSVReader.importGasStations();
 		route = CSVReader.importRoute(allStations);
+		CSVReader.importPrices(route);
+		//this.trainPrediction();
 	}
 	
 	public void addGasStation(GasStation station) {
@@ -29,5 +31,10 @@ public class GasStationController {
 	
 	public Route getRoute() {
 		return route;
+	}
+	
+	public void trainPrediction() {
+		prediction = new PredictionUnit(route.get(0).getStation());
+		prediction.start();
 	}
 }

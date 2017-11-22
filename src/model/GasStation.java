@@ -105,6 +105,20 @@ public class GasStation {
 		}
 		return prevPrice;
 	}
+	
+	public int getPriceListSize() {
+		return this.historicPrices.size();
+	}
+	
+	public Price getPriceListElement(int i) {
+		if(i < this.historicPrices.size() && i >= 0)
+			return this.historicPrices.get(i);
+		return null;
+	}
+	
+	public void setPriceList(List<Price> prices) {
+		this.historicPrices = prices;
+	}
 
     /**
      * @return the historicPrices
