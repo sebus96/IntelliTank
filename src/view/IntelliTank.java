@@ -41,6 +41,7 @@ public class IntelliTank extends Application {
 	Canvas canvas; 
 	GraphicsContext gc;
 	GasStationController gsc;
+	Scene scene;
 	
 	@Override
     public void start(Stage primaryStage) {
@@ -54,7 +55,7 @@ public class IntelliTank extends Application {
         canvas = new Canvas(640, 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
         sp.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
-        Scene scene = new Scene(border, 640, 480);
+        scene = new Scene(border, 640, 480);
         primaryStage.setScene(scene);
         
         //The NavigationBar is on the left side
@@ -64,7 +65,7 @@ public class IntelliTank extends Application {
         MenuBar bar = new MenuBar();
         
         //Methods to fill each part with content
-        displayNavigationBar(vbox,border);
+        displayNavigationBar(vbox, border);
         displayRoute();
         displayMenubar(bar, border);
         Image icon = new Image("/img/gas-station.png");
@@ -101,23 +102,19 @@ public class IntelliTank extends Application {
     			Alert alert = new Alert(AlertType.INFORMATION);
     			alert.setTitle("Mitwirkende");
     			alert.setHeaderText(null);
-    			alert.setContentText("Dieses Projekt wurde von Sebastian Drath, Axel Claassen und Burak Kadioglu entwickelt.");
-
+    			alert.setContentText("Dieses Projekt wurde von Sebastian Drath, Sezer Dursun, Axel Claassen und Burak Kadioglu entwickelt.");
     			alert.showAndWait();
     		}
 		});
-    	
         bar.getMenus().addAll(datei, hilfe);
     	border.setTop(bar);
     }
     
     //displays navigation bar on the left
     private void displayNavigationBar(VBox vbox, BorderPane border) {
-        
     	vbox.setAlignment(Pos.TOP_CENTER);
         vbox.setPadding(new Insets(10));
         vbox.setSpacing(8);
-    	
     	Button route = new Button("Route");
     	route.setPrefSize(125, 40);
     	route.setStyle("-fx-font-size: 18");
@@ -137,11 +134,25 @@ public class IntelliTank extends Application {
     	menuprice.setPrefSize(125, 40);
     	Image euroImg = new Image(getClass().getResourceAsStream("/img/euro.png"), 35, 35, false, false);
     	menuprice.setGraphic(new ImageView(euroImg));
+    	int counter = 0;
         for (int i = 0; i < gsc.getRoute().getLength(); i++) {
 	        //int key = entry.getKey();
 //	        vbox.getChildren().add(new Hyperlink(stationsOnRoute.get(i).getName()));
         	MenuItem menuitem = new MenuItem(gsc.getRoute().get(i).getStation().getName());
         	menuprice.getItems().add(menuitem);
+        	counter++;
+        }
+        for(int i = 0; i < counter; i++) {
+        	MenuItem item = menuprice.getItems().get(i);
+        	item.setOnAction(new EventHandler<ActionEvent>() {
+        		@Override
+        		public void handle(ActionEvent event) {
+        			GasStation gs = gsc.getRoute().get(0).getStation();
+        			PreisDiagramm diagramm = new PreisDiagramm(gs);
+//        			diagramm.generateDiagramm(gs);
+        			diagramm.run();
+        		}
+			});
         }
         vbox.getChildren().add(menuprice);
         border.setLeft(vbox);
