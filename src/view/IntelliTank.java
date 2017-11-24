@@ -3,6 +3,7 @@ package view;
 import java.text.DecimalFormat;
 
 import controller.GasStationController;
+import java.math.RoundingMode;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -29,7 +30,7 @@ import javafx.scene.text.TextAlignment;
 //import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import model.GasStation;
-
+import model.MainModel;
 /**
  *
  * @author Admin
@@ -42,11 +43,12 @@ public class IntelliTank extends Application {
 	GraphicsContext gc;
 	GasStationController gsc;
 	Scene scene;
-	
+	MainModel mm;
 	@Override
     public void start(Stage primaryStage) {
      
         gsc = new GasStationController();
+        
         //Create the foundation: borderPane -> Scrollpane -> Canvas
         primaryStage.setTitle("IntelliTank");
         BorderPane border = new BorderPane();
@@ -63,6 +65,11 @@ public class IntelliTank extends Application {
         
         //The MenuBar is on the top
         MenuBar bar = new MenuBar();
+       
+        //Temporary
+        /*mm = new MainModel();
+        mm.calculateFPGSP(gsc.getRoute());*/
+        //temporary
         
         //Methods to fill each part with content
         displayNavigationBar(vbox, border);
@@ -193,7 +200,8 @@ public class IntelliTank extends Application {
         gc.strokeOval(180-circleWidth/2, circleStart, circleWidth, circleHeight);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        gc.fillText(gsc.getRoute().get(index).getStation().getHouseNumber(),180,circleStart + circleHeight/2);
+        double priceForStation = (double)gsc.getRoute().get(index).getStation().getPrice(gsc.getRoute().get(index).getTime())/1000;
+        gc.fillText(priceForStation + "",180,circleStart + circleHeight/2);
         gc.setTextAlign(TextAlignment.LEFT);
         gc.fillText(gsc.getRoute().get(index).getStation().getName() + ", " + gsc.getRoute().get(index).getStation().getPostcode() + " " + gsc.getRoute().get(index).getStation().getLocation(), 220, circleStart + circleHeight/2);
         
@@ -219,6 +227,7 @@ public class IntelliTank extends Application {
     	double latitudeB = Math.toRadians(latB);
     	double longitudeB = Math.toRadians(longB);
     	DecimalFormat f = new DecimalFormat("#0.00"); 
+        f.setRoundingMode(RoundingMode.DOWN);
     	double dist = 6378.388*Math.acos((Math.sin(latitudeA)*Math.sin(latitudeB))+(Math.cos(latitudeA)*Math.cos(latitudeB)*Math.cos(longitudeB-longitudeA)));
     	String output = f.format(dist) + "km" + " / ";	
     	double consumption = 5.6*dist/100;

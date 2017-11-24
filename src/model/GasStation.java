@@ -82,7 +82,7 @@ public class GasStation {
 	 * @param d Date for which the price is needed
 	 * @return the price at the specified date
 	 */
-	public int getProjectedPrice(Date d) {
+	/*public int getProjectedPrice(Date d) {
 		int prevPrice = -1;
 		for(Price p: this.projectedPrices) {
 			if(p.getTime().after(d)) {
@@ -92,11 +92,17 @@ public class GasStation {
 			
 		}
 		return prevPrice;
-	}
+	}*/
 	
-	public int getHistoricPrice(Date d) {
+	public int getPrice(Date d) {
 		int prevPrice = -1;
 		for(Price p: this.historicPrices) {
+			if(p.getTime().after(d)) {
+				return prevPrice;
+			}
+			prevPrice = p.getPrice();
+		}
+                for(Price p: this.projectedPrices) {
 			if(p.getTime().after(d)) {
 				return prevPrice;
 			}
