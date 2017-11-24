@@ -17,8 +17,8 @@ public class MainModel {
     //FPGSP = Fixed Path Gas Station Problem
     public void calculateFPGSP(Route route) {
 
-        final double gasUsedPerHundredKm = 5.6 / 100;
-        final double maxDistance = route.getTankCapacity() / gasUsedPerHundredKm;
+        final double gasUsedPerKm = 5.6 / 100;
+        final double maxDistance = route.getTankCapacity() / gasUsedPerKm;
         //1. Go through all the stations i in the route and set prevStation and nextStation
         //  prevStation = the station before s(s included), which has the lowest gas price and would be in reach with a full tank
         //  nextStation = the station after s, which has the lowest gas price and would be in reach with a full tank
@@ -38,11 +38,12 @@ public class MainModel {
             
             System.out.println(route.get(i).getPrevStation().getStation().getPrice(route.get(i).getPrevStation().getTime()) + " ---> " + route.get(i).getStation().getPrice(route.get(i).getTime()) + "(" + route.get(i).isBreakPoint() + ") ---> " + route.get(i).getNextStation().getStation().getPrice(route.get(i).getNextStation().getTime()));
             //System.out.println("Next für " + route.get(i).getStation().getPrice(route.get(i).getTime()) + " ist " + route.get(i).getNextStation().getStation().getPrice(route.get(i).getNextStation().getTime()) + " bp: " + route.get(i).isBreakPoint());
-            //3. Execute the algorithm
+        }
+        //3. Execute the algorithm
             // the goal is to go from one breakpoint to the next until you reach the end of the route
             // if you cant reach the next breakpoint, fill tank completely,check next() and go there
             // at next() fill just enough to get to the breakpoint
-        }
+        createRefillPlan(route, gasUsedPerKm);
     }
     //1.1. Find the prevStation of every station. Mark it as breakpoint if its the cheapest compared to the pther stations in reach
 
@@ -128,5 +129,45 @@ public class MainModel {
         double longitudeB = Math.toRadians(longB);
         double dist = 6378.388 * Math.acos((Math.sin(latitudeA) * Math.sin(latitudeB)) + (Math.cos(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA)));
         return dist;
+    }
+
+    private void createRefillPlan(Route route, double gasUsedPerKm) {
+        
+        RefuelStop refillStation = route.get(0).getNextStation();
+        double currentTankStatus = 0;
+        for(int i = 0;i<route.getLength();i++) {
+            
+            //Update fuelStatus here
+            if(i>0) {
+                double distanceFromLastStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i - 1).getStation().getLatitude(), route.get(i - 1).getStation().getLongitude());
+                route.get(i).setFuelAmount(currentTankStatus - gasUsedPerKm * distanceFromLastStation);
+            }
+                
+            
+            //only refuel at break points
+            if(!route.get(i).isBreakPoint())
+                continue;
+            
+            if(route.get(i).equals(refillStation)) {
+                //hier ist der naechste next, neuen next auslesen und speichern und tanken
+            }
+            //finde naechsten breakpoint und tank so viel um dahin zu kommen
+            double kmToNextBreakpoint = 0;
+            for(int j = i+1;j<route.getLength();j++) {
+                
+                kmToNextBreakpoint += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
+                
+                if(route.get(j).isBreakPoint() == true) {
+                    break;
+                }
+            }
+            
+            route.get(i).setRefillAmount(kmToNextBreakpoint * gasUsedPerKm);
+            currentTankStatus += kmToNextBreakpoint * gasUsedPerKm;
+            //if(route.get(refillStation).getNextStation().getStation().getPrice(route.get(i).getNextStation().getTime()
+            
+            //if(route.get(i).getNextStation().getStation().getPrice(route.get(i).getNextStation().getTime()))
+        }
+            
     }
 }
