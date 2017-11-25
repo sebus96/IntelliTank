@@ -31,6 +31,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import model.GasStation;
 import model.MainModel;
+import model.RefuelStop;
 /**
  *
  * @author Admin
@@ -57,7 +58,7 @@ public class IntelliTank extends Application {
         canvas = new Canvas(640, 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
         sp.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
-        scene = new Scene(border, 640, 480);
+        scene = new Scene(border, 800, 600);
         primaryStage.setScene(scene);
         
         //The NavigationBar is on the left side
@@ -67,13 +68,14 @@ public class IntelliTank extends Application {
         MenuBar bar = new MenuBar();
        
         //Temporary
-        /*mm = new MainModel();
-        mm.calculateFPGSP(gsc.getRoute());*/
+        mm = new MainModel();
+        mm.calculateFPGSP(gsc.getRoute());
         //temporary
         
         //Methods to fill each part with content
         displayNavigationBar(vbox, border);
         displayRoute();
+        displayResult();
         displayMenubar(bar, border);
         Image icon = new Image("/img/gas-station.png");
         primaryStage.getIcons().add(icon);
@@ -164,17 +166,7 @@ public class IntelliTank extends Application {
         vbox.getChildren().add(menuprice);
         border.setLeft(vbox);
     }
-    // TEMPORARY UNTIL THE IO IS INTEGRATED. CURRENTLY, MAP IS FILLED WITH THESE STATIC VALUES
-    /*private void fillMapWithStations() {
-    	gsc.addGasStation(new GasStation(1,"CLASSIC Langballig","CLASSIC","Poststr.","5",24977,"Langballig",54.7976,9.63537));
-        gsc.addGasStation(new GasStation(2,"Aral Tankstelle","ARAL","Nordstrasse","20",24943,"Flensburg",54.79709,9.476214));
-        gsc.addGasStation(new GasStation(3,"WIKING FL-Nord","WIKING","Neustadt 14","",24939,"Flensburg",54.79669,9.42907));
-        gsc.addGasStation(new GasStation(4,"Poetzsch TankTreff","Sonstige","Industrieweg","40",24952,"Harrislee",54.7941,9.37233));
-        gsc.addGasStation(new GasStation(5,"team Tankstelle Niebüll","team","Gather Landstr.","29-31",25899,"Niebüll",54.791,8.8337));
-        gsc.addGasStation(new GasStation(6,"bft-willer Station 158","bft","An der Nordstr. ","7",24989,"Streichmühle",54.783,9.6731));
-        gsc.addGasStation(new GasStation(7,"Tankstelle","UNITOL","Ostring","59",25899,"Niebüll",54.781883,8.851878));
-        gsc.addGasStation(new GasStation(8,"ELAN NIEBUELL","ELAN","BUSCH JOHANNSEN STR.","2",25899,"NIEBUELL",54.77996,8.83436));
-    }*/
+
     //gets repeatedly called by the displayroute function. Creates an elipse and a line for a specific gas station
     private void displayGasStation(int index) {
         
@@ -205,17 +197,24 @@ public class IntelliTank extends Application {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.fillText(gsc.getRoute().get(index).getStation().getName() + ", " + gsc.getRoute().get(index).getStation().getPostcode() + " " + gsc.getRoute().get(index).getStation().getLocation(), 220, circleStart + circleHeight/2);
         
+        
+        RefuelStop rs = gsc.getRoute().get(index);
+        double currentGasPercentage = rs.getFuelAmount()/gsc.getRoute().getTankCapacity() * 100;
+        double currentRefillPercentage = rs.getRefillAmount()/gsc.getRoute().getTankCapacity() * 100;
+        
+        DecimalFormat f = new DecimalFormat("#0.0"); 
+        //f.setRoundingMode(RoundingMode.UP);
         //create a rectangle which shows the current gas status
         gc.setFill(Color.WHITE);
         gc.fillRect(30, circleStart, 100, circleHeight);
         gc.setFill(Color.BLACK);
-        int currentGasPercentage = 10;//this variable is only temporary until gas management is implemented
-        gc.fillRect(30, circleStart, currentGasPercentage/*TODO, depends on current gas status*/, circleHeight);
-        gc.fillText("1,7 L", 30, circleStart-10);
+        //this variable is only temporary until gas management is implemented
+        gc.fillRect(30, circleStart, currentGasPercentage, circleHeight);
+        gc.fillText(f.format(rs.getFuelAmount()) + " L", 30, circleStart-10);
         gc.setFill(Color.GREEN);
-        gc.fillRect(30 + currentGasPercentage, circleStart, 50/*TODO, depends on current gas status*/, circleHeight);
+        gc.fillRect(30 + currentGasPercentage, circleStart, currentRefillPercentage, circleHeight);
         gc.setTextAlign(TextAlignment.RIGHT);
-        gc.fillText("+ 5,6 L", 130, circleStart-10);
+        gc.fillText("+ " + f.format(rs.getRefillAmount()) + " L", 130, circleStart-10);
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLACK);
         gc.strokeRect(30, circleStart, 100, circleHeight);
@@ -233,5 +232,10 @@ public class IntelliTank extends Application {
     	double consumption = 5.6*dist/100;
     	output += f.format(consumption) + "L verbraucht"; 
     	return output;
+    }
+
+    private void displayResult() {
+        DecimalFormat f = new DecimalFormat("#0.00"); 
+        gc.fillText("Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt " + f.format(gsc.getRoute().getTotalEuros()) + "Eur.",10,50);
     }
 }

@@ -7,6 +7,31 @@ import java.util.List;
 public class Route {
 	private double tankCapacity;
 	private List<RefuelStop> route;
+        private double totalEuros,totalKm,totalLiters;
+
+    public double getTotalEuros() {
+        return totalEuros;
+    }
+
+    public void setTotalEuros(double totalEuros) {
+        this.totalEuros = totalEuros;
+    }
+
+    public double getTotalKm() {
+        return totalKm;
+    }
+
+    public void setTotalKm(double totalKm) {
+        this.totalKm = totalKm;
+    }
+
+    public double getTotalLiters() {
+        return totalLiters;
+    }
+
+    public void setTotalLiters(double totalLiters) {
+        this.totalLiters = totalLiters;
+    }
 	
 	public Route( int tankCapacity ) {
 		this.tankCapacity = tankCapacity;
