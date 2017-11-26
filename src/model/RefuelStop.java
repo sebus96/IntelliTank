@@ -11,6 +11,15 @@ public class RefuelStop {
     private RefuelStop prevStation;
     private RefuelStop nextStation;
     private boolean breakPoint;
+    private boolean nextStationBool;
+
+    public boolean isNextStation() {
+        return nextStationBool;
+    }
+
+    public void setNextStationBool(boolean nextStationBool) {
+        this.nextStationBool = nextStationBool;
+    }
     //the current amount of gas in the tank and how much gas is added at that station
     private double fuelAmount;
     private double refillAmount;
