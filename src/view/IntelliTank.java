@@ -201,7 +201,7 @@ public class IntelliTank extends Application {
         RefuelStop rs = gsc.getRoute().get(index);
         double currentGasPercentage = rs.getFuelAmount()/gsc.getRoute().getTankCapacity() * 100;
         double currentRefillPercentage = rs.getRefillAmount()/gsc.getRoute().getTankCapacity() * 100;
-        
+        //System.out.println(rs.getFuelAmount() + " " + rs.getRefillAmount());
         DecimalFormat f = new DecimalFormat("#0.0"); 
         //f.setRoundingMode(RoundingMode.UP);
         //create a rectangle which shows the current gas status
@@ -210,7 +210,7 @@ public class IntelliTank extends Application {
         gc.setFill(Color.BLACK);
         //this variable is only temporary until gas management is implemented
         gc.fillRect(30, circleStart, currentGasPercentage, circleHeight);
-        gc.fillText(f.format(rs.getFuelAmount()) + " L", 30, circleStart-10);
+        gc.fillText(f.format(Math.abs(rs.getFuelAmount())) + " L", 30, circleStart-10);
         gc.setFill(Color.GREEN);
         gc.fillRect(30 + currentGasPercentage, circleStart, currentRefillPercentage, circleHeight);
         gc.setTextAlign(TextAlignment.RIGHT);
