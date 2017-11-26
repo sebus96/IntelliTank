@@ -1,10 +1,12 @@
 package view;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import controller.GasStationController;
-import java.math.RoundingMode;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -16,9 +18,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -26,6 +29,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 //import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -124,11 +128,16 @@ public class IntelliTank extends Application {
     	vbox.setAlignment(Pos.TOP_CENTER);
         vbox.setPadding(new Insets(10));
         vbox.setSpacing(8);
-    	Button route = new Button("Route");
-    	route.setPrefSize(125, 40);
-    	route.setStyle("-fx-font-size: 18");
-    	Image routeImg = new Image(getClass().getResourceAsStream("/img/route.png"), 35, 35, false, false);
-    	route.setGraphic(new ImageView(routeImg));
+    	Button route = new Button();
+    	route.setText("Route");
+    	route.setPrefSize(150, 40);
+    	route.setStyle("-fx-background-image:url(/img/route.png);"
+    			+ "-fx-background-size:35px;"
+    			+ "-fx-background-repeat:no-repeat;"
+    			+ "-fx-background-position:center;"
+    			+ "-fx-font-size: 16;"
+    			+ "-fx-font-weight:bold");
+    	route.setAlignment(Pos.BASELINE_LEFT);
     	route.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override
@@ -137,33 +146,32 @@ public class IntelliTank extends Application {
 			}
 		});
     	vbox.getChildren().add(route);
-    	
-    	MenuButton menuprice = new MenuButton("Preis");
-    	menuprice.setStyle("-fx-font-size: 18");
-    	menuprice.setPrefSize(125, 40);
+    	ComboBox<String> priceCombobox = new ComboBox();
+    	priceCombobox.setPromptText("Preis");
+    	priceCombobox.setPrefSize(150, 40);
+    	priceCombobox.setStyle("-fx-background-image:url(/img/euro.png);"
+    			+ "-fx-background-size:35px;"
+    			+ "-fx-background-repeat:no-repeat;"
+    			+ "-fx-background-position:center;"
+    			+ "-fx-font-size: 16;"
+    			+ "-fx-font-weight:bold");
     	Image euroImg = new Image(getClass().getResourceAsStream("/img/euro.png"), 35, 35, false, false);
-    	menuprice.setGraphic(new ImageView(euroImg));
-    	int counter = 0;
-        for (int i = 0; i < gsc.getRoute().getLength(); i++) {
-	        //int key = entry.getKey();
-//	        vbox.getChildren().add(new Hyperlink(stationsOnRoute.get(i).getName()));
-        	MenuItem menuitem = new MenuItem(gsc.getRoute().get(i).getStation().getName());
-        	menuprice.getItems().add(menuitem);
-        	counter++;
+        ObservableList<String> menuItems = FXCollections.observableArrayList();
+        for(int i = 0; i < gsc.getRoute().getLength(); i++) {
+        	menuItems.add(gsc.getRoute().get(i).getStation().getName());
         }
-        for(int i = 0; i < counter; i++) {
-        	MenuItem item = menuprice.getItems().get(i);
-        	item.setOnAction(new EventHandler<ActionEvent>() {
-        		@Override
-        		public void handle(ActionEvent event) {
-        			GasStation gs = gsc.getRoute().get(0).getStation();
-        			PreisDiagramm diagramm = new PreisDiagramm(gs);
-//        			diagramm.generateDiagramm(gs);
-        			diagramm.run();
-        		}
-			});
-        }
-        vbox.getChildren().add(menuprice);
+        priceCombobox.getItems().addAll(menuItems);
+        priceCombobox.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent arg0) {
+				String gasStation = priceCombobox.getSelectionModel().getSelectedItem();
+    			GasStation gs = gsc.getRoute().get(priceCombobox.getSelectionModel().getSelectedIndex()).getStation();
+    			PreisDiagramm diagramm = new PreisDiagramm(gs, gasStation);
+    			diagramm.generateDiagramm();
+			}
+		});
+        vbox.getChildren().add(priceCombobox);
         border.setLeft(vbox);
     }
 
@@ -236,6 +244,12 @@ public class IntelliTank extends Application {
 
     private void displayResult() {
         DecimalFormat f = new DecimalFormat("#0.00"); 
-        gc.fillText("Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt " + f.format(gsc.getRoute().getTotalEuros()) + "Eur.",10,50);
+        Label output = new Label("Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt " + f.format(gsc.getRoute().getTotalEuros()) + "Eur.");
+    	Image gasStation = new Image(getClass().getResourceAsStream("/img/gasstation.png"), 5, 5, false, false);
+        output.setGraphic(new ImageView(gasStation));
+//    	output.setStyle("-fx-font-size: 100px");
+//    	output.setFont(new Font("Arial", 30));
+//    	output.setPrefSize(3330, 30);
+        gc.fillText(output.getText(),10,50);
     }
 }
