@@ -146,7 +146,7 @@ public class IntelliTank extends Application {
 			}
 		});
     	vbox.getChildren().add(route);
-    	ComboBox<String> priceCombobox = new ComboBox();
+    	final ComboBox<String> priceCombobox = new ComboBox();
     	priceCombobox.setPromptText("Preis");
     	priceCombobox.setPrefSize(150, 40);
     	priceCombobox.setStyle("-fx-background-image:url(/img/euro.png);"
