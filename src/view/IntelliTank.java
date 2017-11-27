@@ -167,7 +167,7 @@ public class IntelliTank extends Application {
 			public void handle(ActionEvent arg0) {
 				String gasStation = priceCombobox.getSelectionModel().getSelectedItem();
     			GasStation gs = gsc.getRoute().get(priceCombobox.getSelectionModel().getSelectedIndex()).getStation();
-    			PreisDiagramm diagramm = new PreisDiagramm(gs, gasStation);
+    			PriceDiagram diagramm = new PriceDiagram(gs, gasStation);
     			diagramm.generateDiagramm();
 			}
 		});

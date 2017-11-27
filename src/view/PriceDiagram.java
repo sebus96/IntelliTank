@@ -12,12 +12,12 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import model.GasStation;
 
-public class PreisDiagramm {
+public class PriceDiagram {
 	
 	private GasStation gs;
 	private String gsName;
 	
-	public PreisDiagramm(GasStation gs, String gsName) {
+	public PriceDiagram(GasStation gs, String gsName) {
 		this.gs = gs;
 		this.gsName = gsName;
 	}
@@ -39,6 +39,7 @@ public class PreisDiagramm {
             String date = sdf.format(gs.getPriceListElement(i).getTime());
         	series.getData().add(new XYChart.Data<String, Number>(sdf.format(currentDate), gs.getPriceListElement(i).getPrice()));
         	System.out.println("TEST: Datum: " + sdf.format(currentDate));
+//        	System.out.println(gs.getPriceListElement(i).getTime());
         }
         Scene scene  = new Scene(lineChart, 640, 480);
         lineChart.getData().setAll(series);
