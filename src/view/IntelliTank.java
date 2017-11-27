@@ -29,7 +29,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 //import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -146,7 +145,7 @@ public class IntelliTank extends Application {
 			}
 		});
     	vbox.getChildren().add(route);
-    	final ComboBox<String> priceCombobox = new ComboBox();
+    	final ComboBox<String> priceCombobox = new ComboBox<>();
     	priceCombobox.setPromptText("Preis");
     	priceCombobox.setPrefSize(150, 40);
     	priceCombobox.setStyle("-fx-background-image:url(/img/euro.png);"
@@ -155,7 +154,7 @@ public class IntelliTank extends Application {
     			+ "-fx-background-position:center;"
     			+ "-fx-font-size: 16;"
     			+ "-fx-font-weight:bold");
-    	Image euroImg = new Image(getClass().getResourceAsStream("/img/euro.png"), 35, 35, false, false);
+    	//Image euroImg = new Image(getClass().getResourceAsStream("/img/euro.png"), 35, 35, false, false);
         ObservableList<String> menuItems = FXCollections.observableArrayList();
         for(int i = 0; i < gsc.getRoute().getLength(); i++) {
         	menuItems.add(gsc.getRoute().get(i).getStation().getName());
@@ -165,9 +164,8 @@ public class IntelliTank extends Application {
 			
 			@Override
 			public void handle(ActionEvent arg0) {
-				String gasStation = priceCombobox.getSelectionModel().getSelectedItem();
     			GasStation gs = gsc.getRoute().get(priceCombobox.getSelectionModel().getSelectedIndex()).getStation();
-    			PriceDiagram diagramm = new PriceDiagram(gs, gasStation);
+    			PriceDiagram diagramm = new PriceDiagram(gs);
     			diagramm.generateDiagramm();
 			}
 		});
