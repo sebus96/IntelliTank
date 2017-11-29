@@ -70,7 +70,8 @@ public class CSVReader {
 		}
 	}
 	
-	private static void importPrice(GasStation gs) {
+	public static void importPrice(GasStation gs) {
+//		double start = System.nanoTime();
 		String filename = "data/Benzinpreise/" + gs.getID() + ".csv";
 		List<String> lines = readCSV(filename);
 		List<Price> prices = new ArrayList<Price>();
@@ -82,6 +83,8 @@ public class CSVReader {
 			prices.add(new Price(getDate(lineElements[0]), getInteger(lineElements[1])));
 		}
 		gs.setPriceList(prices);
+//		double time = (System.nanoTime() - start) / 1000 / 1000 / 1000;
+//		System.out.println("time: " + time);
 	}
 	
 	private static String[] prepareRowData(String row) {

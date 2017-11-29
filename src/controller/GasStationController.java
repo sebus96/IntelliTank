@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import io.CSVReader;
@@ -15,7 +17,7 @@ public class GasStationController {
 		allStations = CSVReader.importGasStations();
 		route = CSVReader.importRoute(allStations);
 		CSVReader.importPrices(route);
-		//this.trainPrediction();
+		this.trainPrediction();
 	}
 	
 	public void addGasStation(GasStation station) {
@@ -35,6 +37,17 @@ public class GasStationController {
 	
 	public void trainPrediction() {
 		prediction = new PredictionUnit(route.get(0).getStation());
+//		CSVReader.importPrice(allStations.get(3006));
+//		prediction = new PredictionUnit(allStations.get(3006));
 		prediction.start();
+		prediction.test();
+		prediction.checkDate(new Date());
+		System.out.println(prediction.checkDayHour(Calendar.MONDAY, 18));
+		System.out.println(prediction.checkDayHour(Calendar.TUESDAY, 18));
+		System.out.println(prediction.checkDayHour(Calendar.WEDNESDAY, 18));
+		System.out.println(prediction.checkDayHour(Calendar.THURSDAY, 18));
+		System.out.println(prediction.checkDayHour(Calendar.FRIDAY, 18));
+		System.out.println(prediction.checkDayHour(Calendar.SATURDAY, 18));
+		System.out.println(prediction.checkDayHour(Calendar.SUNDAY, 18));
 	}
 }
