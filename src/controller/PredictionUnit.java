@@ -21,7 +21,7 @@ public class PredictionUnit {
 	
 	public int checkDate(Date d) {
 		double res = p.output(d);
-		System.out.println(gs.getID() + ") " + gs.getBrand() + " " + gs.getName() + ": " + (res/1000.0) + " €");
+		System.out.println(gs.getID() + ") " + gs.getBrand() + " " + gs.getName() + ": " + (res/1000.0) + " ï¿½");
 		return (int)res;
 	}
 	
@@ -42,7 +42,7 @@ public class PredictionUnit {
 			}
 			avgDiff += diff/gs.getPriceListSize();
 		}
-		System.out.println("Average: " + ((int)avgDiff/1000.0) + " €" + "\nMaximum: " + ((int)maxDiff/1000.0) + " €");
+		System.out.println("Average: " + ((int)avgDiff/1000.0) + " ?" + "\nMaximum: " + ((int)maxDiff/1000.0) + " ?");
 	}
 	
 //	public void startNetwork() {

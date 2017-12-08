@@ -35,7 +35,7 @@ public class Perceptron {
 	* Perzeptron wird trainiert.
 	*
 	* @param traindata Datensatz zum Training
-	* @return true||false Je nach dem, ob 95% richtig erkannt werden, hängt der Rückgabewert davon ab
+	* @return true||false Je nach dem, ob 95% richtig erkannt werden, haengt der Rueckgabewert davon ab
 	*/
 	public boolean train(GasStation gs, Date until) {
 		double totalDifference = 0;
@@ -84,7 +84,7 @@ public class Perceptron {
 	
 	/**
 	* Berechnet das Skalarprodukt zwischen den Gewichten und dem Eingabevektor.
-	* @param input Datum für das der Preis bestimmt werden soll
+	* @param input Datum fuer das der Preis bestimmt werden soll
 	* @return berechneter Preis
 	*/
 	public double output(Date d) {
@@ -116,7 +116,7 @@ public class Perceptron {
 	}
 	
 	/**
-	* Gibt Anzahl der Epochen zurück.
+	* Gibt Anzahl der Epochen zurueck.
 	* @return anzahlEpochen
 	*/
 	public int getEpochen() {
