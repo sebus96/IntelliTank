@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
 public class GasStation {
 	private int id;
 	private String name, brand, street, location, houseNumber;
 	private int postcode;
+	private FederalState state;
 	private double longitude, latitude; // Laengen- und Breitengrad
 	private List<Price> historicPrices;
 	private List<Price> projectedPrices;
 	
-	public GasStation(int id, String name, String brand, String street, String houseNumber, int postcode, String location,
+	public GasStation(int id, String name, String brand, String street, String houseNumber, int postcode, FederalState state, String location,
 			double longitude, double latitude) {
 		this.id = id;
 		this.name = name;
@@ -25,6 +27,7 @@ public class GasStation {
 		this.longitude = longitude; // Laenge
 		this.historicPrices = new ArrayList<Price>();
 		this.projectedPrices = new ArrayList<Price>();
+		this.state = state;
 	}
 	
 //	public GasStation(Map<String, String> textAttributes, Map<String, Integer> numberAttributes, Map<String, Double> positionAttributes){
@@ -50,6 +53,10 @@ public class GasStation {
 
 	public String getBrand() {
 		return brand;
+	}
+	
+	public FederalState getState() {
+		return state;
 	}
 
 	public String getStreet() {
@@ -102,14 +109,14 @@ public class GasStation {
 			}
 			prevPrice = p.getPrice();
 		}
-                for(Price p: this.projectedPrices) {
+		for(Price p: this.projectedPrices) {
 			if(p.getTime().after(d)) {
 				return prevPrice;
 			}
 			prevPrice = p.getPrice();
 			
 		}
-		return prevPrice;
+		return -1;//prevPrice;
 	}
 	
 	public int getPriceListSize() {

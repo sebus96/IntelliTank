@@ -13,14 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import model.FederalState;
 import model.GasStation;
 import model.Price;
 import model.Route;
 
 public class CSVReader {
+	private static List<Postalcode> post2state;
 	
 	public static Map<Integer, GasStation> importGasStations() {
 		String filename = "data/Tankstellen.csv";
+		importPostalcodes();
 		List<String> lines = readCSV(filename);
 		Map<Integer, GasStation> stations = new HashMap<>();
 		for(String line: lines) {
@@ -28,13 +31,15 @@ public class CSVReader {
 			if(lineElements.length != 9) {
 				System.err.println("Input stations: Illegal Input row size");
 			}
+			int postcode = getInteger(lineElements[5]);
 			GasStation station = new GasStation(
 					getInteger(lineElements[0]),// id
 					lineElements[1],// name
 					lineElements[2],// brand
 					lineElements[3],// street
 					lineElements[4],// houseNumber
-					getInteger(lineElements[5]),// postcode
+					postcode,// postcode
+					getState(postcode), // state
 					lineElements[6],// location
 					getDouble(lineElements[7]),// longitude
 					getDouble(lineElements[8])// latitude
@@ -42,6 +47,36 @@ public class CSVReader {
 			stations.put(station.getID(), station);
 		}
 		return stations;
+	}
+	
+	public static FederalState getState(int postalCode) {
+		for(Postalcode pc : post2state) {
+			if(pc.isInArea(postalCode)) {
+				return pc.getState();
+			}
+		}
+		return null;
+	}
+	
+	private static void importPostalcodes(){
+		if(post2state != null) return;
+		String filename = "own data/postalcode2federalstate.csv";
+		post2state = new ArrayList<>();
+		List<String> lines = readCSV(filename);
+		for(String line: lines) {
+			String[] lineElements = line.split(";");
+			if(lineElements.length != 3) {
+				System.out.println(line);
+				System.err.println("Input postalcode: Illegal Input row size");
+				continue;
+			}
+			Postalcode code = new Postalcode(
+					getInteger(lineElements[0]),// lower
+					getInteger(lineElements[1]),// upper
+					lineElements[2]// state
+			);
+			post2state.add(code);
+		}
 	}
 	
 	public static Route importRoute(Map<Integer, GasStation> stations) {
@@ -146,3 +181,42 @@ public class CSVReader {
 		}
 	}
 }
+
+class Postalcode{
+	private int upper, lower;
+	private String state;
+	
+	public Postalcode(int lower, int upper, String state){
+		this.upper = upper;
+		this.lower = lower;
+		this.state = state;
+	}
+	
+	public boolean isInArea(int postcode){
+		return postcode <= upper && postcode >= lower;
+	}
+	
+	public FederalState getState(){
+		switch(this.state){
+		case "Baden-Württemberg":		return FederalState.BW;
+		case "Bayern":					return FederalState.BY;
+		case "Berlin":					return FederalState.BE;
+		case "Brandenburg":				return FederalState.BB;
+		case "Bremen":					return FederalState.HB;
+		case "Hamburg":					return FederalState.HH;
+		case "Hessen":					return FederalState.HE;
+		case "Mecklenburg-Vorpommern":	return FederalState.MV;
+		case "Niedersachsen":			return FederalState.NI;
+		case "Nordrhein-Westfalen":		return FederalState.NW;
+		case "Rheinland-Pfalz":			return FederalState.RP;
+		case "Saarland":				return FederalState.SL;
+		case "Sachsen":					return FederalState.SN;
+		case "Sachsen-Anhalt":			return FederalState.ST;
+		case "Schleswig-Holstein":		return FederalState.SH;
+		case "Thüringen":				return FederalState.TH;
+		default:						return FederalState.DEF;
+		}
+	}
+}
+
+
