@@ -73,6 +73,7 @@ public class IntelliTank extends Application {
         //Temporary
         mm = new MainModel();
         mm.calculateFPGSP(gsc.getRoute());
+        mm.calculateBasicGasUsage(gsc.getRoute());
         //temporary
         
         //Methods to fill each part with content
@@ -242,7 +243,7 @@ public class IntelliTank extends Application {
 
     private void displayResult() {
         DecimalFormat f = new DecimalFormat("#0.00"); 
-        Label output = new Label("Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt " + f.format(gsc.getRoute().getTotalEuros()) + "Eur.");
+        Label output = new Label("Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt " + f.format(gsc.getRoute().getTotalEuros()) + "Eur. (" + gsc.getRoute().getTotalEuroBasic() + ")");
     	Image gasStation = new Image(getClass().getResourceAsStream("/img/gasstation.png"), 5, 5, false, false);
         output.setGraphic(new ImageView(gasStation));
 //    	output.setStyle("-fx-font-size: 100px");

@@ -13,7 +13,32 @@ import java.text.DecimalFormat;
  * @author Admin
  */
 public class MainModel {
-
+    //Calculate how much it would cost if you just filled the tank completely at every station(as comparison)
+    public void calculateBasicGasUsage(Route route) {
+    
+        final double gasUsedPerKm = 5.6 / 100;
+        final double maxDistance = route.getTankCapacity() / gasUsedPerKm;
+        double totalEuros = 0;
+        double currentFuelAmount = 0;
+        double lostFuel = 0;
+        for (int i = 0; i < route.getLength(); i++) {
+            //fill tank completely at the first station
+            if(i==0) {
+                currentFuelAmount = route.getTankCapacity();
+                totalEuros = route.getTankCapacity() * route.get(i).getStation().getPrice(route.get(i).getTime()) / 1000;
+            }
+            //fill the missing amount from last stop
+            else {
+                double distanceFromLastStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i - 1).getStation().getLatitude(), route.get(i - 1).getStation().getLongitude());
+                lostFuel = gasUsedPerKm * distanceFromLastStation;
+                
+                totalEuros += lostFuel * route.get(i).getStation().getPrice(route.get(i).getTime()) / 1000;
+                System.out.println("neu " + totalEuros);
+            }
+            
+        }
+        route.setTotalEuroBasic(totalEuros);
+    }
     //FPGSP = Fixed Path Gas Station Problem
     public void calculateFPGSP(Route route) {
 
