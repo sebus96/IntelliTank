@@ -33,7 +33,7 @@ public class MainModel {
                 lostFuel = gasUsedPerKm * distanceFromLastStation;
                 
                 totalEuros += lostFuel * route.get(i).getStation().getPrice(route.get(i).getTime()) / 1000;
-                System.out.println("neu " + totalEuros);
+                
             }
             
         }
