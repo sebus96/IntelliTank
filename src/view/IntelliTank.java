@@ -29,6 +29,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 //import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -246,9 +247,9 @@ public class IntelliTank extends Application {
         Label output = new Label("Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt " + f.format(gsc.getRoute().getTotalEuros()) + "Eur. (" + f.format(gsc.getRoute().getTotalEuroBasic()) + " Eur)");
     	Image gasStation = new Image(getClass().getResourceAsStream("/img/gasstation.png"), 5, 5, false, false);
         output.setGraphic(new ImageView(gasStation));
-//    	output.setStyle("-fx-font-size: 100px");
-//    	output.setFont(new Font("Arial", 30));
-//    	output.setPrefSize(3330, 30);
+    	output.setStyle("-fx-font-size: 100px");
+    	output.setFont(new Font("Arial", 30));
+    	output.setPrefSize(3330, 30);
         gc.fillText(output.getText(),10,50);
     }
 }

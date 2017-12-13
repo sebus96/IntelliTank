@@ -1,6 +1,7 @@
 package view;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javafx.scene.Scene;
@@ -49,9 +50,26 @@ public class PriceDiagram {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(gs.getName());
         Stage stage = new Stage();
-        for(int i= 0; i < gs.getPriceListSize(); i++) {
+        Calendar c = Calendar.getInstance();
+    	c.setTime(gs.getPriceListElement(0).getTime());
+        c.set(Calendar.HOUR_OF_DAY, 12);
+        c.set(Calendar.MINUTE, 0);
+        int sum = 0;
+        int ctr = 0;
+        Price lastPrice = gs.getPriceListElement(0);
+        for(int i = 0; i < gs.getPriceListSize(); i++) {
         	Price p = gs.getPriceListElement(i);
-        	series.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), p.getPrice()));
+        	long timeBetween = p.getTime().getTime() - lastPrice.getTime().getTime();
+        	timeBetween /= 1000*60*60;
+        	sum += lastPrice.getPrice()*timeBetween;
+        	ctr += timeBetween;
+        	if(p.getTime().after(c.getTime())) {
+	        	c.add(Calendar.WEEK_OF_YEAR, 1);
+	        	series.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), sum/ctr));
+	        	sum = 0;
+	        	ctr = 0;
+        	}
+        	lastPrice = p;
         }
         Scene scene  = new Scene(lineChart, 640, 480);
         lineChart.getData().add(series);
