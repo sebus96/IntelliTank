@@ -80,7 +80,8 @@ public class CSVReader {
 	}
 	
 	public static Route importRoute(Map<Integer, GasStation> stations) {
-		String filename = "data/Fahrzeugrouten/Bertha Benz Memorial Route.csv";
+//		String filename = "data/Fahrzeugrouten/Bertha Benz Memorial Route.csv";
+		String filename = "own data/routes/Hannover Hildesheim.csv";
 		List<String> lines = readCSV(filename);
 		Route route = new Route(getInteger(lines.remove(0)));
 		for(String line: lines) {
