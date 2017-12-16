@@ -201,7 +201,10 @@ public class IntelliTank extends Application {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         double priceForStation = (double)gsc.getRoute().get(index).getStation().getPrice(gsc.getRoute().get(index).getTime())/1000;
-        gc.fillText(priceForStation + "",180,circleStart + circleHeight/2);
+        if(priceForStation < 0)
+            gc.fillText("---",180,circleStart + circleHeight/2);
+        else
+            gc.fillText(priceForStation + "",180,circleStart + circleHeight/2);
         gc.setTextAlign(TextAlignment.LEFT);
         gc.fillText(gsc.getRoute().get(index).getStation().getName() + ", " + gsc.getRoute().get(index).getStation().getPostcode() + " " + gsc.getRoute().get(index).getStation().getLocation(), 220, circleStart + circleHeight/2);
         

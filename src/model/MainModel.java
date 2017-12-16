@@ -90,6 +90,7 @@ public class MainModel {
             gasPrice = route.get(i).getStation().getProjectedPrice(route.get(i).getTime());
         } */ else {
             System.out.println("Error: Gas Price for " + route.get(i).getStation().getName() + " not found for " + route.get(i).getTime());
+            gasPrice = 9999;
         }
         //System.out.println("Checking: " + gasPrice);
         //Try to find a better price in the previous Gas stations
@@ -137,9 +138,10 @@ public class MainModel {
             if (gasPrice == 0) {
                 if (route.get(j).getStation().getPrice(route.get(j).getTime()) != -1) {
                     gasPrice = route.get(j).getStation().getPrice(route.get(j).getTime());
-                }/* else if (route.get(j).getStation().getPrice(route.get(i).getTime()) != -1) {
-                    gasPrice = route.get(j).getStation().getPrice(route.get(j).getTime());
-                }*/
+                } 
+                else {
+                    continue;
+                }
                 nextStationNumber = j;
             } else {
                 if (route.get(j).getStation().getPrice(route.get(j).getTime()) < gasPrice && route.get(j).getStation().getPrice(route.get(j).getTime()) > 0) {
@@ -174,7 +176,7 @@ public class MainModel {
         double totalEuros = 0, totalKm = 0;
         for (int i = 0; i < route.getLength(); i++) {
             //System.out.println("------");
-            //System.out.println("Station " + route.get(i).getStation().getPrice(route.get(i).getTime()));
+            //System.out.println("Station " + route.get(i).getStation().getPrice(route.get(i).getTime()) + " breakp? " + route.get(i).isBreakPoint() + " next? " + route.get(i).isNextStation());
             //Update fuelStatus(which is gonna be the black bar) here
             if (i > 0) {
                 double distanceFromLastStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i - 1).getStation().getLatitude(), route.get(i - 1).getStation().getLongitude());
