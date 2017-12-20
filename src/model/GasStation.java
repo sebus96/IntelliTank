@@ -146,4 +146,9 @@ public class GasStation {
     public List<Price> getProjectedPrices() {
         return projectedPrices;
     }*/
+	
+	@Override
+	public String toString() {
+		return name + " (" + id + ")";
+	}
 }

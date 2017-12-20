@@ -88,4 +88,9 @@ public class RefuelStop {
     public void setNextStation(RefuelStop nextStation) {
         this.nextStation = nextStation;
     }
+    
+    @Override
+    public String toString() {
+    	return "(" + time + ": " + station + ")";
+    }
 }
