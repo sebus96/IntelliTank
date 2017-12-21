@@ -1,20 +1,24 @@
 package controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import io.CSVReader;
 import model.GasStation;
+import model.RefuelStop;
 import model.Route;
 
 public class GasStationController {
 	private Map<Integer, GasStation> allStations;
 	private Route route;
-	private PredictionUnit prediction;
+	private List<PredictionUnit> predictions;
 	
 	public GasStationController() {
 		allStations = CSVReader.importGasStations();
 		route = CSVReader.importRoute(allStations);
 		CSVReader.importPrices(route);
+		this.predictions = new ArrayList<>();
 		this.trainPrediction();
 	}
 	
@@ -34,11 +38,20 @@ public class GasStationController {
 	}
 	
 	public void trainPrediction() {
-		GasStation gs = route.get(0).getStation();
-		prediction = new PredictionUnit(gs);
-//		CSVReader.importPrice(allStations.get(3006));
-//		prediction = new PredictionUnit(allStations.get(3006));
-		prediction.train(gs.getPriceListElement(8000).getTime());
-		prediction.testHourSteps(gs.getPriceListElement(8000).getTime());
+		System.out.println("Start prediction");
+		for(int i = 0; i < route.getLength(); i++) {
+			RefuelStop rs = route.get(i);
+			GasStation gs = rs.getStation();
+			if (gs.getPriceListSize() == 0) {
+				System.err.println("Pricelist of " + gs + " does not exist");
+				continue;
+			}
+			PredictionUnit pu = new PredictionUnit(gs, route.get(0).getTime());
+			predictions.add(pu);
+			pu.train();
+			rs.setPredictedPrices(pu.testAndSetHourSteps());
+			System.out.println(((i + 1)*100 / route.getLength()) + " %");
+		}
+		System.out.println("Prediction finished");
 	}
 }

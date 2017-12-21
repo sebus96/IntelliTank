@@ -71,13 +71,13 @@ public class Perceptron {
 			epochCounter++;
 			//System.out.println(totalDifference);
 		} while(totalDifference/listCounter > precision && epochCounter <= this.epochs);
-		System.out.println(epochCounter + " Epochen");
-		System.out.print("[");
+		//System.out.println(epochCounter + " Epochen");
+		/*System.out.print("[");
 		for(int i = 0; i < weights.length; i++) {
 			if(i==7 || i==7+24) System.out.println();
 			System.out.print(weights[i] + (i < weights.length-1 ? ", ": ""));
 		}
-		System.out.print("]\n");
+		System.out.print("]\n");*/
 		return totalDifference/listCounter <= precision;
 	}
 	
@@ -99,7 +99,7 @@ public class Perceptron {
 		int[] res = new int[oldPriceNumber];
 		c.add(Calendar.HOUR_OF_DAY, -1 * oldPriceNumber);
 		for(int i = 0; i < oldPriceNumber; i++) {
-			res[i] = station.getPrice(c.getTime());
+			res[i] = station.getHistoricPrice(c.getTime());
 			c.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		return res;
