@@ -201,8 +201,11 @@ public class IntelliTank extends Application {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         double priceForStation = (double)gsc.getRoute().get(index).getStation().getPrice(gsc.getRoute().get(index).getTime())/1000;
-        if(priceForStation < 0)
-            gc.fillText("---",180,circleStart + circleHeight/2);
+        if(gsc.getRoute().get(index).isPriceGuessed() == true) {
+            gc.setFill(Color.RED);
+            gc.fillText((double)gsc.getRoute().get(index).getGuessedPrice()/1000+"",180,circleStart + circleHeight/2);
+            gc.setFill(Color.BLACK);
+        }
         else
             gc.fillText(priceForStation + "",180,circleStart + circleHeight/2);
         gc.setTextAlign(TextAlignment.LEFT);

@@ -89,8 +89,9 @@ public class MainModel {
         }/* else if (route.get(i).getStation().getProjectedPrice(route.get(i).getTime()) != -1) {
             gasPrice = route.get(i).getStation().getProjectedPrice(route.get(i).getTime());
         } */ else {
-            System.out.println("Error: Gas Price for " + route.get(i).getStation().getName() + " not found for " + route.get(i).getTime());
-            gasPrice = 9999;
+            gasPrice = guessPrice(route,i);
+            System.out.println("Error: Gas Price for " + route.get(i).getStation().getName() + " not found for " + route.get(i).getTime() + ". Guessed Price: " + gasPrice);
+            
         }
         //System.out.println("Checking: " + gasPrice);
         //Try to find a better price in the previous Gas stations
@@ -126,7 +127,7 @@ public class MainModel {
     private RefuelStop findNextStation(Route route, int i, double maxDistance) {
 
         double traveledDistance = 0;
-        int gasPrice = 0;
+        double gasPrice = 0;
         int nextStationNumber = -1;
         for (int j = i + 1; j < route.getLength(); j++) {
 
@@ -140,17 +141,15 @@ public class MainModel {
                     gasPrice = route.get(j).getStation().getPrice(route.get(j).getTime());
                 } 
                 else {
+                    gasPrice = guessPrice(route,j);
                     continue;
                 }
                 nextStationNumber = j;
             } else {
-                if (route.get(j).getStation().getPrice(route.get(j).getTime()) < gasPrice && route.get(j).getStation().getPrice(route.get(j).getTime()) > 0) {
+                if (route.get(j).getStation().getPrice(route.get(j).getTime()) <= gasPrice && route.get(j).getStation().getPrice(route.get(j).getTime()) > 0) {
                     gasPrice = route.get(j).getStation().getPrice(route.get(j).getTime());
                     nextStationNumber = j;
-                }/* else if (route.get(j).getStation().getHistoricPrice(route.get(j).getTime()) < gasPrice && route.get(j).getStation().getHistoricPrice(route.get(j).getTime()) > 0) {
-                    gasPrice = route.get(j).getStation().getHistoricPrice(route.get(j).getTime());
-                    nextStationNumber = j;
-                }*/
+                }
             }
 
         }
@@ -174,9 +173,10 @@ public class MainModel {
         //RefuelStop refillStation = route.get(0).getNextStation();
         double currentTankStatus = 0;
         double totalEuros = 0, totalKm = 0;
+        //iterate through all the stations in the route
         for (int i = 0; i < route.getLength(); i++) {
             //System.out.println("------");
-            //System.out.println("Station " + route.get(i).getStation().getPrice(route.get(i).getTime()) + " breakp? " + route.get(i).isBreakPoint() + " next? " + route.get(i).isNextStation());
+            //System.out.println("Station " + route.get(i).getStation().getPrice(route.get(i).getTime()) + " bp= " + route.get(i).isBreakPoint() + " nxt= " + route.get(i).isNextStation());
             //Update fuelStatus(which is gonna be the black bar) here
             if (i > 0) {
                 double distanceFromLastStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i - 1).getStation().getLatitude(), route.get(i - 1).getStation().getLongitude());
@@ -193,6 +193,29 @@ public class MainModel {
             }
 
             double kmToNextTarget = 0;
+            
+            //Falls die "next" Tankstelle ein Breakpoint ist, bedeutet das, dass sie billiger ist, als die aktuelle. Also nur das nötigste tanken
+            if (route.get(i).getNextStation().isBreakPoint() == true) {
+                for (int j = i + 1; j < route.getLength(); j++) {
+
+                        kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
+                        
+                        if (route.get(j).isNextStation() || route.get(j).isBreakPoint()) {
+                            //System.out.println("Its not the cheapest one, fill just enough to reach next target: " + kmToNextTarget);
+                            break;
+                        }
+                    }
+            }
+            //Falls die "next" Tankstelle kein Breakpoint ist, bedeutet das, dass die aktuelle Tankstelle billiger ist. Also volltanken, falls nicht kurz vor Ende der Route
+            else {
+                //volltanken
+                for (int j = i + 1; j < route.getLength(); j++) {
+                   kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
+                }
+                //System.out.println("Its cheaper than any in radius. Fill completely. Km to end: " + kmToNextTarget);
+            }
+            
+            /*
             //if its a breakpoint+nextstation = fill tank completely. Only fill less if final gasstation is nearby. then just fill enough to reach it
             if (route.get(i).isNextStation() && route.get(i).isBreakPoint()) {//.equals(refillStation)) {
 
@@ -201,22 +224,22 @@ public class MainModel {
 
                         kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
 
-                        if (route.get(j).isNextStation() && route.get(j).isBreakPoint()) {//equals(route.get(i).getNextStation())/* oder next??*/) {
+                        if (route.get(j).isNextStation() && route.get(j).isBreakPoint()) {//equals(route.get(i).getNextStation())) {
                             break;
                         }
                     }
-                    //System.out.println("Its  a next station, but the upcoming nextstation is cheaper, so only fill enough to get there: " + kmToNextTarget);
+                    System.out.println("Its  a next station, but the upcoming nextstation is cheaper, so only fill enough to get there: " + kmToNextTarget);
                 } else {
                     for (int j = i + 1; j < route.getLength(); j++) {
 
                         kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
                         //refillStation = route.get(i).getNextStation();
                     }
-                    //System.out.println("Its a next station and its cheaper than the upcoming one. Fill completely. Km to end: " + kmToNextTarget);
-                    //System.out.println("New next: " + route.get(i).getStation().getPrice(route.get(i).getTime()));
+                    System.out.println("Its a next station and its cheaper than the upcoming one. Fill completely. Km to end: " + kmToNextTarget);
+                    System.out.println("New next: " + route.get(i).getStation().getPrice(route.get(i).getTime()));
                 }
-                //System.out.println("Its a next station + breakpoint station. Km to end: " + kmToNextTarget);
-                //System.out.println("New next: " + route.get(i).getStation().getPrice(route.get(i).getTime()));
+                System.out.println("Its a next station + breakpoint station. Km to end: " + kmToNextTarget);
+                System.out.println("New next: " + route.get(i).getStation().getPrice(route.get(i).getTime()));
             } //Means that the current station is more expensive than "next", so only refuel the minimum
             else if (route.get(i).getNextStation().isBreakPoint() == true) {
 
@@ -224,38 +247,41 @@ public class MainModel {
 
                     kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
 
-                    if (route.get(j).isBreakPoint() == true/* oder next??*/) {
+                    if (route.get(j).isBreakPoint() == true) {
                         break;
                     }
                 }
-                //System.out.println("Its  a breakpoint station only. Km to next breakpoint: " + kmToNextTarget);
-            } else if (route.get(i).isNextStation()) {
+                System.out.println("Its  a breakpoint station only. Km to next breakpoint: " + kmToNextTarget);
+            } 
+            else if (route.get(i).isNextStation()) {
                 if (route.get(i).getNextStation().isBreakPoint()) {
                     for (int j = i + 1; j < route.getLength(); j++) {
 
                         kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
 
-                        if (route.get(j).equals(route.get(i).isNextStation())/* oder next??*/) {
+                        if (route.get(j).equals(route.get(i).isNextStation())) {
                             break;
                         }
                     }
-                    //System.out.println("Its  a next station only. The upcoming nextstation is cheaper, so only fill enough to get there: " + kmToNextTarget);
+                    System.out.println("Its  a next station only. The upcoming nextstation is cheaper, so only fill enough to get there: " + kmToNextTarget);
                 } else {
                     for (int j = i + 1; j < route.getLength(); j++) {
 
                         kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
                         //refillStation = route.get(i).getNextStation();
                     }
-                    //System.out.println("Its a next station but not a breakpoint and its cheaper than the upcoming one. Fill completely. Km to end: " + kmToNextTarget);
-                    //System.out.println("New next: " + route.get(i).getStation().getPrice(route.get(i).getTime()));
+                    System.out.println("Its a next station but not a breakpoint and its cheaper than the upcoming one. Fill completely. Km to end: " + kmToNextTarget);
+                    System.out.println("New next: " + route.get(i).getStation().getPrice(route.get(i).getTime()));
                 }
-            }
+            }*/
             if ((kmToNextTarget * gasUsedPerKm) + currentTankStatus > route.getTankCapacity()) {
                 //System.out.println("Liters too much (" + (kmToNextTarget * gasUsedPerKm) + ") cut to " + (route.getTankCapacity() - currentTankStatus));
+                
                 route.get(i).setRefillAmount(route.getTankCapacity() - currentTankStatus);
                 currentTankStatus = route.getTankCapacity();
             } else {
                 double refillAmount = kmToNextTarget * gasUsedPerKm - currentTankStatus;
+                //System.out.println(refillAmount+" = "+kmToNextTarget+" * "+gasUsedPerKm+" - "+currentTankStatus);
                 route.get(i).setRefillAmount(refillAmount);
                 currentTankStatus += refillAmount;
             }
@@ -267,5 +293,35 @@ public class MainModel {
         route.setTotalLiters(totalKm * gasUsedPerKm);
         route.setTotalEuros(totalEuros);
 
+    }
+    
+    //Rät den Preis Anhand aller anderen Tankstellen auf der Route. Einfluss abhängig von Entfernung
+    private double guessPrice(Route route, int i) {
+        
+        //Die summe aller Distanzen zur Ausgangstankstelle
+        double totalDistance = 0;
+        //Berechnet totalDistance
+        for(int j = 0;j<route.getLength(); j++) {
+            if(i == j || route.get(j).getStation().getPrice(route.get(i).getTime()) < 0) {
+                
+                continue;
+            }
+            totalDistance += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude());   
+        }
+        double guessedPrice = 0;
+        double divisor = 0;
+        //addiert alle Preise mit deren Gewichten zusammen
+        for(int j = 0;j<route.getLength(); j++) {
+            if(i == j || route.get(j).getStation().getPrice(route.get(i).getTime()) < 0) {
+                continue;
+            }
+            double priceAtStation = route.get(j).getStation().getPrice(route.get(i).getTime());
+            double distanceToStation = calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude());    
+            guessedPrice += (1-(distanceToStation/totalDistance)) * priceAtStation;
+            divisor += (1-distanceToStation/totalDistance);
+        }
+        guessedPrice /= divisor;
+        route.get(i).setGuessedPrice((int)guessedPrice);
+        return guessedPrice;
     }
 }

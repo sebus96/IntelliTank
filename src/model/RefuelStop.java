@@ -6,12 +6,27 @@ public class RefuelStop {
 
     private Date time;
     private GasStation station;
+    private int guessedPrice = 0;
 
     //Variables below are needed for the Fixed Path Gas Station Problem
     private RefuelStop prevStation;
     private RefuelStop nextStation;
     private boolean breakPoint;
     private boolean nextStationBool;
+    private boolean priceGuessed;
+
+    public int getGuessedPrice() {
+        return guessedPrice;
+    }
+
+    public void setGuessedPrice(int guessedPrice) {
+        this.priceGuessed = true;
+        this.guessedPrice = guessedPrice;
+    }
+
+    public boolean isPriceGuessed() {
+        return priceGuessed;
+    }
 
     public boolean isNextStation() {
         return nextStationBool;
@@ -88,9 +103,9 @@ public class RefuelStop {
     public void setNextStation(RefuelStop nextStation) {
         this.nextStation = nextStation;
     }
-    
+
     @Override
     public String toString() {
-    	return "(" + time + ": " + station + ")";
+        return "(" + time + ": " + station + ")";
     }
 }
