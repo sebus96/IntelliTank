@@ -8,7 +8,7 @@ public class Price {
 	
 	public Price(Date time, int price) {
 		this.time = time;
-		this.price = price;
+		this.price = roundPrice(price);
 	}
 	
 	public Date getTime() {
@@ -17,5 +17,9 @@ public class Price {
 	
 	public int getPrice() {
 		return price;
+	}
+	
+	public static int roundPrice(int price) {
+		return (int)(Math.ceil(( price + 1 ) / 10.0 ) * 10 ) - 1;
 	}
 }

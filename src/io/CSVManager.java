@@ -18,7 +18,7 @@ import model.GasStation;
 import model.Price;
 import model.Route;
 
-public class CSVReader {
+public class CSVManager {
 	private static List<Postalcode> post2state;
 	
 	public static Map<Integer, GasStation> importGasStations() {
@@ -141,6 +141,23 @@ public class CSVReader {
 		gs.setPriceList(prices);
 //		double time = (System.nanoTime() - start) / 1000 / 1000 / 1000;
 //		System.out.println("time: " + time);
+	}
+	
+	public static void importPredictionJobs() {
+		String filename = "";
+		List<String> lines = readCSV(filename);
+		if(lines == null) {
+			System.err.println("Could not import Prediction \"" + filename + "\"!");
+			return;
+		}
+		// TODO new PredictionPoint
+		for(String line: lines) {
+			String[] lineElements = prepareRowData(line);
+			if(lineElements.length != 3) {
+				System.err.println("Import prediction: Illegal Input row size");
+			}
+			// TODO create element
+		}
 	}
 	
 	private static String[] prepareRowData(String row) {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.CSVReader;
+import io.CSVManager;
 import model.GasStation;
 import model.RefuelStop;
 import model.Route;
@@ -15,9 +15,9 @@ public class GasStationController {
 	private List<PredictionUnit> predictions;
 	
 	public GasStationController() {
-		allStations = CSVReader.importGasStations();
-		route = CSVReader.importRoute(allStations);
-		CSVReader.importPrices(route);
+		allStations = CSVManager.importGasStations();
+		route = CSVManager.importRoute(allStations);
+		CSVManager.importPrices(route);
 		this.predictions = new ArrayList<>();
 		this.trainPrediction();
 	}
