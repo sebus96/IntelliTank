@@ -1,6 +1,5 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class RefuelStop {
     public RefuelStop(GasStation station, Date time) {
         this.station = station;
         this.time = time;
-        this.predictedPrices = new ArrayList<>();
+//        this.predictedPrices = new ArrayList<>();
     }
     
     @Deprecated // normalerweise sollten hier nur die vorhergesagten Preise verwendet werden
@@ -32,13 +31,15 @@ public class RefuelStop {
     
     public int getPredictedPrice(Date d) {
     	int prevPrice = -1;
+    	if(predictedPrices == null || predictedPrices.size() == 0) return -1;
 		for(Price p: this.predictedPrices) {
 			if(p.getTime().after(d)) {
 				return prevPrice;
 			}
 			prevPrice = p.getPrice();
 		}
-		return -1;//prevPrice;
+		System.err.println("Could not predict prices for more than 1 month!");
+		return -1;
     }
     
     public int getPredictedPrice() {
@@ -47,10 +48,6 @@ public class RefuelStop {
     
     public void setPredictedPrices( List<Price> predicted) {
     	this.predictedPrices = predicted;
-    }
-    
-    public void addPredictedPrice( Price p) {
-    	this.predictedPrices.add(p);
     }
 
     public int getGuessedPrice() {

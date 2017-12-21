@@ -48,8 +48,8 @@ public class GasStationController {
 			}
 			PredictionUnit pu = new PredictionUnit(gs, route.get(0).getTime());
 			predictions.add(pu);
-			pu.train();
-			rs.setPredictedPrices(pu.testAndSetHourSteps());
+			boolean trainSuccess = pu.train();
+			if(trainSuccess) rs.setPredictedPrices(pu.testAndSetHourSteps());
 			System.out.println(((i + 1)*100 / route.getLength()) + " %");
 		}
 		System.out.println("Prediction finished");
