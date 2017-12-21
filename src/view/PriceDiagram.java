@@ -65,7 +65,7 @@ public class PriceDiagram {
         	ctr += timeBetween;
         	if(p.getTime().after(c.getTime())) {
 	        	c.add(Calendar.WEEK_OF_YEAR, 1);
-	        	series.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), sum/ctr));
+	        	if(ctr > 0) series.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), sum/ctr));
 	        	sum = 0;
 	        	ctr = 0;
         	}

@@ -25,6 +25,10 @@ public class CSVReader {
 		String filename = "data/Tankstellen.csv";
 		importPostalcodes();
 		List<String> lines = readCSV(filename);
+		if(lines == null) {
+			System.err.println("Could not import gasstations!");
+			return null;
+		}
 		Map<Integer, GasStation> stations = new HashMap<>();
 		for(String line: lines) {
 			String[] lineElements = prepareRowData(line);
@@ -63,6 +67,10 @@ public class CSVReader {
 		String filename = "own data/postalcode2federalstate.csv";
 		post2state = new ArrayList<>();
 		List<String> lines = readCSV(filename);
+		if(lines == null){
+			System.err.println("Could not import Postalcodes!");
+			return;
+		}
 		for(String line: lines) {
 			String[] lineElements = line.split(";");
 			if(lineElements.length != 3) {
@@ -81,8 +89,14 @@ public class CSVReader {
 	
 	public static Route importRoute(Map<Integer, GasStation> stations) {
 //		String filename = "data/Fahrzeugrouten/Bertha Benz Memorial Route.csv";
+//		String filename = "own data/routes/Hildesheim Harz.csv";
+//		String filename = "own data/routes/Oldenburg Hannover.csv";
 		String filename = "own data/routes/Hannover Hildesheim.csv";
 		List<String> lines = readCSV(filename);
+		if(lines == null) {
+			System.err.println("Could not import Route \"" + filename + "\"!");
+			return null;
+		}
 		Route route = new Route(getInteger(lines.remove(0)));
 		for(String line: lines) {
 			String[] lineElements = prepareRowData(line);
@@ -91,6 +105,7 @@ public class CSVReader {
 			}
 			route.addRouteElement(stations.get(getInteger(lineElements[1])), getDate(lineElements[0]));
 		}
+		System.out.println(route);
 		return route;
 	}
 	
@@ -101,6 +116,7 @@ public class CSVReader {
 	}
 	
 	public static void importPrices(Route route) {
+		if(route == null) return;
 		for(int i = 0; i < route.getLength(); i++) {
 			importPrice(route.get(i).getStation());
 		}
@@ -110,6 +126,10 @@ public class CSVReader {
 //		double start = System.nanoTime();
 		String filename = "data/Benzinpreise/" + gs.getID() + ".csv";
 		List<String> lines = readCSV(filename);
+		if(lines == null){
+			System.err.println("Could not import prices for " + gs);
+			return;
+		}
 		List<Price> prices = new ArrayList<Price>();
 		for(String line: lines) {
 			String[] lineElements = prepareRowData(line);
