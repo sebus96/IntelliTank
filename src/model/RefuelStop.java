@@ -1,12 +1,16 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class RefuelStop {
 
     private Date time;
     private GasStation station;
     private int guessedPrice = 0;
+    
+    private List<Price> predictedPrices;
 
     //Variables below are needed for the Fixed Path Gas Station Problem
     private RefuelStop prevStation;
@@ -14,6 +18,40 @@ public class RefuelStop {
     private boolean breakPoint;
     private boolean nextStationBool;
     private boolean priceGuessed;
+
+    public RefuelStop(GasStation station, Date time) {
+        this.station = station;
+        this.time = time;
+        this.predictedPrices = new ArrayList<>();
+    }
+    
+    @Deprecated // normalerweise sollten hier nur die vorhergesagten Preise verwendet werden
+    public int getHistoricPrice(Date d) { // TODO Bedarf?
+    	return station.getHistoricPrice(d);
+    }
+    
+    public int getPredictedPrice(Date d) {
+    	int prevPrice = -1;
+		for(Price p: this.predictedPrices) {
+			if(p.getTime().after(d)) {
+				return prevPrice;
+			}
+			prevPrice = p.getPrice();
+		}
+		return -1;//prevPrice;
+    }
+    
+    public int getPredictedPrice() {
+    	return this.getPredictedPrice(this.time);
+    }
+    
+    public void setPredictedPrices( List<Price> predicted) {
+    	this.predictedPrices = predicted;
+    }
+    
+    public void addPredictedPrice( Price p) {
+    	this.predictedPrices.add(p);
+    }
 
     public int getGuessedPrice() {
         return guessedPrice;
@@ -53,11 +91,6 @@ public class RefuelStop {
 
     public void setRefillAmount(double refillAmount) {
         this.refillAmount = refillAmount;
-    }
-
-    public RefuelStop(GasStation station, Date time) {
-        this.station = station;
-        this.time = time;
     }
 
     public Date getTime() {

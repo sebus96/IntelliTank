@@ -5,8 +5,6 @@
  */
 package model;
 
-import java.text.DecimalFormat;
-
 /**
  * This class contains Algorithms that can be executed by the controller
  *
@@ -25,14 +23,14 @@ public class MainModel {
             //fill tank completely at the first station
             if(i==0) {
                 currentFuelAmount = route.getTankCapacity();
-                totalEuros = route.getTankCapacity() * route.get(i).getStation().getPrice(route.get(i).getTime()) / 1000;
+                totalEuros = route.getTankCapacity() * route.get(i).getPredictedPrice() / 1000;
             }
             //fill the missing amount from last stop
             else {
                 double distanceFromLastStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i - 1).getStation().getLatitude(), route.get(i - 1).getStation().getLongitude());
                 lostFuel = gasUsedPerKm * distanceFromLastStation;
                 
-                totalEuros += lostFuel * route.get(i).getStation().getPrice(route.get(i).getTime()) / 1000;
+                totalEuros += lostFuel * route.get(i).getPredictedPrice() / 1000;
                 
             }
             
@@ -84,8 +82,8 @@ public class MainModel {
         int prevStationNumber = i;
         double gasPrice = 0;
         //check prices to find the price at that specific Date
-        if (route.get(i).getStation().getPrice(route.get(i).getTime()) != -1) {
-            gasPrice = route.get(i).getStation().getPrice(route.get(i).getTime());
+        if (route.get(i).getPredictedPrice() != -1) {
+            gasPrice = route.get(i).getPredictedPrice();
         }/* else if (route.get(i).getStation().getProjectedPrice(route.get(i).getTime()) != -1) {
             gasPrice = route.get(i).getStation().getProjectedPrice(route.get(i).getTime());
         } */ else {
@@ -107,8 +105,8 @@ public class MainModel {
             //if it passes if and else if, it either was more expensive or the price was not found
             //(Thought: Could it be that the previous station was in HistoricPrices-list and the current one in the projectedPrices-list?)
             //System.out.println((i-j) + " before, the price is: " + route.get(j).getStation().getPrice(route.get(j).getTime()));
-            if (route.get(j).getStation().getPrice(route.get(j).getTime()) < gasPrice && route.get(j).getStation().getPrice(route.get(j).getTime()) > 0) {
-                gasPrice = route.get(j).getStation().getPrice(route.get(j).getTime());
+            if (route.get(j).getPredictedPrice() < gasPrice && route.get(j).getPredictedPrice() > 0) {
+                gasPrice = route.get(j).getPredictedPrice();
                 prevStationNumber = j;
                 //System.out.println("new gas price: " + gasPrice);
             }/* else if (route.get(j).getStation().getPrice(route.get(j).getTime()) < gasPrice && route.get(j).getStation().getHistoricPrice(route.get(j).getTime()) > 0) {
@@ -137,8 +135,8 @@ public class MainModel {
             }
             //if there is no nextStation set yet
             if (gasPrice == 0) {
-                if (route.get(j).getStation().getPrice(route.get(j).getTime()) != -1) {
-                    gasPrice = route.get(j).getStation().getPrice(route.get(j).getTime());
+                if (route.get(j).getPredictedPrice() != -1) {
+                    gasPrice = route.get(j).getPredictedPrice();
                 } 
                 else {
                     gasPrice = guessPrice(route,j);
@@ -146,8 +144,8 @@ public class MainModel {
                 }
                 nextStationNumber = j;
             } else {
-                if (route.get(j).getStation().getPrice(route.get(j).getTime()) <= gasPrice && route.get(j).getStation().getPrice(route.get(j).getTime()) > 0) {
-                    gasPrice = route.get(j).getStation().getPrice(route.get(j).getTime());
+                if (route.get(j).getPredictedPrice() <= gasPrice && route.get(j).getPredictedPrice() > 0) {
+                    gasPrice = route.get(j).getPredictedPrice();
                     nextStationNumber = j;
                 }
             }
@@ -285,7 +283,7 @@ public class MainModel {
                 route.get(i).setRefillAmount(refillAmount);
                 currentTankStatus += refillAmount;
             }
-            totalEuros += route.get(i).getRefillAmount() * route.get(i).getStation().getPrice(route.get(i).getTime()) / 1000;
+            totalEuros += route.get(i).getRefillAmount() * route.get(i).getPredictedPrice() / 1000;
             //System.out.println("Refill: " + route.get(i).getRefillAmount() + " bei " + ((double)route.get(i).getStation().getPrice(route.get(i).getTime())/1000) + "Eur /L");
 
         }
@@ -302,7 +300,7 @@ public class MainModel {
         double totalDistance = 0;
         //Berechnet totalDistance
         for(int j = 0;j<route.getLength(); j++) {
-            if(i == j || route.get(j).getStation().getPrice(route.get(i).getTime()) < 0) {
+            if(i == j || route.get(j).getPredictedPrice(route.get(i).getTime()) < 0) {
                 
                 continue;
             }
@@ -312,10 +310,10 @@ public class MainModel {
         double divisor = 0;
         //addiert alle Preise mit deren Gewichten zusammen
         for(int j = 0;j<route.getLength(); j++) {
-            if(i == j || route.get(j).getStation().getPrice(route.get(i).getTime()) < 0) {
+            if(i == j || route.get(j).getPredictedPrice(route.get(i).getTime()) < 0) {
                 continue;
             }
-            double priceAtStation = route.get(j).getStation().getPrice(route.get(i).getTime());
+            double priceAtStation = route.get(j).getPredictedPrice(route.get(i).getTime());
             double distanceToStation = calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude());    
             guessedPrice += (1-(distanceToStation/totalDistance)) * priceAtStation;
             divisor += (1-distanceToStation/totalDistance);
