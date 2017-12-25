@@ -11,9 +11,9 @@ package model;
  * @author Admin
  */
 public class MainModel {
-    //Calculate how much it would cost if you just filled the tank completely at every station(as comparison)
+    //Normale Tankstrategie: Immer volltanken, sobald Tank leer ist
     public void calculateBasicGasUsage(Route route) {
-    
+    /*
         final double gasUsedPerKm = 5.6 / 100;
         final double maxDistance = route.getTankCapacity() / gasUsedPerKm;
         double totalEuros = 0;
@@ -34,6 +34,34 @@ public class MainModel {
                 
             }
             
+        }
+        route.setTotalEuroBasic(totalEuros);*/
+        final double gasUsedPerKm = 5.6 / 100;
+        final double maxDistance = route.getTankCapacity() / gasUsedPerKm;
+        double totalEuros = 0;
+        double currentFuelAmount = 0;
+        for (int i = 0; i+1 < route.getLength(); i++) {
+            double kmToNextStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i + 1).getStation().getLatitude(), route.get(i + 1).getStation().getLongitude());
+            if(currentFuelAmount <= kmToNextStation * gasUsedPerKm) {
+                double kmToGoal = 0;
+                for(int j = i;j+1<route.getLength();j++) {
+                    kmToGoal += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j+1).getStation().getLatitude(), route.get(j+1).getStation().getLongitude());
+                    if(kmToGoal > maxDistance) {
+                        break;
+                    }
+                }
+                if(kmToGoal > maxDistance) {
+                    totalEuros += ((route.getTankCapacity() - currentFuelAmount) * (double)route.get(i).getPredictedPrice()/1000);
+                    currentFuelAmount = route.getTankCapacity();
+                    
+                }
+                else {
+                    totalEuros += ((kmToGoal * gasUsedPerKm)-currentFuelAmount) * ((double)route.get(i).getPredictedPrice()/1000);
+                    currentFuelAmount += (kmToGoal * gasUsedPerKm);
+                    
+                }
+            }
+            currentFuelAmount -= (kmToNextStation * gasUsedPerKm);
         }
         route.setTotalEuroBasic(totalEuros);
     }
@@ -295,7 +323,7 @@ public class MainModel {
     
     //Rät den Preis Anhand aller anderen Tankstellen auf der Route. Einfluss abhängig von Entfernung
     private double guessPrice(Route route, int i) {
-        
+        /*
         //Die summe aller Distanzen zur Ausgangstankstelle
         double totalDistance = 0;
         //Berechnet totalDistance
@@ -319,7 +347,25 @@ public class MainModel {
             divisor += (1-distanceToStation/totalDistance);
         }
         guessedPrice /= divisor;
-        route.get(i).setGuessedPrice((int)guessedPrice);
-        return guessedPrice;
+        int guessedPriceRounded = Price.roundPrice((int)guessedPrice);
+        route.get(i).setGuessedPrice(guessedPriceRounded);
+        return guessedPriceRounded;*/
+        //Die summe aller Distanzen zur Ausgangstankstelle
+        double guessedPrice = 0;
+        double divisor = 0;
+        //addiert alle Preise mit deren Gewichten zusammen
+        for(int j = 0;j<route.getLength(); j++) {
+            if(i == j || route.get(j).getPredictedPrice(route.get(i).getTime()) < 0) {
+                continue;
+            }
+            double priceAtStation = route.get(j).getPredictedPrice(route.get(i).getTime());
+            double distanceToStation = calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude());    
+            guessedPrice += (1/distanceToStation) * priceAtStation;
+            divisor += (1/distanceToStation);
+        }
+        guessedPrice /= divisor;
+        int guessedPriceRounded = Price.roundPrice((int)guessedPrice);
+        route.get(i).setGuessedPrice(guessedPriceRounded);
+        return guessedPriceRounded;
     }
 }

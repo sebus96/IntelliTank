@@ -141,7 +141,7 @@ public class IntelliTank extends Application {
                 });
     	vorhersagezeitpunkte.getItems().addAll(itemImportV);
         
-    	Menu ueber = new Menu("Über");
+    	Menu ueber = new Menu("Ã¼ber");
     	MenuItem itemUeber = new MenuItem("Mitwirkende");
     	ueber.getItems().addAll(itemUeber);
     	itemUeber.setOnAction(new EventHandler<ActionEvent>() {
@@ -246,7 +246,7 @@ public class IntelliTank extends Application {
         
         Image imageDecline = new Image(getClass().getResourceAsStream("/img/external-link.png"));
         
-        //Implementierung per Buttons. Funktionalität (Öffnen des entspr. Preisdiagramms) korrekt, jedoch "rutscht" das Zeichen beim Scrollen nicht runter
+        //Implementierung per Buttons. FunktionalitÃ¤t (Ã¶ffnen des entspr. Preisdiagramms) korrekt, jedoch "rutscht" das Zeichen beim Scrollen nicht runter
         //Das linke Zeichen
         Button bLink= new Button();
         bLink.setGraphic(new ImageView(imageDecline));
@@ -266,7 +266,7 @@ public class IntelliTank extends Application {
 
         gc.fillText(gsc.getRoute().get(index).getStation().getName() + ", " + gsc.getRoute().get(index).getStation().getPostcode() + " " + gsc.getRoute().get(index).getStation().getLocation(), 220, circleStart + circleHeight/2);
        
-        //Implementierung mit der DrawImage-Methode. Öffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
+        //Implementierung mit der DrawImage-Methode. ï¿½ffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
         //das rechte Zeichen
         gc.drawImage(imageDecline, 225, (circleStart + circleHeight/2)+12);
         scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
