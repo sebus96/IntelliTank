@@ -3,12 +3,15 @@ package view;
 import java.io.File;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import controller.GasStationController;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -17,7 +20,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -53,6 +55,8 @@ public class IntelliTank extends Application {
 	Scene scene;
 	MainModel mm;
 	BorderPane border;
+	Map<Integer, Double> indexWithYCoordinate = new HashMap();
+	
 	@Override
     public void start(Stage primaryStage) {
      
@@ -243,53 +247,9 @@ public class IntelliTank extends Application {
         else
             gc.fillText(priceForStation + "",180,circleStart + circleHeight/2);
         gc.setTextAlign(TextAlignment.LEFT);
-        
-        Image imageDecline = new Image(getClass().getResourceAsStream("/img/external-link.png"));
-        
-        //Implementierung per Buttons. Funktionalität (öffnen des entspr. Preisdiagramms) korrekt, jedoch "rutscht" das Zeichen beim Scrollen nicht runter
-        //Das linke Zeichen
-        Button bLink= new Button();
-        bLink.setGraphic(new ImageView(imageDecline));
-        bLink.setLayoutX(220);
-        bLink.setLayoutY(circleStart + circleHeight/2);
-        bLink.setOnAction(new EventHandler<ActionEvent>() {
-			
-			@Override
-			public void handle(ActionEvent arg0) {
-    			GasStation gs = gsc.getRoute().get(index).getStation();
-    			PriceDiagram diagramm = new PriceDiagram(gs);
-    			diagramm.generateDiagramm();
-    			//Zur Kontrolle
-    			System.out.println(circleStart + circleHeight/2);
-			}
-		});
-
+               
         gc.fillText(gsc.getRoute().get(index).getStation().getName() + ", " + gsc.getRoute().get(index).getStation().getPostcode() + " " + gsc.getRoute().get(index).getStation().getLocation(), 220, circleStart + circleHeight/2);
        
-        //Implementierung mit der DrawImage-Methode. �ffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
-        //das rechte Zeichen
-        gc.drawImage(imageDecline, 225, (circleStart + circleHeight/2)+12);
-        scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent me) {
-            	//Bei der Abfrage wurde der Y-Anteil nicht beachtet, da der einen sehr hohen Wert hat
-            	//Wahrscheinlich weil es die letzte Tanke (letztes index)
-            	if(me.getX() > 215 && me.getX() < 245) {
-            		GasStation gs = gsc.getRoute().get(index).getStation();
-        			PriceDiagram diagramm = new PriceDiagram(gs);
-        			diagramm.generateDiagramm();
-            	}
-            	
-            	//Zur Kontrolle
-                System.out.println("Coordinate X -> " + me.getX());
-                System.out.println("Coordinate Y -> " + me.getY());
-                int x = circleStart + circleHeight/2;
-                System.out.println("Curent Y: " + x);
-            }
-        });
-        border.getChildren().add(bLink);
-        
         RefuelStop rs = gsc.getRoute().get(index);
         double currentGasPercentage = rs.getFuelAmount()/gsc.getRoute().getTankCapacity() * 100;
         double currentRefillPercentage = rs.getRefillAmount()/gsc.getRoute().getTankCapacity() * 100;
@@ -310,6 +270,38 @@ public class IntelliTank extends Application {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLACK);
         gc.strokeRect(30, circleStart, 100, circleHeight);
+        
+        Image imageDecline = new Image(getClass().getResourceAsStream("/img/external-link.png"));
+        double yCoordinate = circleStart + circleHeight/2;
+        indexWithYCoordinate.put(index, yCoordinate);
+        //Implementierung mit der DrawImage-Methode. �ffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
+        //das rechte Zeichen
+        gc.drawImage(imageDecline, 220, (circleStart + circleHeight/2)+8);
+        scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent me) {
+            	Set<Integer> indexSet = indexWithYCoordinate.keySet();             	
+            	Iterator iter = indexSet.iterator();
+            	while(iter.hasNext()) {
+            		int indexTmp = (int) iter.next();
+            		double yCoordinate = indexWithYCoordinate.get(indexTmp);
+            		System.out.println(yCoordinate + "!!");
+            		if((me.getX() > 215) && (me.getX() < 245) && (me.getY() < yCoordinate+8+16+30) && (me.getY() > yCoordinate-8-16-30)) {
+                		System.out.println("index von methode: " + index);
+                		System.out.println("index gespeichert: " + indexTmp);
+            			GasStation gs = gsc.getRoute().get(indexTmp).getStation();
+            			PriceDiagram diagramm = new PriceDiagram(gs);
+            			diagramm.generateDiagramm();	
+            			break;
+            		}
+            	}
+            	
+            	//Zur Kontrolle
+                System.out.println("Coordinate X -> " + me.getX());
+                System.out.println("Coordinate Y -> " + me.getY());
+            }
+        });
     }
     
     //Ist nur ein Test, nicht ernst nehmen
