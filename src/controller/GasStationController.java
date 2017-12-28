@@ -14,7 +14,7 @@ public class GasStationController {
 	private Map<Integer, GasStation> allStations;
 	private Route route;
 	private List<PredictionUnit> predictions;
-        private MainModel mainModel;
+	private MainModel mainModel;
 
 
 	public GasStationController() {
@@ -23,8 +23,8 @@ public class GasStationController {
 		CSVManager.importPrices(route);
 		this.predictions = new ArrayList<>();
 		this.trainPrediction();
-                mainModel = new MainModel();
-                mainModel.calculateGasUsage(route);
+		mainModel = new MainModel();
+		mainModel.calculateGasUsage(route);
 	}
 	
 	public void addGasStation(GasStation station) {

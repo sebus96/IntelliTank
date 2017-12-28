@@ -1,8 +1,5 @@
 package view;
 
-import com.sun.javafx.tk.FontLoader;
-//import com.sun.javafx.tk.FontMetrics;
-import com.sun.javafx.tk.Toolkit;
 import java.io.File;
 //import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -10,6 +7,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import com.sun.javafx.tk.FontLoader;
+//import com.sun.javafx.tk.FontMetrics;
+import com.sun.javafx.tk.Toolkit;
 
 import controller.GasStationController;
 //import java.awt.font.TextAttribute;
@@ -58,7 +59,7 @@ public class IntelliTank extends Application {
 	Canvas canvas; 
 	GraphicsContext gc;
 	GasStationController gsc;
-        Map<Integer, Double> indexWithYCoordinate = new HashMap();
+        Map<Integer, Double> indexWithYCoordinate = new HashMap<>();
 	Scene scene;
 	BorderPane border;
         ScrollPane sp;
@@ -289,9 +290,9 @@ public class IntelliTank extends Application {
                 //System.out.println("Viewable: min: " + offsetPosition + " max: " + (offsetPosition + scene.getHeight()) + " Total pos: " + ((int)me.getY() + offsetPosition) + " " + ((int)me.getSceneY() + offsetPosition));
             	int yPosition = ((int)me.getY() + offsetPosition - (int)bar.getHeight());
                 Set<Integer> indexSet = indexWithYCoordinate.keySet();             	
-            	Iterator iter = indexSet.iterator();
+            	Iterator<Integer> iter = indexSet.iterator();
             	while(iter.hasNext()) {
-            		int indexTmp = (int) iter.next();
+            		int indexTmp = iter.next();
             		double yCoordinate = indexWithYCoordinate.get(indexTmp);
             		//System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
                         String gasStationName = gsc.getRoute().get(indexTmp).getStation().getName() + ", " + gsc.getRoute().get(indexTmp).getStation().getPostcode() + " " + gsc.getRoute().get(indexTmp).getStation().getLocation();

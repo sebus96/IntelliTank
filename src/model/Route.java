@@ -56,10 +56,15 @@ public class Route {
 	}
 	
 	public int getLength() {
+		if (route == null) return 0;
 		return route.size();
 	}
 	
 	public RefuelStop get(int i) {
+		if (i < 0 || i >= route.size()){
+			System.out.println("TT: " + i + " " + this.getLength());
+			return null;
+		}
 		return route.get(i);
 	}
 	
