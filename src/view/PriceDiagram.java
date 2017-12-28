@@ -22,9 +22,6 @@ public class PriceDiagram {
     private static List<GasStation> gasStations = new ArrayList<GasStation>();
     private static Stage priceStage;
 
-    /*public PriceDiagram(GasStation gs) {
-		this.gs = gs;
-	}*/
     public static void displayGasStation(GasStation gs) {
 
         if (priceStage == null) {
@@ -35,6 +32,9 @@ public class PriceDiagram {
             gasStations = new ArrayList<GasStation>();
             }); 
         }
+        //Verhindert, dass die Tankstellen doppelt angezeigt werden. Die alte wird entfernt, damit die zuletzt angeklickte im Vordergrund steht
+        if(gasStations.contains(gs))
+            gasStations.remove(gs);
         gasStations.add(gs);
         generateDiagram();
         if(!priceStage.isShowing()) {
@@ -46,6 +46,16 @@ public class PriceDiagram {
 
         double xMin = gasStations.get(0).getPriceListElement(0).getTime().getTime();
         double xMax = gasStations.get(0).getPriceListElement(gasStations.get(0).getPriceListSize() - 1).getTime().getTime();
+        
+        //Schaut, wie breit der Wertebereich in X-Richtung sein muss(von welchem Datum bis zu welchem) um alle Tankstellenpreise im Graphen darstellen zu können
+        for(GasStation g : gasStations) {
+            if(g.getPriceListElement(0).getTime().getTime() < xMin) {
+                xMin = g.getPriceListElement(0).getTime().getTime();
+            }
+            if(g.getPriceListElement(g.getPriceListSize()-1).getTime().getTime() > xMax) {
+                xMax = g.getPriceListElement(g.getPriceListSize()-1).getTime().getTime();
+            }
+        }
         double xSteps = 1000 * 60 * 60 * 24 * 30.5;//2635200000.0; // one month in milliseconds
         NumberAxis xAxis = new NumberAxis(xMin, xMax, xSteps);
         NumberAxis yAxis = new NumberAxis(1000.0, 2000.0, 100.0);
@@ -78,9 +88,6 @@ public class PriceDiagram {
         priceStage.setScene(scene);
     }
 
-    /*public PriceDiagram() {
-        this.<error> = new ArrayList<>();
-    }*/
     private static XYChart.Series<Number, Number> createSeries(GasStation gs) {
         
         XYChart.Series<Number, Number> series = new XYChart.Series<>();

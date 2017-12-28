@@ -235,7 +235,7 @@ public class IntelliTank extends Application {
             gc.strokeLine(180, lineStart, 180, lineEnd/*TODO: Should length depend on distance between stations*/);
             GasStation a = gsc.getRoute().get(index-1).getStation();
             GasStation b = gsc.getRoute().get(index).getStation();
-            gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()), 200, (lineStart + lineEnd)/2);
+            gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km", 200, (lineStart + lineEnd)/2);
         }
         
         //Create an elipse with gas price in it(position dependent on counter)
@@ -300,7 +300,8 @@ public class IntelliTank extends Application {
             		int indexTmp = (int) iter.next();
             		double yCoordinate = indexWithYCoordinate.get(indexTmp);
             		//System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
-            		if((me.getX() > 220) && (me.getX() < getTextWidth(stationName) + 10 + imageDecline.getWidth()/*TODO: textbreite einbeziehen*/) && (yPosition > yCoordinate-gc.getFont().getSize()/2) && (yPosition < yCoordinate+gc.getFont().getSize()/2)) {
+                        String gasStationName = gsc.getRoute().get(indexTmp).getStation().getName() + ", " + gsc.getRoute().get(indexTmp).getStation().getPostcode() + " " + gsc.getRoute().get(indexTmp).getStation().getLocation();
+            		if((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()/*TODO: textbreite einbeziehen*/) && (yPosition > yCoordinate-gc.getFont().getSize()/2) && (yPosition < yCoordinate+gc.getFont().getSize()/2)) {
                 		//System.out.println("index von methode: " + index);
                 		//System.out.println("index gespeichert: " + indexTmp);
             			GasStation gs = gsc.getRoute().get(indexTmp).getStation();
@@ -324,10 +325,10 @@ public class IntelliTank extends Application {
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         Label label = new Label(stationName);
         label.setFont(Font.font(gc.getFont().getName(), FontWeight.THIN, FontPosture.REGULAR, gc.getFont().getSize()));
-        //System.out.println("The label's width is: " + fontLoader.computeStringWidth(label.getText(), label.getFont()));
+        //System.out.println(stationName + "'s width is: " + fontLoader.computeStringWidth(label.getText(), label.getFont()));
         return (int)fontLoader.computeStringWidth(label.getText(), label.getFont());
     }
-    
+    /*
     //Ist nur ein Test, nicht ernst nehmen
     public class ButtonForPriceDiagram extends StackPane {
     	int x = 0;
@@ -349,20 +350,22 @@ public class IntelliTank extends Application {
             	}
             });
     	}
-    }
+    }*/
     
-    private String calculateDistance(double latA, double longA, double latB, double longB) {
+    private double calculateDistance(double latA, double longA, double latB, double longB) {
     	double latitudeA = Math.toRadians(latA);
     	double longitudeA = Math.toRadians(longA);
     	double latitudeB = Math.toRadians(latB);
     	double longitudeB = Math.toRadians(longB);
-    	DecimalFormat f = new DecimalFormat("#0.00"); 
-        f.setRoundingMode(RoundingMode.DOWN);
+    	//DecimalFormat f = new DecimalFormat("#0.00"); 
+        //f.setRoundingMode(RoundingMode.DOWN);
     	double dist = 6378.388*Math.acos((Math.sin(latitudeA)*Math.sin(latitudeB))+(Math.cos(latitudeA)*Math.cos(latitudeB)*Math.cos(longitudeB-longitudeA)));
-    	String output = f.format(dist) + " km" + " / ";	
-    	double consumption = 5.6*dist/100;
-    	output += f.format(consumption) + " L verbraucht"; 
-    	return output;
+        dist *= 100;
+        int distance = (int)dist;
+    	//String output = f.format(dist) + " km" + " / ";	
+    	//double consumption = 5.6*dist/100;
+    	//output += f.format(consumption) + " L verbraucht"; 
+    	return (double)distance/100;
     }
 
     private void displayResult() {
