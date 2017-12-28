@@ -46,6 +46,7 @@ public class MainModel {
         double totalEuros = 0;
         double currentFuelAmount = 0;
         for (int i = 0; i+1 < route.getLength(); i++) {
+            route.get(i).setFuelAmountBasic(currentFuelAmount);
             double kmToNextStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i + 1).getStation().getLatitude(), route.get(i + 1).getStation().getLongitude());
             if(currentFuelAmount <= kmToNextStation * gasUsedPerKm) {
                 double kmToGoal = 0;
@@ -56,19 +57,22 @@ public class MainModel {
                     }
                 }
                 if(kmToGoal > maxDistance) {
+                    route.get(i).setRefillAmountBasic(route.getTankCapacity() - currentFuelAmount);
+                    //System.out.println("REFULL : " + (route.getTankCapacity() - currentFuelAmount));
                     totalEuros += ((route.getTankCapacity() - currentFuelAmount) * (double)route.get(i).getPredictedPrice()/1000);
                     currentFuelAmount = route.getTankCapacity();
                     
                 }
                 else {
+                    route.get(i).setRefillAmountBasic((kmToGoal * gasUsedPerKm)-currentFuelAmount);
+                    //System.out.println("REFULW : " + ((kmToGoal * gasUsedPerKm)-currentFuelAmount));
                     totalEuros += ((kmToGoal * gasUsedPerKm)-currentFuelAmount) * ((double)route.get(i).getPredictedPrice()/1000);
                     currentFuelAmount += (kmToGoal * gasUsedPerKm);
-                    
                 }
             }
             currentFuelAmount -= (kmToNextStation * gasUsedPerKm);
         }
-        route.setTotalEuroBasic(totalEuros);
+        route.setTotalEurosBasic(totalEuros);
     }
     //FPGSP = Fixed Path Gas Station Problem
     private void calculateFPGSP(Route route) {
@@ -316,7 +320,7 @@ public class MainModel {
                 route.get(i).setRefillAmount(refillAmount);
                 currentTankStatus += refillAmount;
             }
-            totalEuros += route.get(i).getRefillAmount() * route.get(i).getPredictedPrice() / 1000;
+            totalEuros += route.get(i).getRefillAmount(route) * route.get(i).getPredictedPrice() / 1000;
             //System.out.println("Refill: " + route.get(i).getRefillAmount() + " bei " + ((double)route.get(i).getStation().getPrice(route.get(i).getTime())/1000) + "Eur /L");
 
         }

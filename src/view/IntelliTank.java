@@ -30,7 +30,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+//import javafx.scene.image.ImageView;
 //import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -63,6 +63,7 @@ public class IntelliTank extends Application {
 	BorderPane border;
         ScrollPane sp;
         MenuBar bar;
+        SwitchButton switchButton;
         
     @Override
     public void start(Stage primaryStage) {
@@ -73,6 +74,7 @@ public class IntelliTank extends Application {
         primaryStage.setTitle("IntelliTank");
         border = new BorderPane();
         sp = new ScrollPane();
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         border.setCenter(sp);
         
         scene = new Scene(border, 640, 600);
@@ -84,7 +86,6 @@ public class IntelliTank extends Application {
        
         //Methods to fill each part with content
         displayRoute();
-        displayResult();
         displayMenubar(bar, border);
         Image icon = new Image("/img/gas-station.png");
         primaryStage.getIcons().add(icon);
@@ -98,13 +99,16 @@ public class IntelliTank extends Application {
     //iterates theough the entire map, which includes all gas stations on the route.    
     private void displayRoute() {
 
-        canvas = new Canvas(600, 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
+        canvas = new Canvas(640, 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
         sp.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
+        //Erstellt einen Button, mit dem man zwischen den Tankstrategien wechseln kann
+        switchButton = new SwitchButton(gsc,gc,/*(int)scene.getWidth() - 120*/640-125,10);
         //Iterates through the entire list
         for (int i = 0; i < gsc.getRoute().getLength(); i++) {
 	        displayGasStation(i);
         }
+        displayResult();
     }
        
     //displays menu bar on the top
@@ -205,13 +209,19 @@ public class IntelliTank extends Application {
 
     private void displayResult() {
         DecimalFormat f = new DecimalFormat("#0.00"); 
-        Label output = new Label("Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt " + f.format(gsc.getRoute().getTotalEuros()) + "Eur. (" + f.format(gsc.getRoute().getTotalEuroBasic()) + " Eur)");
-    	Image gasStation = new Image(getClass().getResourceAsStream("/img/gasstation.png"), 5, 5, false, false);
-        output.setGraphic(new ImageView(gasStation));
-    	output.setStyle("-fx-font-size: 100px");
-    	output.setFont(new Font("Arial", 30));
-    	output.setPrefSize(3330, 30);
-        gc.fillText(output.getText(),10,50);
+        String output = "Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt ";
+    	if(gsc.getRoute().showBasicStrategy()) {
+            output += f.format(gsc.getRoute().getTotalEurosBasic()) + " Eur.";
+        }
+        else {
+            output += f.format(gsc.getRoute().getTotalEuros()) + " Eur.";
+        }
+        Image gasStation = new Image(getClass().getResourceAsStream("/img/gasstation.png"), 5, 5, false, false);
+        //output.setGraphic(new ImageView(gasStation));
+    	//output.setStyle("-fx-font-size: 100px");
+    	//output.setFont(new Font("Arial", 30));
+    	//output.setPrefSize(3330, 30);
+        gc.fillText(output,10,50);
     }
 
     private void createGasPriceNode(int index, int circleStart, int circleWidth, int circleHeight) {
@@ -234,8 +244,8 @@ public class IntelliTank extends Application {
 
     private void createFuelStatusRectangle(int index,int circleStart,int circleHeight) {
         RefuelStop rs = gsc.getRoute().get(index);
-        double currentGasPercentage = rs.getFuelAmount()/gsc.getRoute().getTankCapacity() * 100;
-        double currentRefillPercentage = rs.getRefillAmount()/gsc.getRoute().getTankCapacity() * 100;
+        double currentGasPercentage = rs.getFuelAmount(gsc.getRoute())/gsc.getRoute().getTankCapacity() * 100;
+        double currentRefillPercentage = rs.getRefillAmount(gsc.getRoute())/gsc.getRoute().getTankCapacity() * 100;
         //System.out.println(rs.getFuelAmount() + " " + rs.getRefillAmount());
         DecimalFormat f = new DecimalFormat("#0.0"); 
         //f.setRoundingMode(RoundingMode.UP);
@@ -245,11 +255,11 @@ public class IntelliTank extends Application {
         gc.setFill(Color.BLACK);
         //this variable is only temporary until gas management is implemented
         gc.fillRect(30, circleStart, currentGasPercentage, circleHeight);
-        gc.fillText(f.format(Math.abs(rs.getFuelAmount())) + " L", 30, circleStart-10);
+        gc.fillText(f.format(Math.abs(rs.getFuelAmount(gsc.getRoute()))) + " L", 30, circleStart-10);
         gc.setFill(Color.GREEN);
         gc.fillRect(30 + currentGasPercentage, circleStart, currentRefillPercentage, circleHeight);
         gc.setTextAlign(TextAlignment.RIGHT);
-        gc.fillText("+ " + f.format(rs.getRefillAmount()) + " L", 130, circleStart-10);
+        gc.fillText("+ " + f.format(rs.getRefillAmount(gsc.getRoute())) + " L", 130, circleStart-10);
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLACK);
         gc.strokeRect(30, circleStart, 100, circleHeight);
@@ -295,6 +305,11 @@ public class IntelliTank extends Application {
             			break;
             		}
             	}
+                //Falls der Button zum switchen der Tankstrategie gedrückt wurde
+                if(switchButton.wasClicked((int)me.getX(),yPosition)) {
+                    switchButton.buttonPressed();
+                    displayRoute();
+                }
             	
             	//Zur Kontrolle
                 //System.out.println("Coordinate X -> " + me.getX());
@@ -315,4 +330,5 @@ public class IntelliTank extends Application {
             gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km", 200, (lineStart + lineEnd)/2);
         }
     }
+
 }

@@ -8,12 +8,21 @@ public class Route {
 	private double tankCapacity;
 	private List<RefuelStop> route;
         private double totalEuros,totalKm,totalLiters,totalEuroBasic;
+        private boolean showBasicStrategy;//entscheidet, welche Tankstrategie gezeigt werden soll: die Standart-Strategie oder die "schlaue"
 
-    public double getTotalEuroBasic() {
+    public boolean showBasicStrategy() {
+        return showBasicStrategy;
+    }
+
+    public void setShowBasicStrategy(boolean showBasicStrategy) {
+        this.showBasicStrategy = showBasicStrategy;
+    }
+        
+    public double getTotalEurosBasic() {
         return totalEuroBasic;
     }
 
-    public void setTotalEuroBasic(double totalEuroBasic) {
+    public void setTotalEurosBasic(double totalEuroBasic) {
         this.totalEuroBasic = totalEuroBasic;
     }
 

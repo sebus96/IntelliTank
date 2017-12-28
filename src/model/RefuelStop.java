@@ -25,16 +25,8 @@ public class RefuelStop {
     private double fuelAmountBasic;
     private double refillAmountBasic;
 
-    public double getFuelAmountBasic() {
-        return fuelAmountBasic;
-    }
-
     public void setFuelAmountBasic(double fuelAmountBasic) {
         this.fuelAmountBasic = fuelAmountBasic;
-    }
-
-    public double getRefillAmountBasic() {
-        return refillAmountBasic;
     }
 
     public void setRefillAmountBasic(double refillAmountBasic) {
@@ -96,15 +88,20 @@ public class RefuelStop {
     }
 
 
-    public double getFuelAmount() {
+    public double getFuelAmount(Route route) {
+        if(route.showBasicStrategy())
+            return fuelAmountBasic;
         return fuelAmount;
+        
     }
 
     public void setFuelAmount(double fuelAmount) {
         this.fuelAmount = fuelAmount;
     }
 
-    public double getRefillAmount() {
+    public double getRefillAmount(Route route) {
+        if(route.showBasicStrategy())
+            return refillAmountBasic;
         return refillAmount;
     }
 
