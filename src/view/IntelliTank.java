@@ -1,5 +1,8 @@
 package view;
 
+import com.sun.javafx.tk.FontLoader;
+import com.sun.javafx.tk.FontMetrics;
+import com.sun.javafx.tk.Toolkit;
 import java.io.File;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -9,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import controller.GasStationController;
+import java.awt.font.TextAttribute;
+import java.text.AttributedString;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -34,6 +39,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 //import javafx.scene.layout.StackPane;
@@ -56,7 +64,8 @@ public class IntelliTank extends Application {
 	MainModel mm;
 	BorderPane border;
 	Map<Integer, Double> indexWithYCoordinate = new HashMap();
-	
+	ScrollPane sp;
+        MenuBar bar;
 	@Override
     public void start(Stage primaryStage) {
      
@@ -65,20 +74,18 @@ public class IntelliTank extends Application {
         //Create the foundation: borderPane -> Scrollpane -> Canvas
         primaryStage.setTitle("IntelliTank");
         border = new BorderPane();
-        ScrollPane sp = new ScrollPane();
+        sp = new ScrollPane();
         border.setCenter(sp);
-        canvas = new Canvas(640, 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
+        canvas = new Canvas(600, 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
 //        border.getChildren().add(canvas);
         sp.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
-        scene = new Scene(border, 800, 600);
+        scene = new Scene(border, 640, 600);
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
-        
-        //The NavigationBar is on the left side
-        VBox vbox = new VBox();
-        
+
         //The MenuBar is on the top
-        MenuBar bar = new MenuBar();
+        bar = new MenuBar();
        
         //Temporary
         mm = new MainModel();
@@ -87,7 +94,7 @@ public class IntelliTank extends Application {
         //temporary
         
         //Methods to fill each part with content
-        displayNavigationBar(vbox, border);
+        //displayNavigationBar(vbox, border);
         displayRoute();
         displayResult();
         displayMenubar(bar, border);
@@ -247,9 +254,10 @@ public class IntelliTank extends Application {
         else
             gc.fillText(priceForStation + "",180,circleStart + circleHeight/2);
         gc.setTextAlign(TextAlignment.LEFT);
-               
-        gc.fillText(gsc.getRoute().get(index).getStation().getName() + ", " + gsc.getRoute().get(index).getStation().getPostcode() + " " + gsc.getRoute().get(index).getStation().getLocation(), 220, circleStart + circleHeight/2);
-       
+        String stationName = gsc.getRoute().get(index).getStation().getName() + ", " + gsc.getRoute().get(index).getStation().getPostcode() + " " + gsc.getRoute().get(index).getStation().getLocation();
+        gc.setFill(Color.BLUE);
+        gc.fillText(stationName, 220, circleStart + circleHeight/2);
+        gc.setFill(Color.BLACK);
         RefuelStop rs = gsc.getRoute().get(index);
         double currentGasPercentage = rs.getFuelAmount()/gsc.getRoute().getTankCapacity() * 100;
         double currentRefillPercentage = rs.getRefillAmount()/gsc.getRoute().getTankCapacity() * 100;
@@ -270,38 +278,54 @@ public class IntelliTank extends Application {
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLACK);
         gc.strokeRect(30, circleStart, 100, circleHeight);
-        
+
+        //füge die Verlinkung zum Preisdiagramm ein
         Image imageDecline = new Image(getClass().getResourceAsStream("/img/external-link.png"));
         double yCoordinate = circleStart + circleHeight/2;
         indexWithYCoordinate.put(index, yCoordinate);
         //Implementierung mit der DrawImage-Methode. �ffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
         //das rechte Zeichen
-        gc.drawImage(imageDecline, 220, (circleStart + circleHeight/2)+8);
+        gc.drawImage(imageDecline, 220 + 10 + getTextWidth(stationName), circleStart + circleHeight/2 - imageDecline.getHeight()/2);
         scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
             @Override
             public void handle(MouseEvent me) {
-            	Set<Integer> indexSet = indexWithYCoordinate.keySet();             	
+                //System.out.println("POSS: " + me.getY() + " " + sp.getVvalue() + " CANVAS HEIGHT" + canvas.getHeight());
+                int offsetPosition = (int) Math.round((canvas.getHeight() + bar.getHeight() -scene.getHeight()) * sp.getVvalue());
+                //System.out.println("Viewable: min: " + offsetPosition + " max: " + (offsetPosition + scene.getHeight()) + " Total pos: " + ((int)me.getY() + offsetPosition) + " " + ((int)me.getSceneY() + offsetPosition));
+            	int yPosition = ((int)me.getY() + offsetPosition - (int)bar.getHeight());
+                Set<Integer> indexSet = indexWithYCoordinate.keySet();             	
             	Iterator iter = indexSet.iterator();
             	while(iter.hasNext()) {
             		int indexTmp = (int) iter.next();
             		double yCoordinate = indexWithYCoordinate.get(indexTmp);
-            		System.out.println(yCoordinate + "!!");
-            		if((me.getX() > 215) && (me.getX() < 245) && (me.getY() < yCoordinate+8+16+30) && (me.getY() > yCoordinate-8-16-30)) {
-                		System.out.println("index von methode: " + index);
-                		System.out.println("index gespeichert: " + indexTmp);
+            		//System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
+            		if((me.getX() > 220) && (me.getX() < getTextWidth(stationName) + 10 + imageDecline.getWidth()/*TODO: textbreite einbeziehen*/) && (yPosition > yCoordinate-gc.getFont().getSize()/2) && (yPosition < yCoordinate+gc.getFont().getSize()/2)) {
+                		//System.out.println("index von methode: " + index);
+                		//System.out.println("index gespeichert: " + indexTmp);
             			GasStation gs = gsc.getRoute().get(indexTmp).getStation();
-            			PriceDiagram diagramm = new PriceDiagram(gs);
-            			diagramm.generateDiagramm();	
+                                PriceDiagram.displayGasStation(gs);
+            			/*PriceDiagram diagramm = new PriceDiagram(gs);
+            			diagramm.generateDiagramm();*/	
             			break;
             		}
             	}
             	
             	//Zur Kontrolle
-                System.out.println("Coordinate X -> " + me.getX());
-                System.out.println("Coordinate Y -> " + me.getY());
+                //System.out.println("Coordinate X -> " + me.getX());
+                //System.out.println("Coordinate Y -> " + me.getY());
             }
         });
+    }
+
+    private int getTextWidth(String stationName) {
+        //System.out.println(gc.getFont().getName() + " nn " + gc.getFont().getStyle() + " nn "+ gc.getFont().getSize());
+        //java.awt.Font f = new java.awt.Font();
+        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+        Label label = new Label(stationName);
+        label.setFont(Font.font(gc.getFont().getName(), FontWeight.THIN, FontPosture.REGULAR, gc.getFont().getSize()));
+        //System.out.println("The label's width is: " + fontLoader.computeStringWidth(label.getText(), label.getFont()));
+        return (int)fontLoader.computeStringWidth(label.getText(), label.getFont());
     }
     
     //Ist nur ein Test, nicht ernst nehmen
