@@ -11,8 +11,13 @@ package model;
  * @author Admin
  */
 public class MainModel {
+    
+    public void calculateGasUsage(Route route) {
+        this.calculateFPGSP(route);
+        this.calculateBasicGasUsage(route);
+    }
     //Normale Tankstrategie: Immer volltanken, sobald Tank leer ist
-    public void calculateBasicGasUsage(Route route) {
+    private void calculateBasicGasUsage(Route route) {
     /*
         final double gasUsedPerKm = 5.6 / 100;
         final double maxDistance = route.getTankCapacity() / gasUsedPerKm;
@@ -66,7 +71,7 @@ public class MainModel {
         route.setTotalEuroBasic(totalEuros);
     }
     //FPGSP = Fixed Path Gas Station Problem
-    public void calculateFPGSP(Route route) {
+    private void calculateFPGSP(Route route) {
 
         final double gasUsedPerKm = 5.6 / 100;
         final double maxDistance = route.getTankCapacity() / gasUsedPerKm;

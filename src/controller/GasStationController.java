@@ -8,18 +8,23 @@ import io.CSVManager;
 import model.GasStation;
 import model.RefuelStop;
 import model.Route;
+import model.MainModel;
 
 public class GasStationController {
 	private Map<Integer, GasStation> allStations;
 	private Route route;
 	private List<PredictionUnit> predictions;
-	
+        private MainModel mainModel;
+
+
 	public GasStationController() {
 		allStations = CSVManager.importGasStations();
 		route = CSVManager.importRoute(allStations);
 		CSVManager.importPrices(route);
 		this.predictions = new ArrayList<>();
 		this.trainPrediction();
+                mainModel = new MainModel();
+                mainModel.calculateGasUsage(route);
 	}
 	
 	public void addGasStation(GasStation station) {
@@ -36,6 +41,10 @@ public class GasStationController {
 	public Route getRoute() {
 		return route;
 	}
+	
+        public MainModel getMainModel() {
+            return mainModel;
+        }
 	
 	public void trainPrediction() {
 		System.out.println("Start prediction");

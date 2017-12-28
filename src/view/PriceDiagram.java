@@ -27,6 +27,7 @@ public class PriceDiagram {
         if (priceStage == null) {
             gasStations = new ArrayList<GasStation>();
             priceStage = new Stage();
+            priceStage.setTitle("Preisdiagramm");
             priceStage.setOnCloseRequest(event -> {
             priceStage = null;
             gasStations = new ArrayList<GasStation>();

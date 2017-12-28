@@ -8,6 +8,7 @@ public class RefuelStop {
     private Date time;
     private GasStation station;
     private int guessedPrice = 0;
+    private boolean priceGuessed;
     
     private List<Price> predictedPrices;
 
@@ -16,7 +17,30 @@ public class RefuelStop {
     private RefuelStop nextStation;
     private boolean breakPoint;
     private boolean nextStationBool;
-    private boolean priceGuessed;
+
+    //Aktuelle Menge an Gas und wieviel an dem jeweiligen RefuelStop aufgefüllt wurde. die unteren beiden sind für die Standart Tankstrategie
+    private double fuelAmount;
+    private double refillAmount;
+    
+    private double fuelAmountBasic;
+    private double refillAmountBasic;
+
+    public double getFuelAmountBasic() {
+        return fuelAmountBasic;
+    }
+
+    public void setFuelAmountBasic(double fuelAmountBasic) {
+        this.fuelAmountBasic = fuelAmountBasic;
+    }
+
+    public double getRefillAmountBasic() {
+        return refillAmountBasic;
+    }
+
+    public void setRefillAmountBasic(double refillAmountBasic) {
+        this.refillAmountBasic = refillAmountBasic;
+    }
+    
 
     public RefuelStop(GasStation station, Date time) {
         this.station = station;
@@ -70,9 +94,7 @@ public class RefuelStop {
     public void setNextStationBool(boolean nextStationBool) {
         this.nextStationBool = nextStationBool;
     }
-    //the current amount of gas in the tank and how much gas is added at that station
-    private double fuelAmount;
-    private double refillAmount;
+
 
     public double getFuelAmount() {
         return fuelAmount;
