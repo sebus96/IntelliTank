@@ -295,7 +295,7 @@ public class MainView {
                             mi.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(final ActionEvent e) {
-                                    gsc.changeCurrentRoute(mi.getText());
+                                    //gsc.changeCurrentRoute(mi.getText());
                                 }
                             });
                             routes.getItems().add(mi);
