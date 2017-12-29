@@ -1,7 +1,6 @@
 package view;
 
 import java.io.File;
-//import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,13 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sun.javafx.tk.FontLoader;
-//import com.sun.javafx.tk.FontMetrics;
 import com.sun.javafx.tk.Toolkit;
 
 import controller.GasStationController;
-//import java.awt.font.TextAttribute;
-//import java.text.AttributedString;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
@@ -24,37 +19,28 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-//import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
-//import javafx.scene.image.ImageView;
-//import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-//import javafx.scene.layout.StackPane;
-//import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-//import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-//import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
-//import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import model.GasStation;
-//import model.MainModel;
 import model.RefuelStop;
 /**
  *
  * @author Admin
  */
-public class IntelliTank extends Application {
+public class MainView {
     
 	Canvas canvas; 
 	GraphicsContext gc;
@@ -66,11 +52,10 @@ public class IntelliTank extends Application {
         MenuBar bar;
         SwitchButton switchButton;
         
-    @Override
-    public void start(Stage primaryStage) {
+
+    public MainView(Stage primaryStage,GasStationController gsc) {
      
-        gsc = new GasStationController();
-        
+        this.gsc = gsc;
         //Create the foundation: borderPane -> Scrollpane -> Canvas
         primaryStage.setTitle("IntelliTank");
         border = new BorderPane();
@@ -91,10 +76,6 @@ public class IntelliTank extends Application {
         Image icon = new Image("/img/gas-station.png");
         primaryStage.getIcons().add(icon);
         primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
     
     //iterates theough the entire map, which includes all gas stations on the route.    

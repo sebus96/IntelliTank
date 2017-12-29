@@ -5,19 +5,21 @@ import java.util.List;
 import java.util.Map;
 
 import io.CSVManager;
+import javafx.stage.Stage;
 import model.GasStation;
 import model.RefuelStop;
 import model.Route;
 import model.MainModel;
+import view.MainView;
 
 public class GasStationController {
 	private Map<Integer, GasStation> allStations;
 	private Route route;
 	private List<PredictionUnit> predictions;
 	private MainModel mainModel;
+        private MainView mainView;
 
-
-	public GasStationController() {
+	public GasStationController(Stage primaryStage) {
 		allStations = CSVManager.importGasStations();
 		route = CSVManager.importStandardRoute(allStations);
 		CSVManager.importPrices(route);
@@ -25,6 +27,7 @@ public class GasStationController {
 		this.trainPrediction();
 		mainModel = new MainModel();
 		mainModel.calculateGasUsage(route);
+                mainView = new MainView(primaryStage,this);
 	}
 	
 	public void addGasStation(GasStation station) {
