@@ -15,6 +15,7 @@ import java.util.Map;
 
 import model.FederalState;
 import model.GasStation;
+import model.PredictionPoint;
 import model.Price;
 import model.Route;
 
@@ -87,14 +88,19 @@ public class CSVManager {
 		}
 	}
 	
-	public static Route importRoute(Map<Integer, GasStation> stations) {
-//		String filename = "data/Fahrzeugrouten/Bertha Benz Memorial Route.csv";
-//		String filename = "own data/routes/Hildesheim Harz.csv";
-//		String filename = "own data/routes/Oldenburg Hannover.csv";
-		String filename = "own data/routes/Hannover Hildesheim.csv";
-		List<String> lines = readCSV(filename);
+	public static Route importStandardRoute(Map<Integer, GasStation> stations) {
+//		File f = new File("data/Fahrzeugrouten/Bertha Benz Memorial Route.csv");
+//		File f = new File("own data/routes/Hildesheim Harz.csv");
+//		File f = new File("own data/routes/Oldenburg Hannover.csv");
+		File f = new File("own data/routes/Hannover Hildesheim.csv");
+		
+		return importRoute(f, stations);
+	}
+	
+	public static Route importRoute(File routeFile, Map<Integer, GasStation> stations) {
+		List<String> lines = readCSV(routeFile);
 		if(lines == null) {
-			System.err.println("Could not import Route \"" + filename + "\"!");
+			System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
 			return null;
 		}
 		Route route = new Route(getInteger(lines.remove(0)));
@@ -107,6 +113,24 @@ public class CSVManager {
 		}
 		System.out.println(route);
 		return route;
+	}
+	
+	public static List<PredictionPoint> importPredictionPoint(File predictionFile, Map<Integer, GasStation> stations) {
+		String filename = "";
+		List<String> lines = readCSV(filename);
+		if(lines == null) {
+			System.err.println("Could not import Prediction \"" + filename + "\"!");
+			return null;
+		}
+		List<PredictionPoint> result = new ArrayList<>();
+		for(String line: lines) {
+			String[] lineElements = prepareRowData(line);
+			if(lineElements.length != 3) {
+				System.err.println("Import prediction: Illegal Input row size");
+			}
+			result.add(new PredictionPoint(stations.get(getInteger(lineElements[2])), getDate(lineElements[0]), getDate(lineElements[1])) );
+		}
+		return result;
 	}
 	
 	public static void importPrices(List<GasStation> gsl) {
@@ -125,7 +149,7 @@ public class CSVManager {
 	public static void importPrice(GasStation gs) {
 //		double start = System.nanoTime();
 		String filename = "data/Benzinpreise/" + gs.getID() + ".csv";
-		List<String> lines = readCSV(filename);
+		List<String> lines = readCSV(new File(filename));
 		if(lines == null){
 			System.err.println("Could not import prices for " + gs);
 			return;
@@ -143,23 +167,6 @@ public class CSVManager {
 //		System.out.println("time: " + time);
 	}
 	
-	public static void importPredictionJobs() {
-		String filename = "";
-		List<String> lines = readCSV(filename);
-		if(lines == null) {
-			System.err.println("Could not import Prediction \"" + filename + "\"!");
-			return;
-		}
-		// TODO new PredictionPoint
-		for(String line: lines) {
-			String[] lineElements = prepareRowData(line);
-			if(lineElements.length != 3) {
-				System.err.println("Import prediction: Illegal Input row size");
-			}
-			// TODO create element
-		}
-	}
-	
 	private static String[] prepareRowData(String row) {
 		String[] res = row.split(";");
 		for(int i = 0; i < res.length; i++) {
@@ -169,12 +176,19 @@ public class CSVManager {
 	}
 	
 	private static List<String> readCSV(String filename) {
+		return readCSV(new File(filename));
+	}
+	
+	private static List<String> readCSV(File file) {
 		List<String> lines = new ArrayList<>();
-		File f = new File(filename);
+		if(file == null || !file.exists()) {
+			System.err.println("File \"" + file + "\" does not exist!");
+			return null;
+		}
 		Reader r = null;
 		BufferedReader br = null;
 		try{
-			r = new FileReader(f);
+			r = new FileReader(file);
 			br = new BufferedReader(r);
 			String line;
 			while((line = br.readLine()) != null){

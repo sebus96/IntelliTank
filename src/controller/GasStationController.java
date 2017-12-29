@@ -19,7 +19,7 @@ public class GasStationController {
 
 	public GasStationController() {
 		allStations = CSVManager.importGasStations();
-		route = CSVManager.importRoute(allStations);
+		route = CSVManager.importStandardRoute(allStations);
 		CSVManager.importPrices(route);
 		this.predictions = new ArrayList<>();
 		this.trainPrediction();
