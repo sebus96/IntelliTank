@@ -39,7 +39,7 @@ public class SwitchButton {
         if(gsc.getRoute().showBasicStrategy())
             buttonText = "Zur intelligenten\nStrategie wechseln";
         else
-            buttonText = "Zur Standard\nStrategie wechseln";
+            buttonText = "Zur Standard-\nStrategie wechseln";
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFill(Color.WHITE);
         gc.fillRect(x,y,width,height);

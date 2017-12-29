@@ -109,7 +109,7 @@ public class MainView {
     			Alert alert = new Alert(AlertType.INFORMATION);
     			alert.setTitle("Mitwirkende");
     			alert.setHeaderText(null);
-    			alert.setContentText("Dieses Projekt wurde von Sebastian Drath, Sezer Dursun, Axel Claassen und Burak Kadioglu entwickelt.");
+    			alert.setContentText("Dieses Projekt wurde von Sezer Dursun, Sebastian Drath, Axel Claassen und Burak Kadioglu entwickelt.");
     			alert.showAndWait();
     		}
 		});
@@ -158,20 +158,41 @@ public class MainView {
     }
 
     private void displayResult() {
-        DecimalFormat f = new DecimalFormat("#0.00"); 
-        String output = "Auf " + f.format(gsc.getRoute().getTotalKm()) + "km wurden " + f.format(gsc.getRoute().getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt ";
-    	if(gsc.getRoute().showBasicStrategy()) {
-            output += f.format(gsc.getRoute().getTotalEurosBasic()) + " Eur.";
+        gc.setFill(Color.WHITE);
+        gc.fillRect(30, 10, 366, 64);
+        gc.setFill(Color.BLACK);
+        gc.strokeRect(30, 10, 366, 64);
+        gc.strokeLine(152, 10, 152, 74);
+        gc.strokeLine(274, 10, 274, 74);
+        Image imgKm = new Image(getClass().getResourceAsStream("/img/route-a-b.png"));
+        gc.drawImage(imgKm, 30, 10);
+        Image imgFuelGauge = new Image(getClass().getResourceAsStream("/img/fuel-gauge.png"));
+        gc.drawImage(imgFuelGauge, 152, 10);
+        Image imgEuro = new Image(getClass().getResourceAsStream("/img/euro.png"));
+        gc.drawImage(imgEuro, 274, 10);
+        DecimalFormat f = new DecimalFormat("#0.00");
+        String outputKm = f.format(gsc.getRoute().getTotalKm()) + " km";
+        gc.setFont(new Font(12));
+        gc.fillText(outputKm, 101, 42);
+        gc.setFont(Font.getDefault());
+        String outputFuelGauge = f.format(gsc.getRoute().getTotalLiters()) + " L";
+        gc.setFont(new Font(15));
+        gc.fillText(outputFuelGauge, 223, 42);
+        gc.setFont(Font.getDefault());
+    	String outputEuro = "";
+        if(gsc.getRoute().showBasicStrategy()) {
+            outputEuro += f.format(gsc.getRoute().getTotalEurosBasic()) + " €";
+            gc.setFont(new Font(15));
+            gc.fillText(outputEuro, 345, 42);
+            gc.setFont(Font.getDefault());
         }
         else {
-            output += f.format(gsc.getRoute().getTotalEuros()) + " Eur.";
+            outputEuro += f.format(gsc.getRoute().getTotalEuros()) + " €";
+            gc.setFont(new Font(15));
+            gc.fillText(outputEuro, 345, 42);
+            gc.setFont(Font.getDefault());
+
         }
-        Image gasStation = new Image(getClass().getResourceAsStream("/img/gasstation.png"), 5, 5, false, false);
-        //output.setGraphic(new ImageView(gasStation));
-    	//output.setStyle("-fx-font-size: 100px");
-    	//output.setFont(new Font("Arial", 30));
-    	//output.setPrefSize(3330, 30);
-        gc.fillText(output,10,50);
     }
 
     private void createGasPriceNode(int index, int circleStart, int circleWidth, int circleHeight) {
