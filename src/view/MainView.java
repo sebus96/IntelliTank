@@ -11,6 +11,7 @@ import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
 import controller.GasStationController;
+import io.CSVManager;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
@@ -24,6 +25,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -67,12 +69,9 @@ public class MainView {
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
 
-        //The MenuBar is on the top
-        bar = new MenuBar();
-       
         //Methods to fill each part with content
         displayRoute();
-        displayMenubar(bar, border);
+        displayMenubar(border);
         Image icon = new Image("/img/gas-station.png");
         primaryStage.getIcons().add(icon);
         primaryStage.show();
@@ -94,43 +93,13 @@ public class MainView {
     }
        
     //displays menu bar on the top
-    private void displayMenubar(MenuBar bar, BorderPane border) {    	
-    	Menu routen = new Menu("Routen");
-    	MenuItem itemImportRoute = new MenuItem("Importieren");
-    	itemImportRoute.setOnAction(
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(final ActionEvent e) {
-                        FileChooser fc = new FileChooser();
-                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
-                        File selectedFile = fc.showOpenDialog(null);
-                        if (selectedFile != null) {
-                        	System.out.println("Sieg.");
-                        } else {
-                        	System.out.println("Datei ist nicht valide.");
-                        }
-                    }
-                });
-    	routen.getItems().addAll(itemImportRoute);
-    	
-    	Menu vorhersagezeitpunkte = new Menu("Vorhersagezeitpunkte");
-    	MenuItem itemImportV = new MenuItem("Importieren");
-    	itemImportV.setOnAction(
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(final ActionEvent e) {
-                        FileChooser fc = new FileChooser();
-                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
-                        File selectedFile = fc.showOpenDialog(null);
-                        if (selectedFile != null) {
-                        	System.out.println("Sieg.");
-                        } else {
-                        	System.out.println("Datei ist nicht valide.");
-                        }
-                    }
-                });
-    	vorhersagezeitpunkte.getItems().addAll(itemImportV);
+    private void displayMenubar(BorderPane border) {    
+        bar = new MenuBar();
+        border.setTop(bar);
         
+        setUpRouteTab();
+    	setUpPredictionPointTab();
+    	
     	Menu ueber = new Menu("über");
     	MenuItem itemUeber = new MenuItem("Mitwirkende");
     	ueber.getItems().addAll(itemUeber);
@@ -144,8 +113,7 @@ public class MainView {
     			alert.showAndWait();
     		}
 		});
-        bar.getMenus().addAll(routen, vorhersagezeitpunkte, ueber);
-    	border.setTop(bar);
+        //bar.getMenus().addAll(routen, vorhersagezeitpunkte, ueber);
     }
     
     //gets repeatedly called by the displayroute function. Creates an elipse and a line for a specific gas station
@@ -311,6 +279,69 @@ public class MainView {
             GasStation b = gsc.getRoute().get(index).getStation();
             gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km", 200, (lineStart + lineEnd)/2);
         }
+    }
+
+    private void setUpRouteTab() {
+        
+        Menu routes = new Menu("Routen");
+        //Wenn der "Route"-Reiter gedrueckt wird, aktualisiere die Liste der Routen in dem Ordner (evtl setOnShowing?)
+        routes.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(final ActionEvent e) {
+                        //Entferne alles ausser die ersten 3(Import und 2 seperator) und füge danach alle aus dem Ordner hinzu
+                        routes.getItems().remove(3,routes.getItems().size()-1);
+                        for(String s : CSVManager.readRouteNames()) {
+                            MenuItem mi = new MenuItem(s);
+                            mi.setOnAction(new EventHandler<ActionEvent>() {
+                                @Override
+                                public void handle(final ActionEvent e) {
+                                    gsc.changeCurrentRoute(mi.getText());
+                                }
+                            });
+                            routes.getItems().add(mi);
+                        }
+                    }});
+    	
+        MenuItem itemImportRoute = new MenuItem("Importieren");
+    	itemImportRoute.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(final ActionEvent e) {
+                        FileChooser fc = new FileChooser();
+                        File workingDirectory = new File(System.getProperty("user.dir"));
+                        fc.setInitialDirectory(workingDirectory);
+                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
+                        File selectedFile = fc.showOpenDialog(null);
+                        if (selectedFile != null) {
+                        	System.out.println("Sieg.");
+                                //TODO: datei in owndata/routes kopieren
+                        } else {
+                        	System.out.println("Datei ist nicht valide.");
+                        }
+                    }
+                });
+        routes.getItems().addAll(itemImportRoute,new SeparatorMenuItem(),new SeparatorMenuItem());
+        bar.getMenus().add(routes);
+    }
+
+    private void setUpPredictionPointTab() {
+        Menu vorhersagezeitpunkte = new Menu("Vorhersagezeitpunkte");
+    	MenuItem itemImportV = new MenuItem("Importieren");
+    	itemImportV.setOnAction(
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(final ActionEvent e) {
+                        FileChooser fc = new FileChooser();
+                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
+                        File selectedFile = fc.showOpenDialog(null);
+                        if (selectedFile != null) {
+                        	System.out.println("Sieg.");
+                        } else {
+                        	System.out.println("Datei ist nicht valide.");
+                        }
+                    }
+                });
+    	vorhersagezeitpunkte.getItems().addAll(itemImportV);
+        //bar.getMenus().addAll(routen, vorhersagezeitpunkte, ueber);
     }
 
 }

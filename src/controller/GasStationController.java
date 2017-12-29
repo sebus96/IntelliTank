@@ -18,11 +18,13 @@ public class GasStationController {
 	private List<PredictionUnit> predictions;
 	private MainModel mainModel;
         private MainView mainView;
+        //private List<String> routeNames;
 
 	public GasStationController(Stage primaryStage) {
 		allStations = CSVManager.importGasStations();
 		route = CSVManager.importStandardRoute(allStations);
 		CSVManager.importPrices(route);
+                //routeNames = CSVManager.readRouteNames();
 		this.predictions = new ArrayList<>();
 		this.trainPrediction();
 		mainModel = new MainModel();
@@ -66,4 +68,8 @@ public class GasStationController {
 		}
 		System.out.println("Prediction finished");
 	}
+
+    public void changeCurrentRoute(String text) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
