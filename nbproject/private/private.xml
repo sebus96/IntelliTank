@@ -3,16 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/model/GasStation.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/model/MainModel.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/controller/GasStationController.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/.git/config</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/main/Main.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/model/RefuelStop.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/intellitank/IntelliTank.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/model/Route.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/model/Price.java</file>
-            <file>file:/D:/Dropbox/Uni%20(3)/Informaticup/IntelliTank/src/io/CSVReader.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/io/CSVManager.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/IntelliTank.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/Price.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/Route.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/MainModel.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/GasStation.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/controller/GasStationController.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/PriceDiagram.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/SwitchButton.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/RefuelStop.java</file>
         </group>
     </open-files>
 </project-private>

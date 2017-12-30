@@ -162,20 +162,40 @@ public class MainView {
     }
 
     private void displayResult(Route route) {
-        DecimalFormat f = new DecimalFormat("#0.00"); 
-        String output = "Auf " + f.format(route.getTotalKm()) + "km wurden " + f.format(route.getTotalLiters()) + "L verbraucht bei einem Preis von insgesamt ";
-    	if(route.showBasicStrategy()) {
-            output += f.format(route.getTotalEurosBasic()) + " Eur.";
+        gc.setFill(Color.WHITE);
+        gc.fillRect(30, 10, 366, 64);
+        gc.setFill(Color.BLACK);
+        gc.strokeRect(30, 10, 366, 64);
+        gc.strokeLine(152, 10, 152, 74);
+        gc.strokeLine(274, 10, 274, 74);
+        Image imgKm = new Image(getClass().getResourceAsStream("/img/route-a-b.png"));
+        gc.drawImage(imgKm, 30, 10);
+        Image imgFuelGauge = new Image(getClass().getResourceAsStream("/img/fuel-gauge.png"));
+        gc.drawImage(imgFuelGauge, 152, 10);
+        Image imgEuro = new Image(getClass().getResourceAsStream("/img/euro.png"));
+        gc.drawImage(imgEuro, 274, 10);
+        DecimalFormat f = new DecimalFormat("#0.00");
+        String outputKm = f.format(route.getTotalKm()) + " km";
+        gc.setFont(new Font(12));
+        gc.fillText(outputKm, 101, 42);
+        gc.setFont(Font.getDefault());
+        String outputFuelGauge = f.format(route.getTotalLiters()) + " L";
+        gc.setFont(new Font(15));
+        gc.fillText(outputFuelGauge, 223, 42);
+        gc.setFont(Font.getDefault());
+    	String outputEuro = "";
+        if(route.showBasicStrategy()) {
+            outputEuro += f.format(route.getTotalEurosBasic()) + " �";
+            gc.setFont(new Font(15));
+            gc.fillText(outputEuro, 345, 42);
+            gc.setFont(Font.getDefault());
         }
         else {
-            output += f.format(route.getTotalEuros()) + " Eur.";
+            outputEuro += f.format(route.getTotalEuros()) + " �";
+            gc.setFont(new Font(15));
+            gc.fillText(outputEuro, 345, 42);
+            gc.setFont(Font.getDefault());
         }
-        Image gasStation = new Image(getClass().getResourceAsStream("/img/gasstation.png"), 5, 5, false, false);
-        //output.setGraphic(new ImageView(gasStation));
-    	//output.setStyle("-fx-font-size: 100px");
-    	//output.setFont(new Font("Arial", 30));
-    	//output.setPrefSize(3330, 30);
-        gc.fillText(output,10,50);
     }
 
     private void createGasPriceNode(Route route, int index, int circleStart, int circleWidth, int circleHeight) {

@@ -51,7 +51,7 @@ public class PredictionUnit {
 		List<Price> predictedPriceList = new ArrayList<>();
 		Calendar c = Calendar.getInstance();
 		c.setTime(trainUntil);
-		predictedPriceList.add(new Price(c.getTime(), gs.getHistoricPrice(c.getTime()))); // letzter bekannter Preis zu Beginn der Route eingefügt
+		predictedPriceList.add(new Price(c.getTime(), gs.getHistoricPrice(c.getTime()))); // letzter bekannter Preis zu Beginn der Route eingefÃ¼gt
 		c.add(Calendar.HOUR_OF_DAY, (-1)*(p.getOldPriceNumber()-1));
 		for(int i = 0; i < p.getOldPriceNumber(); i++) {
 			lastPrices.add((double)gs.getHistoricPrice(c.getTime()));
@@ -80,11 +80,11 @@ public class PredictionUnit {
 		avgPrice /= ctr;
 		realAvgPrice /= ctr;
 		if(PRINT_RESULTS) System.out.println(gs + "\n"
-				+ "Durchschnittsabweichung: " + ((int)avgDiff/1000.0) + " €\n"
-				+ "Maximale Abweichung: " + ((int)maxDiff/1000.0) + " €\n"
-				+ "Durchschnittspreis: " + ((int)avgPrice/1000.0) + " € (real: " + ((int)realAvgPrice/1000.0) + " €)\n"
-				+ "Maximalpreis: " + ((int)maxPrice/1000.0) + " € (real: " + ((int)realMaxPrice/1000.0) + " €)\n"
-				+ "Minimalpreis: " + ((int)minPrice/1000.0) + " € (real: " + ((int)realMinPrice/1000.0) + " €)\n");
+				+ "Durchschnittsabweichung: " + ((int)avgDiff/1000.0) + " \n"
+				+ "Maximale Abweichung: " + ((int)maxDiff/1000.0) + " \n"
+				+ "Durchschnittspreis: " + ((int)avgPrice/1000.0) + "  (real: " + ((int)realAvgPrice/1000.0) + " )\n"
+				+ "Maximalpreis: " + ((int)maxPrice/1000.0) + "  (real: " + ((int)realMaxPrice/1000.0) + " )\n"
+				+ "Minimalpreis: " + ((int)minPrice/1000.0) + "  (real: " + ((int)realMinPrice/1000.0) + " )\n");
 		return predictedPriceList;
 	}
 	
@@ -118,6 +118,6 @@ public class PredictionUnit {
 //		}
 //		System.out.println(ctr);
 //		avgDiff /= ctr;
-//		System.out.println("Average: " + ((int)avgDiff/1000.0) + " €" + "\nMaximum: " + ((int)maxDiff/1000.0) + " €");
+//		System.out.println("Average: " + ((int)avgDiff/1000.0) + " ï¿½" + "\nMaximum: " + ((int)maxDiff/1000.0) + " ï¿½");
 //	}
 }

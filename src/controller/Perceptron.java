@@ -134,7 +134,7 @@ public class Perceptron {
 	
 	/**
 	* Berechnet das Skalarprodukt zwischen den Gewichten und dem Eingabevektor.
-	* @param input Datum für das der Preis bestimmt werden soll
+	* @param input Datum fÃ¼r das der Preis bestimmt werden soll
 	* @return berechneter Preis
 	*/
 	public double output(Date d, List<Double> lastPrices) {
