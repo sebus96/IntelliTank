@@ -12,6 +12,10 @@ import com.sun.javafx.tk.Toolkit;
 
 import controller.GasStationController;
 import io.CSVManager;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -77,7 +81,6 @@ public class MainView {
         displayMenubar(border);
         Image icon = new Image("/img/gas-station.png");
         mainStage.getIcons().add(icon);
-        //mainStage.show();
     }
     
     //iterates theough the entire map, which includes all gas stations on the route.    
@@ -338,10 +341,15 @@ public class MainView {
                         fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
                         File selectedFile = fc.showOpenDialog(null);
                         if (selectedFile != null) {
-                        	System.out.println("Sieg.");
-                                //TODO: datei in owndata/routes kopieren
+                            try {
+                                CSVManager.copyRoute(selectedFile);
+                            } catch (FileNotFoundException ex) {
+                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         } else {
-                        	System.out.println("Datei ist nicht valide.");
+                        	System.out.println("Keine Datei ausgewaehlt.");
                         }
                     }
                 });
@@ -367,7 +375,7 @@ public class MainView {
                     }
                 });
     	vorhersagezeitpunkte.getItems().addAll(itemImportV);
-        //bar.getMenus().addAll(routen, vorhersagezeitpunkte, ueber);
+        bar.getMenus().add(vorhersagezeitpunkte);
     }
     public void hide() {
         canvas = null;

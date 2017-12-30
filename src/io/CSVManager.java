@@ -2,9 +2,16 @@ package io;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -92,18 +99,18 @@ public class CSVManager {
         }
     }
 
-    public static Route importStandardRoute(Map<Integer, GasStation> stations,String routeName) {
-        
+    public static Route importStandardRoute(Map<Integer, GasStation> stations, String routeName) {
+
         File f = new File(routePath + routeName + ".csv");
 //		File f = new File("data/Fahrzeugrouten/Bertha Benz Memorial Route.csv");
 //		File f = new File("own data/routes/Hildesheim Harz.csv");
 //		File f = new File("own data/routes/Oldenburg Hannover.csv");
 //        File f = new File(routePath + "Hannover Hildesheim.csv");
 
-        return importRoute(f, stations,routeName);
+        return importRoute(f, stations, routeName);
     }
 
-    public static Route importRoute(File routeFile, Map<Integer, GasStation> stations,String routeName) {
+    public static Route importRoute(File routeFile, Map<Integer, GasStation> stations, String routeName) {
         List<String> lines = readCSV(routeFile);
         if (lines == null) {
             System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
@@ -256,59 +263,68 @@ public class CSVManager {
         }
         return routeNames;
     }
+
+    public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
+
+        InputStream is = new FileInputStream(selectedFile);
+
+        Path path = Paths.get(routePath + selectedFile.getName());
+
+        Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+    }
 }
 
-    class Postalcode {
+class Postalcode {
 
-        private int upper, lower;
-        private String state;
+    private int upper, lower;
+    private String state;
 
-        public Postalcode(int lower, int upper, String state) {
-            this.upper = upper;
-            this.lower = lower;
-            this.state = state;
-        }
+    public Postalcode(int lower, int upper, String state) {
+        this.upper = upper;
+        this.lower = lower;
+        this.state = state;
+    }
 
-        public boolean isInArea(int postcode) {
-            return postcode <= upper && postcode >= lower;
-        }
+    public boolean isInArea(int postcode) {
+        return postcode <= upper && postcode >= lower;
+    }
 
-        public FederalState getState() {
-            switch (this.state) {
-                case "Baden-Württemberg":
-                    return FederalState.BW;
-                case "Bayern":
-                    return FederalState.BY;
-                case "Berlin":
-                    return FederalState.BE;
-                case "Brandenburg":
-                    return FederalState.BB;
-                case "Bremen":
-                    return FederalState.HB;
-                case "Hamburg":
-                    return FederalState.HH;
-                case "Hessen":
-                    return FederalState.HE;
-                case "Mecklenburg-Vorpommern":
-                    return FederalState.MV;
-                case "Niedersachsen":
-                    return FederalState.NI;
-                case "Nordrhein-Westfalen":
-                    return FederalState.NW;
-                case "Rheinland-Pfalz":
-                    return FederalState.RP;
-                case "Saarland":
-                    return FederalState.SL;
-                case "Sachsen":
-                    return FederalState.SN;
-                case "Sachsen-Anhalt":
-                    return FederalState.ST;
-                case "Schleswig-Holstein":
-                    return FederalState.SH;
-                case "Thüringen":
-                    return FederalState.TH;
-                default:
-                    return FederalState.DEF;
-            }
+    public FederalState getState() {
+        switch (this.state) {
+            case "Baden-Württemberg":
+                return FederalState.BW;
+            case "Bayern":
+                return FederalState.BY;
+            case "Berlin":
+                return FederalState.BE;
+            case "Brandenburg":
+                return FederalState.BB;
+            case "Bremen":
+                return FederalState.HB;
+            case "Hamburg":
+                return FederalState.HH;
+            case "Hessen":
+                return FederalState.HE;
+            case "Mecklenburg-Vorpommern":
+                return FederalState.MV;
+            case "Niedersachsen":
+                return FederalState.NI;
+            case "Nordrhein-Westfalen":
+                return FederalState.NW;
+            case "Rheinland-Pfalz":
+                return FederalState.RP;
+            case "Saarland":
+                return FederalState.SL;
+            case "Sachsen":
+                return FederalState.SN;
+            case "Sachsen-Anhalt":
+                return FederalState.ST;
+            case "Schleswig-Holstein":
+                return FederalState.SH;
+            case "Thüringen":
+                return FederalState.TH;
+            default:
+                return FederalState.DEF;
         }
     }
+}
