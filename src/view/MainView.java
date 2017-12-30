@@ -166,39 +166,53 @@ public class MainView {
 
     private void displayResult(Route route) {
         gc.setFill(Color.WHITE);
-        gc.fillRect(30, 10, 366, 64);
+        gc.fillRect(30, 42, 288, 32);
         gc.setFill(Color.BLACK);
-        gc.strokeRect(30, 10, 366, 64);
-        gc.strokeLine(152, 10, 152, 74);
-        gc.strokeLine(274, 10, 274, 74);
+        gc.setFill(Color.WHITE);
+        gc.fillRect(30, 26, 288, 16);
+        gc.setFill(Color.BLACK);
+        gc.strokeRect(30, 26, 288, 16);
+        gc.strokeRect(30, 42, 288, 32);
+        gc.strokeLine(126, 42, 126, 74);
+        gc.strokeLine(222, 42, 222, 74);
+        Image imgRoute = new Image(getClass().getResourceAsStream("/img/route.png"));
+        gc.drawImage(imgRoute, 30, 26);
         Image imgKm = new Image(getClass().getResourceAsStream("/img/route-a-b.png"));
-        gc.drawImage(imgKm, 30, 10);
+        gc.drawImage(imgKm, 30, 42);
         Image imgFuelGauge = new Image(getClass().getResourceAsStream("/img/fuel-gauge.png"));
-        gc.drawImage(imgFuelGauge, 152, 10);
+        gc.drawImage(imgFuelGauge, 126, 42);
         Image imgEuro = new Image(getClass().getResourceAsStream("/img/euro.png"));
-        gc.drawImage(imgEuro, 274, 10);
+        gc.drawImage(imgEuro, 222, 42);
+        gc.strokeLine(30, 42, 318, 42);
+        gc.strokeLine(30, 26, 30, 74);
+        gc.strokeLine(30, 26, 288, 26);
+        gc.strokeLine(30, 74, 318, 74);
         DecimalFormat f = new DecimalFormat("#0.00");
         String outputKm = f.format(route.getTotalKm()) + " km";
         gc.setFont(new Font(12));
-        gc.fillText(outputKm, 101, 42);
+        gc.fillText(outputKm, 62, 58);
         gc.setFont(Font.getDefault());
         String outputFuelGauge = f.format(route.getTotalLiters()) + " L";
         gc.setFont(new Font(15));
-        gc.fillText(outputFuelGauge, 223, 42);
+        gc.fillText(outputFuelGauge, 158, 58);
         gc.setFont(Font.getDefault());
     	String outputEuro = "";
         if(route.showBasicStrategy()) {
-            outputEuro += f.format(route.getTotalEurosBasic()) + " ï¿½";
+            outputEuro += f.format(route.getTotalEurosBasic()) + " €";
             gc.setFont(new Font(15));
-            gc.fillText(outputEuro, 345, 42);
+            gc.fillText(outputEuro, 254, 58);
             gc.setFont(Font.getDefault());
         }
         else {
-            outputEuro += f.format(route.getTotalEuros()) + " ï¿½";
+            outputEuro += f.format(route.getTotalEuros()) + " €";
             gc.setFont(new Font(15));
-            gc.fillText(outputEuro, 345, 42);
+            gc.fillText(outputEuro, 254, 58);
             gc.setFont(Font.getDefault());
         }
+        String nameOfRoute = route.getName();
+        gc.setFill(Color.BROWN);
+        gc.fillText(nameOfRoute, 46, 34);
+        gc.setFill(Color.BLACK);
     }
 
     private void createGasPriceNode(Route route, int index, int circleStart, int circleWidth, int circleHeight) {
