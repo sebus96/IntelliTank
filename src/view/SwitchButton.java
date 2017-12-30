@@ -5,10 +5,10 @@
  */
 package view;
 
-import controller.GasStationController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import model.Route;
 
 /**
  *
@@ -17,7 +17,7 @@ import javafx.scene.text.TextAlignment;
 public class SwitchButton {
     
     GraphicsContext gc;
-    GasStationController gsc;
+    Route route;
     int x,y,width,height;
 
     public int getX() {
@@ -27,8 +27,8 @@ public class SwitchButton {
     public int getY() {
         return y;
     }
-    public SwitchButton(GasStationController gsc, GraphicsContext gc,int x, int y) {
-        this.gsc = gsc;
+    public SwitchButton(Route r, GraphicsContext gc,int x, int y) {
+        this.route = r;
         this.gc = gc;
         this.x = x;
         this.y = y;
@@ -36,7 +36,7 @@ public class SwitchButton {
         height = 40;
         
         String buttonText;
-        if(gsc.getRoute().showBasicStrategy())
+        if(route.showBasicStrategy())
             buttonText = "Zur intelligenten\nStrategie wechseln";
         else
             buttonText = "Zur Standard\nStrategie wechseln";
@@ -49,7 +49,7 @@ public class SwitchButton {
         gc.setTextAlign(TextAlignment.LEFT);
     }
     public void buttonPressed() {
-        gsc.getRoute().setShowBasicStrategy(!gsc.getRoute().showBasicStrategy());
+        route.setShowBasicStrategy(!route.showBasicStrategy());
     }
     public boolean wasClicked(int posX, int posY) {
         if(posX > x && posX < x+width && posY > y && posY < y+height)

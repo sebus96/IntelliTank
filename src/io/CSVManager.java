@@ -92,22 +92,24 @@ public class CSVManager {
         }
     }
 
-    public static Route importStandardRoute(Map<Integer, GasStation> stations) {
+    public static Route importStandardRoute(Map<Integer, GasStation> stations,String routeName) {
+        
+        File f = new File(routePath + routeName + ".csv");
 //		File f = new File("data/Fahrzeugrouten/Bertha Benz Memorial Route.csv");
 //		File f = new File("own data/routes/Hildesheim Harz.csv");
 //		File f = new File("own data/routes/Oldenburg Hannover.csv");
-        File f = new File(routePath + "Hannover Hildesheim.csv");
+//        File f = new File(routePath + "Hannover Hildesheim.csv");
 
-        return importRoute(f, stations);
+        return importRoute(f, stations,routeName);
     }
 
-    public static Route importRoute(File routeFile, Map<Integer, GasStation> stations) {
+    public static Route importRoute(File routeFile, Map<Integer, GasStation> stations,String routeName) {
         List<String> lines = readCSV(routeFile);
         if (lines == null) {
             System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
             return null;
         }
-        Route route = new Route(getInteger(lines.remove(0)));
+        Route route = new Route(routeName, getInteger(lines.remove(0)));
         for (String line : lines) {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 2) {
@@ -249,7 +251,7 @@ public class CSVManager {
         List<String> routeNames = new ArrayList<>();
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile() && listOfFiles[i].getName().contains(".csv")) {
-                routeNames.add(listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length() - 5));
+                routeNames.add(listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length() - 4));
             }
         }
         return routeNames;

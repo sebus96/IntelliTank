@@ -5,10 +5,27 @@ import java.util.Date;
 import java.util.List;
 
 public class Route {
-	private double tankCapacity;
-	private List<RefuelStop> route;
-        private double totalEuros,totalKm,totalLiters,totalEuroBasic;
-        private boolean showBasicStrategy;//entscheidet, welche Tankstrategie gezeigt werden soll: die Standart-Strategie oder die "schlaue"
+
+    private double tankCapacity;
+    private String name;
+    private List<RefuelStop> route;
+    private double totalEuros, totalKm, totalLiters, totalEuroBasic;
+    private boolean showBasicStrategy;//entscheidet, welche Tankstrategie gezeigt werden soll: die Standart-Strategie oder die "schlaue"
+
+    
+    public Route(String name, int tankCapacity) {
+        this.tankCapacity = tankCapacity;
+        this.route = new ArrayList<>();
+        this.name = name;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public boolean showBasicStrategy() {
         return showBasicStrategy;
@@ -17,7 +34,7 @@ public class Route {
     public void setShowBasicStrategy(boolean showBasicStrategy) {
         this.showBasicStrategy = showBasicStrategy;
     }
-        
+
     public double getTotalEurosBasic() {
         return totalEuroBasic;
     }
@@ -49,42 +66,40 @@ public class Route {
     public void setTotalLiters(double totalLiters) {
         this.totalLiters = totalLiters;
     }
-	
-	public Route( int tankCapacity ) {
-		this.tankCapacity = tankCapacity;
-		this.route = new ArrayList<>();
-	}
-	
-	public int getLength() {
-		if (route == null) return 0;
-		return route.size();
-	}
-	
-	public RefuelStop get(int i) {
-		if (i < 0 || i >= route.size()){
-			System.out.println("TT: " + i + " " + this.getLength());
-			return null;
-		}
-		return route.get(i);
-	}
-	
-	public double getTankCapacity() {
-		return this.tankCapacity;
-	}
-	
-	public void setTankCapacity(int capacity) {
-		this.tankCapacity = capacity;
-	}
-	
-	public void addRouteElement(GasStation station, Date time) {
-		route.add(new RefuelStop(station, time));
-	}
-	
-	@Override
-	public String toString() {
-		return "(Tank: " + this.tankCapacity + " L " + this.route + ")";
-	}
-	/*
+
+
+    public int getLength() {
+        if (route == null) {
+            return 0;
+        }
+        return route.size();
+    }
+
+    public RefuelStop get(int i) {
+        if (i < 0 || i >= route.size()) {
+            //System.out.println("TT: " + i + " " + this.getLength());
+            return null;
+        }
+        return route.get(i);
+    }
+
+    public double getTankCapacity() {
+        return this.tankCapacity;
+    }
+
+    public void setTankCapacity(int capacity) {
+        this.tankCapacity = capacity;
+    }
+
+    public void addRouteElement(GasStation station, Date time) {
+        route.add(new RefuelStop(station, time));
+    }
+
+    @Override
+    public String toString() {
+        return "(Tank: " + this.tankCapacity + " L " + this.route + ")";
+    }
+    /*
 	public List<RefuelStop> getRoute() {
 		return route;
 	}*/
