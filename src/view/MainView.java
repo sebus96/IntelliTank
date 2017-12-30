@@ -212,6 +212,7 @@ public class MainView {
         String nameOfRoute = route.getName();
         gc.setFill(Color.BROWN);
         gc.fillText(nameOfRoute, 46, 34);
+        gc.setFill(Color.BLACK);
     }
 
     private void createGasPriceNode(Route route, int index, int circleStart, int circleWidth, int circleHeight) {
