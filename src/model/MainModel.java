@@ -262,13 +262,11 @@ public class MainModel {
             else {
                 totalEuros += route.get(i).getRefillAmount(route) * guessPrice(route, i) / 1000;
             }
-            System.out.println(totalEuros);
         }
         route.setTotalKm(totalKm);
         route.setTotalLiters(totalKm * gasUsedPerKm);
         route.setTotalEuros(totalEuros);
     }
-
     /**
      * Vermutet den Preis anhand aller anderen Tankstellen auf der Route. Je näher eine andere Tankstelle ist, desto höher ist ihr Einfluss bei der Preisbestimmung.
      * @param route Die route, auf der die Tankstelle, für die der Preis vermutet werden soll, liegt.
