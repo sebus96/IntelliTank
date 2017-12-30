@@ -260,8 +260,9 @@ public class MainModel {
                 totalEuros += route.get(i).getRefillAmount(route) * route.get(i).getPredictedPrice() / 1000;
             }
             else {
-                totalEuros += route.get(i).getRefillAmount(route) * guessPrice(route, i);
+                totalEuros += route.get(i).getRefillAmount(route) * guessPrice(route, i) / 1000;
             }
+            System.out.println(totalEuros);
         }
         route.setTotalKm(totalKm);
         route.setTotalLiters(totalKm * gasUsedPerKm);

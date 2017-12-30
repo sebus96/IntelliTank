@@ -224,23 +224,32 @@ public class MainView {
         double currentGasPercentage = rs.getFuelAmount(route)/route.getTankCapacity() * 100;
         double currentRefillPercentage = rs.getRefillAmount(route)/route.getTankCapacity() * 100;
         //System.out.println(rs.getFuelAmount() + " " + rs.getRefillAmount());
-        DecimalFormat f = new DecimalFormat("#0.0"); 
+        DecimalFormat f2 = new DecimalFormat("#0.00"); 
+        DecimalFormat f1 = new DecimalFormat("#0.0"); 
         //f.setRoundingMode(RoundingMode.UP);
         //create a rectangle which shows the current gas status
         gc.setFill(Color.WHITE);
         gc.fillRect(30, circleStart, 100, circleHeight);
         gc.setFill(Color.BLACK);
-        //this variable is only temporary until gas management is implemented
         gc.fillRect(30, circleStart, currentGasPercentage, circleHeight);
-        gc.fillText(f.format(Math.abs(rs.getFuelAmount(route))) + " L", 30, circleStart-10);
+        if(f2.format(Math.abs(rs.getFuelAmount(route))).charAt(3) == '0') {
+            gc.fillText(f1.format(Math.abs(rs.getFuelAmount(route))) + " L", 30, circleStart-10);
+        }
+        else {
+            gc.fillText(f2.format(Math.abs(rs.getFuelAmount(route))) + " L", 30, circleStart-10);
+        }
         gc.setFill(Color.GREEN);
         gc.fillRect(30 + currentGasPercentage, circleStart, currentRefillPercentage, circleHeight);
         gc.setTextAlign(TextAlignment.RIGHT);
-        gc.fillText("+ " + f.format(rs.getRefillAmount(route)) + " L", 130, circleStart-10);
+        if(f2.format(rs.getRefillAmount(route)).charAt(3) == '0') {
+            gc.fillText("+ " + f1.format(rs.getRefillAmount(route)) + " L", 130, circleStart-10);
+        }
+        else {
+            gc.fillText("+ " + f2.format(rs.getRefillAmount(route)) + " L", 130, circleStart-10);
+        }
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLACK);
         gc.strokeRect(30, circleStart, 100, circleHeight);
-
     }
 
     private void createHyperlinkStationText(Route route, int index,int circleStart,int circleHeight) {
