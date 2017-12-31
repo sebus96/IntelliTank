@@ -29,10 +29,13 @@ import model.Route;
 public class CSVManager {
 
     private static List<Postalcode> post2state;
-    public static final String routePath = "own data/routes/";
+    public static final String inputPath = "Eingabedaten/";
+    public static final String routePath = inputPath + "Fahrzeugrouten/";
+    public static final String predictionPath = inputPath + "Vorhersagezeitpunkte/";
+    public static final String pricePath = inputPath + "Benzinpreise/";
 
     public static Map<Integer, GasStation> importGasStations() {
-        String filename = "data/Tankstellen.csv";
+        String filename = inputPath + "Tankstellen.csv";
         importPostalcodes();
         List<String> lines = readCSV(filename);
         if (lines == null) {
@@ -76,7 +79,7 @@ public class CSVManager {
         if (post2state != null) {
             return;
         }
-        String filename = "own data/postalcode2federalstate.csv";
+        String filename = inputPath + "postalcode2federalstate.csv";
         post2state = new ArrayList<>();
         List<String> lines = readCSV(filename);
         if (lines == null) {
@@ -102,9 +105,9 @@ public class CSVManager {
     public static Route importStandardRoute(Map<Integer, GasStation> stations, String routeName) {
 
         File f = new File(routePath + routeName + ".csv");
-//		File f = new File("data/Fahrzeugrouten/Bertha Benz Memorial Route.csv");
-//		File f = new File("own data/routes/Hildesheim Harz.csv");
-//		File f = new File("own data/routes/Oldenburg Hannover.csv");
+//		File f = new File(routePath + "Bertha Benz Memorial Route.csv");
+//		File f = new File(routePath + "Hildesheim Harz.csv");
+//		File f = new File(routePath + "Oldenburg Hannover.csv");
 //        File f = new File(routePath + "Hannover Hildesheim.csv");
 
         return importRoute(f, stations, routeName);
@@ -163,7 +166,7 @@ public class CSVManager {
 
     public static void importPrice(GasStation gs) {
 //		double start = System.nanoTime();
-        String filename = "data/Benzinpreise/" + gs.getID() + ".csv";
+        String filename = pricePath + gs.getID() + ".csv";
         List<String> lines = readCSV(new File(filename));
         if (lines == null) {
             System.err.println("Could not import prices for " + gs);
@@ -253,7 +256,7 @@ public class CSVManager {
     }
 
     public static List<String> readRouteNames() {
-        File folder = new File("own data/routes");
+        File folder = new File(routePath);
         File[] listOfFiles = folder.listFiles();
         List<String> routeNames = new ArrayList<>();
         for (int i = 0; i < listOfFiles.length; i++) {

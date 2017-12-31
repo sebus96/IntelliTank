@@ -1,5 +1,6 @@
 /build/
 /dist/
 /nbproject/private/
-/data/
 /bin/
+/Eingabedaten/Benzinpreise/*
+/Eingabedaten/Tankstellen.csv
