@@ -2,7 +2,6 @@ package controller;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import model.GasStation;
 import model.Price;
@@ -13,15 +12,15 @@ public class Network {
 	private final int oldPriceNumber = 4;
 	private final int inputlength = 7 + 24 + oldPriceNumber;
 	//7+24+oldPriceNumber
-	private double rate;
+//	private double rate;
 	private final int precision = 13;
 	private GasStation station;
 
     private Matrix weightsInputToHidden;
     private Matrix weightsHiddenToOutput;
 
-    public Network(GasStation gs, double rate, int epochs) {
-		this.rate = rate;
+    public Network(GasStation gs/*, double rate*/, int epochs) {
+//		this.rate = rate;
 		this.station = gs;
 		this.epochs = epochs;
     }
@@ -42,12 +41,15 @@ public class Network {
 
         for (int i = 0; i < epochs; i++) {
 
+			int totalDifference = 0;
+			int listCounter = 0;
+			
         	for(int m = 0; m < station.getPriceListSize(); m++) {
 				Price p = station.getPriceListElement(i);
 				if(p.getTime().after(until)) break;
 
                 // feed forward
-                Matrix inputLayer = new Matrix(1, inputlength); // TODO input matrix füllen
+                Matrix inputLayer = generateInputMatrix(p.getTime());
                 Matrix hiddenLayer = MatrixOperations.sigmoid(
                         MatrixOperations.matMult(inputLayer, this.weightsInputToHidden));
                 Matrix outputLayer = MatrixOperations.sigmoid(
@@ -55,6 +57,8 @@ public class Network {
 
                 // calculate error
                 Matrix outputLayerError = calcError(p.getPrice() , outputLayer.getMatrix()[0][0]);
+                totalDifference += Math.abs(outputLayerError.getValue(0, 0));
+                listCounter++;
 
                 // backpropagation
                 // in what direction is the target value? were we really sure? if so, don't change too much.
@@ -74,6 +78,7 @@ public class Network {
                 this.weightsInputToHidden = MatrixOperations.matAdd(this.weightsInputToHidden,
                         MatrixOperations.matMult(inputLayer.transpose(), hiddenLayerDelta.transpose()));
             }
+        	if(totalDifference/listCounter < precision) break;
         }
     }
 
@@ -96,7 +101,7 @@ public class Network {
      * @param input
      * @return
      */
-    public double feedForward(Date input, List<Double> lastPrices){
+    public double feedForward(Date input/*, List<Double> lastPrices*/){
 
         Matrix inputLayer = new Matrix(1, 144/*data.getInput().length*/); // 1 x 144 // TODO generate input
         Matrix hiddenLayer = MatrixOperations.sigmoid(
@@ -107,13 +112,17 @@ public class Network {
         return outputLayer.getValue(0,0);
     }
     
-    private Matrix generateInputMatrix(Date d, List<Double> lastPrices) {
+    private Matrix generateInputMatrix(Date d/*, List<Double> lastPrices*/) {
     	Matrix res = new Matrix(1, inputlength);
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
 		int[] hourVector = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 		int[] weekdayVector = getDayVector(c.get(Calendar.DAY_OF_WEEK));
-		//int[] lastPrices = getPriceVector(c);
+		int[] lastPrices = getPriceVector(c);
+		int ctr = 0;
+		for(int hour: hourVector) res.setValue(0, ctr++, hour);
+		for(int weekday: weekdayVector) res.setValue(0, ctr++, weekday);
+		for(int price: lastPrices) res.setValue(0, ctr++, price);
 		return res;
     }
 	
