@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Route {
+public class Route implements IPredictionStations {
 
     private double tankCapacity;
     private String name;
@@ -21,10 +21,6 @@ public class Route {
     
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public boolean showBasicStrategy() {

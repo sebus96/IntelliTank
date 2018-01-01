@@ -1,21 +1,21 @@
 package view;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
 import controller.GasStationController;
 import io.CSVManager;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -42,6 +42,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.GasStation;
+import model.PredictionPoints;
 import model.RefuelStop;
 import model.Route;
 /**
@@ -97,6 +98,10 @@ public class MainView {
         }
         displayResult(route);
         mainStage.show();
+    }
+    
+    public void displayPredictionPoints(PredictionPoints predictionPoints) {
+    	// TODO show predictionpoint window
     }
        
     //displays menu bar on the top
@@ -343,7 +348,7 @@ public class MainView {
                         //Entferne alles ausser die ersten 3(Import und 2 seperator) und füge danach alle aus dem Ordner hinzu
                         routes.getItems().remove(3,routes.getItems().size());
                         for(String s : CSVManager.readRouteNames()) {
-                            MenuItem mi = new MenuItem(s);
+                            MenuItem mi = new MenuItem(s.substring(0, s.length()-4));
                             mi.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(final ActionEvent e) {

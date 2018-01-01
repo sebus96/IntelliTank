@@ -29,19 +29,6 @@ public class GasStation {
 		//this.projectedPrices = new ArrayList<Price>();
 		this.state = state;
 	}
-	
-//	public GasStation(Map<String, String> textAttributes, Map<String, Integer> numberAttributes, Map<String, Double> positionAttributes){
-//		this.id = numberAttributes.get("ID");
-//		this.name = textAttributes.get("ID");
-//		this.brand = textAttributes.get("ID");
-//		this.street = textAttributes.get("ID");
-//		this.houseNumber = numberAttributes.get("ID");
-//		this.postcode = numberAttributes.get("ID");
-//		this.location = textAttributes.get("ID");
-//		this.latitude = positionAttributes.get("ID"); // Breite
-//		this.longitude = positionAttributes.get("ID"); // Laenge
-//		this.historicPrices = new ArrayList<Price>();
-//	}
 
 	public int getID() {
 		return id;
@@ -121,6 +108,10 @@ public class GasStation {
 	
 	public int getPriceListSize() {
 		return this.historicPrices.size();
+	}
+	
+	public boolean hasPriceList() {
+		return this.historicPrices != null && this.historicPrices.size() > 0;
 	}
 	
 	public Price getPriceListElement(int i) {

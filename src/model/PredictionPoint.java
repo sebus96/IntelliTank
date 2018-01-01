@@ -3,10 +3,11 @@ package model;
 import java.util.Date;
 import java.util.List;
 
-public class PredictionPoint {
+public class PredictionPoint implements IPredictionStation {
 	private GasStation station;
 	private Date priceKnownUntil, predictionTime;
 	private List<Price> predictedPrices;
+	private Price predictedPrice;
 	
 	public PredictionPoint(GasStation station, Date priceKnownUntil, Date predictionTime) {
 		this.station = station;
@@ -25,7 +26,7 @@ public class PredictionPoint {
 		return priceKnownUntil;
 	}
 
-	public Date getPredictionTime() {
+	public Date getTime() {
 		return predictionTime;
 	}
 	
@@ -43,7 +44,10 @@ public class PredictionPoint {
     }
     
     public int getPredictedPrice() {
-    	return this.getPredictedPrice(this.predictionTime);
+    	if(predictedPrice == null || !predictedPrice.getTime().equals(this.predictionTime)) {
+    		predictedPrice = new Price(this.predictionTime, this.getPredictedPrice(this.predictionTime));
+    	}
+    	return predictedPrice.getPrice();
     }
     
     public void setPredictedPrices( List<Price> predicted) {

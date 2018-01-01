@@ -1,7 +1,5 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import io.CSVManager;
@@ -9,9 +7,11 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.stage.Stage;
 import model.GasStation;
-import model.RefuelStop;
-import model.Route;
+import model.IPredictionStation;
+import model.IPredictionStations;
 import model.MainModel;
+import model.PredictionPoints;
+import model.Route;
 import view.MainView;
 import view.ProgressView;
 
@@ -19,31 +19,29 @@ public class GasStationController {
 
     private Map<Integer, GasStation> allStations;
     private Route route;
-    private List<PredictionUnit> predictions;
+    private PredictionPoints predictionPoints;
+//    private List<PredictionUnit> predictions;
     private MainModel mainModel;
     private MainView mainView;
-    private final String standardRoute = "Hannover Hildesheim";
-    private Task<Void> predictionThread;
     private ProgressView pw;
-    //private Stage primaryStage;
 
     public GasStationController(Stage primaryStage) {
         allStations = CSVManager.importGasStations();
-        route = CSVManager.importStandardRoute(allStations, standardRoute);
+        route = CSVManager.importStandardRoute(allStations);
         CSVManager.importPrices(route);
         mainView = new MainView(primaryStage, this);
         mainModel = new MainModel();
         pw = new ProgressView(route.getName());
-        this.predictions = new ArrayList<>();
-        this.trainPrediction();
+//        this.predictions = new ArrayList<>();
+        this.trainPrediction(route);
     }
 
-    public void addGasStation(GasStation station) {
-        if (allStations.containsKey(station.getID())) {
-            System.err.println("Warning: Station with same ID will be inserted.");
-        }
-        allStations.put(station.getID(), station);
-    }
+//    public void addGasStation(GasStation station) {
+//        if (allStations.containsKey(station.getID())) {
+//            System.err.println("Warning: Station with same ID will be inserted.");
+//        }
+//        allStations.put(station.getID(), station);
+//    }
 
     public GasStation getStation(int id) {
         return allStations.get(id);
@@ -52,40 +50,47 @@ public class GasStationController {
     public Route getRoute() {
         return route;
     }
+    
+    public PredictionPoints getPredictionPoints() {
+    	return predictionPoints;
+    }
 
     public MainModel getMainModel() {
         return mainModel;
     }
 
-    public void trainPrediction() {
-        predictionThread = new Task<Void>() {
+    public void trainPrediction(IPredictionStations stations) {
+    	Task<Void> predictionThread = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 System.out.println("Start prediction");
-                for (int i = 0; i < route.getLength(); i++) {
-                    RefuelStop rs = route.get(i);
-                    GasStation gs = rs.getStation();
+                for (int i = 0; i < stations.getLength(); i++) {
+                	IPredictionStation station = stations.get(i);
+                	GasStation gs = station.getStation();
                     if (gs.getPriceListSize() == 0) {
                         System.err.println("Pricelist of " + gs + " does not exist");
                         continue;
                     }
-                    PredictionUnit pu = new PredictionUnit(gs, route.get(0).getTime());
-                    predictions.add(pu);
+                    PredictionUnit pu = new PredictionUnit(gs, station.getTime());
+//                    predictions.add(pu);
                     boolean trainSuccess = pu.train();
                     if (trainSuccess) {
-                        rs.setPredictedPrices(pu.testAndSetHourSteps());
+                        station.setPredictedPrices(pu.testAndSetHourSteps());
                     }
-                    updateProgress((i + 1) * 100 / route.getLength(), 100);
-                    //pw.setProgress((i + 1)/ route.getLength());
-                    //System.out.println(((i + 1) * 100 / route.getLength()) + " %");
+                    updateProgress((i + 1) * 100 / stations.getLength(), 100);
                 }
                 System.out.println("Prediction finished");
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        mainModel.calculateGasUsage(route);
-                        mainView.displayRoute(route);
-                        pw.close();
+                    	if(stations instanceof PredictionPoints) {
+	                        mainView.displayPredictionPoints((PredictionPoints)stations);
+	                        pw.close();
+                    	} else if(stations instanceof Route) {
+                    		mainModel.calculateGasUsage((Route)stations);
+                            mainView.displayRoute((Route)stations);
+                            pw.close();
+                    	}
                     }
                 });
                 return null;
@@ -96,12 +101,21 @@ public class GasStationController {
         new Thread(predictionThread).start();
     }
 
-    public void changeCurrentRoute(String text) {
+    public void changeCurrentRoute(String routeName) {
         mainView.hide();
-        route = CSVManager.importStandardRoute(allStations, text);
+        route = CSVManager.importRoute(allStations, routeName);
         CSVManager.importPrices(route);
         pw = new ProgressView(route.getName());
-        this.predictions = new ArrayList<>();
-        this.trainPrediction();
+//        this.predictions = new ArrayList<>();
+        this.trainPrediction(route);
+    }
+
+    public void showPredictionPoints(String predictionPointName) {
+        mainView.hide();
+        predictionPoints = CSVManager.importPredictionPoints(allStations, predictionPointName);
+        CSVManager.importPrices(predictionPoints);
+        pw = new ProgressView(predictionPoints.getName());
+//        this.predictions = new ArrayList<>();
+        this.trainPrediction(predictionPoints);
     }
 }

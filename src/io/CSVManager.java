@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 import model.FederalState;
 import model.GasStation;
-import model.PredictionPoint;
+import model.PredictionPoints;
 import model.Price;
 import model.Route;
 
@@ -102,19 +103,14 @@ public class CSVManager {
         }
     }
 
-    public static Route importStandardRoute(Map<Integer, GasStation> stations, String routeName) {
-
-        File f = new File(routePath + routeName + ".csv");
-//		File f = new File(routePath + "Bertha Benz Memorial Route.csv");
-//		File f = new File(routePath + "Hildesheim Harz.csv");
-//		File f = new File(routePath + "Oldenburg Hannover.csv");
-//        File f = new File(routePath + "Hannover Hildesheim.csv");
-
-        return importRoute(f, stations, routeName);
+    public static Route importStandardRoute(Map<Integer, GasStation> stations) {
+    	String[] routes = {"Bertha Benz Memorial Route", "Hildesheim Harz", "Oldenburg Hannover", "Hannover Hildesheim"};
+        return importRoute(stations, routes[3]);
     }
 
-    public static Route importRoute(File routeFile, Map<Integer, GasStation> stations, String routeName) {
-        List<String> lines = readCSV(routeFile);
+    public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
+    	File routeFile = new File(routePath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));
+    	List<String> lines = readCSV(routeFile);
         if (lines == null) {
             System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
             return null;
@@ -131,41 +127,44 @@ public class CSVManager {
         return route;
     }
 
-    public static List<PredictionPoint> importPredictionPoint(File predictionFile, Map<Integer, GasStation> stations) {
-        String filename = "";
-        List<String> lines = readCSV(filename);
+    public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
+        File predictionFile = new File(predictionPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
+    	List<String> lines = readCSV(predictionFile);
         if (lines == null) {
-            System.err.println("Could not import Prediction \"" + filename + "\"!");
+            System.err.println("Could not import Prediction \"" + predictionFile.getName() + "\"!");
             return null;
         }
-        List<PredictionPoint> result = new ArrayList<>();
+        PredictionPoints result = new PredictionPoints(predictionName);
         for (String line : lines) {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 3) {
                 System.err.println("Import prediction: Illegal Input row size");
             }
-            result.add(new PredictionPoint(stations.get(getInteger(lineElements[2])), getDate(lineElements[0]), getDate(lineElements[1])));
+            result.addPredictionElement(stations.get(getInteger(lineElements[2])), getDate(lineElements[0]), getDate(lineElements[1]));
         }
         return result;
     }
 
-    public static void importPrices(List<GasStation> gsl) {
-        for (GasStation gs : gsl) {
-            importPrice(gs);
-        }
-    }
-
     public static void importPrices(Route route) {
-        if (route == null) {
-            return;
-        }
+        if (route == null) return;
         for (int i = 0; i < route.getLength(); i++) {
             importPrice(route.get(i).getStation());
         }
     }
 
+    public static void importPrices(PredictionPoints predictionPoints) {
+        if (predictionPoints == null) return;
+        for (int i = 0; i < predictionPoints.getLength(); i++) {
+            importPrice(predictionPoints.get(i).getStation());
+        }
+    }
+
     public static void importPrice(GasStation gs) {
 //		double start = System.nanoTime();
+    	if(gs.hasPriceList()) {
+    		System.err.println("Prices for " + gs + " already imported.");
+    		return;
+    	}
         String filename = pricePath + gs.getID() + ".csv";
         List<String> lines = readCSV(new File(filename));
         if (lines == null) {
@@ -192,7 +191,7 @@ public class CSVManager {
         }
         return res;
     }
-
+    
     private static List<String> readCSV(String filename) {
         return readCSV(new File(filename));
     }
@@ -255,25 +254,24 @@ public class CSVManager {
         }
     }
 
-    public static List<String> readRouteNames() {
-        File folder = new File(routePath);
-        File[] listOfFiles = folder.listFiles();
-        List<String> routeNames = new ArrayList<>();
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile() && listOfFiles[i].getName().contains(".csv")) {
-                routeNames.add(listOfFiles[i].getName().substring(0, listOfFiles[i].getName().length() - 4));
-            }
-        }
-        return routeNames;
+    public static String[] readRouteNames() {
+    	return readFilenames(new File(routePath));
+    }
+
+    public static String[] readPredictionPointNames() {
+    	return readFilenames(new File(predictionPath));
+    }
+    
+    private static String[] readFilenames(File folder) {
+    	String[] listOfFiles = folder.list(new PredictionFileFilter());
+        return listOfFiles;
     }
 
     public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
-
         InputStream is = new FileInputStream(selectedFile);
-
         Path path = Paths.get(routePath + selectedFile.getName());
-
         Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+        is.close();
     }
 }
 
@@ -330,4 +328,12 @@ class Postalcode {
                 return FederalState.DEF;
         }
     }
+}
+
+class PredictionFileFilter implements FilenameFilter {
+	@Override
+	public boolean accept(File dir, String name) {
+		File f = new File(dir.getPath() + File.separator + name);
+		return f.isFile() && name.endsWith(".csv");
+	}
 }

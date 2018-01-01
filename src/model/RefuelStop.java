@@ -3,7 +3,7 @@ package model;
 import java.util.Date;
 import java.util.List;
 
-public class RefuelStop {
+public class RefuelStop implements IPredictionStation {
 
     private Date time;
     private GasStation station;
