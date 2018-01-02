@@ -120,6 +120,7 @@ public class CSVManager {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 2) {
                 System.err.println("Import route: Illegal Input row size");
+                return null;
             }
             route.addRouteElement(stations.get(getInteger(lineElements[1])), getDate(lineElements[0]));
         }

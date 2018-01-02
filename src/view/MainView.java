@@ -203,13 +203,13 @@ public class MainView {
         gc.setFont(Font.getDefault());
     	String outputEuro = "";
         if(route.showBasicStrategy()) {
-            outputEuro += f.format(route.getTotalEurosBasic()) + " €";
+            outputEuro += f.format(route.getTotalEurosBasic()) + " Eur";
             gc.setFont(new Font(15));
             gc.fillText(outputEuro, 254, 58);
             gc.setFont(Font.getDefault());
         }
         else {
-            outputEuro += f.format(route.getTotalEuros()) + " €";
+            outputEuro += f.format(route.getTotalEuros()) + " Eur";
             gc.setFont(new Font(15));
             gc.fillText(outputEuro, 254, 58);
             gc.setFont(Font.getDefault());
