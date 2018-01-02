@@ -1,11 +1,16 @@
-package model;
+package controller;
 
 /**
  * Diese Klasse enthält Algorithmen für Tankstrategien
  *
  * @author Admin
  */
-public class MainModel {
+
+import model.Route;
+import model.RefuelStop;
+import model.Price;
+
+public class RefillStrategies {
 
     
     /**
@@ -127,7 +132,7 @@ public class MainModel {
             }
             //Falls der Preis an einer vorherigen Tankstelle günstiger ist
             if (route.get(j).getPredictedPrice() < gasPrice) {
-                //Prüfe, ob es tatsächlich ein Preis ist
+                //Prüfe, ob es tatsächlich einen Preis gibt
                 if(route.get(j).getPredictedPrice() > 0) {
                     gasPrice = route.get(j).getPredictedPrice();
                     prevStationNumber = j;
@@ -172,7 +177,7 @@ public class MainModel {
             //Falls es ein späterer Durchlauf ist, vergleiche den aktuellen mit dem aktuell günstigsten Tankpreis
             else {
                 if (route.get(j).getPredictedPrice() <= gasPrice) {
-                    //Prüfe, ob es tatsächlich ein Preis ist
+                    //Prüfe, ob es tatsächlich einen Preis gibt
                     if(route.get(j).getPredictedPrice() > 0) {
                         gasPrice = route.get(j).getPredictedPrice();
                         nextStationNumber = j;

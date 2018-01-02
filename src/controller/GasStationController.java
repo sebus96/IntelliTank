@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 import model.GasStation;
 import model.IPredictionStation;
 import model.IPredictionStations;
-import model.MainModel;
+//import model.MainModel;
 import model.PredictionPoints;
 import model.Route;
 import view.MainView;
@@ -21,7 +21,7 @@ public class GasStationController {
     private Route route;
     private PredictionPoints predictionPoints;
 //    private List<PredictionUnit> predictions;
-    private MainModel mainModel;
+    private RefillStrategies refillStrategies;
     private MainView mainView;
     private ProgressView pw;
 
@@ -30,7 +30,7 @@ public class GasStationController {
         route = CSVManager.importStandardRoute(allStations);
         CSVManager.importPrices(route);
         mainView = new MainView(primaryStage, this);
-        mainModel = new MainModel();
+        refillStrategies = new RefillStrategies();
         pw = new ProgressView(route.getName());
 //        this.predictions = new ArrayList<>();
         this.trainPrediction(route);
@@ -55,9 +55,9 @@ public class GasStationController {
     	return predictionPoints;
     }
 
-    public MainModel getMainModel() {
-        return mainModel;
-    }
+    /*public RefillStrategies getMainModel() {
+        return refillStrategies;
+    }*/
 
     public void trainPrediction(IPredictionStations stations) {
     	Task<Void> predictionThread = new Task<Void>() {
@@ -87,7 +87,7 @@ public class GasStationController {
 	                        mainView.displayPredictionPoints((PredictionPoints)stations);
 	                        pw.close();
                     	} else if(stations instanceof Route) {
-                    		mainModel.calculateGasUsage((Route)stations);
+                    		refillStrategies.calculateGasUsage((Route)stations);
                             mainView.displayRoute((Route)stations);
                             pw.close();
                     	}
