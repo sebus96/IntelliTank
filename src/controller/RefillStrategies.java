@@ -1,11 +1,16 @@
-package model;
+package controller;
 
 /**
  * Diese Klasse enthält Algorithmen für Tankstrategien
  *
  * @author Admin
  */
-public class MainModel {
+
+import model.Route;
+import model.RefuelStop;
+import model.Price;
+
+public class RefillStrategies {
 
     
     /**
