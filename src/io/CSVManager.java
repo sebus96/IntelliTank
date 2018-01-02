@@ -104,8 +104,8 @@ public class CSVManager {
     }
 
     public static Route importStandardRoute(Map<Integer, GasStation> stations) {
-    	String[] routes = {"Bertha Benz Memorial Route", "Hildesheim Harz", "Oldenburg Hannover", "Hannover Hildesheim"};
-        return importRoute(stations, routes[3]);
+    	String[] routes = {"Bertha Benz Memorial Route", "Hildesheim Harz", "Oldenburg Hannover", "Hannover Hildesheim", "Kiel Celle"};
+        return importRoute(stations, routes[4]);
     }
 
     public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
