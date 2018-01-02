@@ -86,6 +86,7 @@ public class PredictionTimeGridView {
 					knownTimeColumn.setText(p.getTime() + "");
 					predictionTimeColumn.setText(p.getTime() + "");
 					priceColumn.setText(p.getPredictedPrice() + "");
+					System.out.println("Hallo");
 		        }
 		 
 		        final VBox vbox = new VBox();
