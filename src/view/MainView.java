@@ -102,6 +102,8 @@ public class MainView {
     
     public void displayPredictionPoints(PredictionPoints predictionPoints) {
     	// TODO show predictionpoint window
+        PredictionTimeGridView gridView = new PredictionTimeGridView();
+        gridView.generateGridForPredictionTime(mainStage, predictionPoints);
     }
        
     //displays menu bar on the top
@@ -392,14 +394,15 @@ public class MainView {
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent e) {
-                        FileChooser fc = new FileChooser();
-                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
-                        File selectedFile = fc.showOpenDialog(null);
-                        if (selectedFile != null) {
-                        	System.out.println("Sieg.");
-                        } else {
-                        	System.out.println("Datei ist nicht valide.");
-                        }
+
+//                    	FileChooser fc = new FileChooser();
+//                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
+//                        File selectedFile = fc.showOpenDialog(null);
+//                        if (selectedFile != null) {
+//                        	System.out.println("Sieg.");
+//                        } else {
+//                        	System.out.println("Datei ist nicht valide.");
+//                        }
                     }
                 });
     	vorhersagezeitpunkte.getItems().addAll(itemImportV);
