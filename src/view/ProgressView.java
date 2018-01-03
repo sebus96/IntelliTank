@@ -11,6 +11,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import model.IPredictionStations;
+import model.PredictionPoints;
+import model.Route;
 
 /**
  *
@@ -18,14 +21,14 @@ import javafx.stage.StageStyle;
  */
 public class ProgressView {
 
-    String routeName;
-    ProgressBar progressBar;
+    private String name;
+    private ProgressBar progressBar;
 
-    Stage progressStage;
-    Label l;
+    private Stage progressStage;
+    private Label l;
 
-    public ProgressView(String routeName) {
-        this.routeName = routeName;
+    public ProgressView(IPredictionStations predictionStations) {
+    	this.name = predictionStations.getName();
         progressStage = new Stage();
         BorderPane bp = new BorderPane();
         Scene scene = new Scene(bp, 300, 45);
@@ -33,7 +36,13 @@ public class ProgressView {
         progressStage.initStyle(StageStyle.UTILITY);
         progressStage.setScene(scene);
         progressStage.setTitle("Preise werden berechnet..");
-        l = new Label("Lade Route:\t" + routeName);
+        if(predictionStations instanceof Route) {
+        	l = new Label("Lade Route:\t" + this.name);
+        } else if(predictionStations instanceof PredictionPoints) {
+        	l = new Label("Lade Vorhersagezeitpunkte:\t" + this.name);
+        } else {
+        	l = new Label("Lade:\t" + this.name);
+        }
         progressBar = new ProgressBar(0);
         progressBar.setPrefSize(300, 28);
         bp.setTop(l);

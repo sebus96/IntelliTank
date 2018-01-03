@@ -30,7 +30,7 @@ public class GasStationController {
         CSVManager.importPrices(route);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();
-        pw = new ProgressView(route.getName());
+        pw = new ProgressView(route);
 //        this.predictions = new ArrayList<>();
         this.trainPrediction(route);
     }
@@ -104,7 +104,7 @@ public class GasStationController {
         mainView.hide();
         route = CSVManager.importRoute(allStations, routeName);
         CSVManager.importPrices(route);
-        pw = new ProgressView(route.getName());
+        pw = new ProgressView(route);
 //        this.predictions = new ArrayList<>();
         this.trainPrediction(route);
     }
@@ -113,7 +113,7 @@ public class GasStationController {
         mainView.hide();
         predictionPoints = CSVManager.importPredictionPoints(allStations, predictionPointName);
         CSVManager.importPrices(predictionPoints);
-        pw = new ProgressView(predictionPoints.getName());
+        pw = new ProgressView(predictionPoints);
 //        this.predictions = new ArrayList<>();
         this.trainPrediction(predictionPoints);
     }

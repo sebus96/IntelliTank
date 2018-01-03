@@ -175,7 +175,7 @@ public class MainView {
     }
 
     private void setUpAboutTab() {
-        Menu about = new Menu("Ueber");
+        Menu about = new Menu("Über");
     	MenuItem itemUeber = new MenuItem("Mitwirkende");
     	about.getItems().addAll(itemUeber);
     	itemUeber.setOnAction(new EventHandler<ActionEvent>() {
