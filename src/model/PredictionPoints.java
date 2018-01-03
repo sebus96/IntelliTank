@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 public class PredictionPoints implements IPredictionStations{
     private String name;
     private List<PredictionPoint> predictionPoints;
@@ -16,6 +19,22 @@ public class PredictionPoints implements IPredictionStations{
     
     public String getName() {
         return name;
+    }
+    
+    public ObservableList<PredictionPoint.TableRow> getList() {
+    	List<PredictionPoint.TableRow> result = new ArrayList<>();
+    	int ctr = 1;
+    	for(PredictionPoint p : this.predictionPoints) {
+    		result.add(new PredictionPoint.TableRow(
+    				ctr++,
+    				p.getStation().getName(),
+    				p.getPriceKnownUntil().toString(),
+    				p.getTime().toString(),
+    				p.getPredictedPrice()
+    			)
+    		);
+    	}
+    	return FXCollections.observableArrayList(result);
     }
 
     public int getLength() {
@@ -35,5 +54,10 @@ public class PredictionPoints implements IPredictionStations{
 
     public void addPredictionElement(GasStation station, Date priceKnownUntil, Date predictionTime) {
     	predictionPoints.add(new PredictionPoint(station, priceKnownUntil, predictionTime));
+    }
+    
+    @Override
+    public String toString() {
+    	return "(" + this.name + ": " + this.predictionPoints + ")";
     }
 }

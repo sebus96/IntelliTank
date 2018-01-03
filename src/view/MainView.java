@@ -102,6 +102,7 @@ public class MainView {
     
     public void displayPredictionPoints(PredictionPoints predictionPoints) {
     	// TODO show predictionpoint window
+    	System.out.println(predictionPoints);
         PredictionTimeGridView gridView = new PredictionTimeGridView();
         gridView.generateGridForPredictionTime(mainStage, predictionPoints);
     }
@@ -389,23 +390,47 @@ public class MainView {
 
     private void setUpPredictionPointTab() {
         Menu vorhersagezeitpunkte = new Menu("Vorhersagezeitpunkte");
+        
+        vorhersagezeitpunkte.setOnShowing(new EventHandler<Event>() {
+            @Override
+            public void handle(Event e) {
+                //Entferne alles ausser die ersten 3(Import und 2 seperator) und füge danach alle aus dem Ordner hinzu
+            	vorhersagezeitpunkte.getItems().remove(3,vorhersagezeitpunkte.getItems().size());
+                for(String s : CSVManager.readPredictionPointNames()) {
+                    MenuItem mi = new MenuItem(s.substring(0, s.length()-4));
+                    mi.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(final ActionEvent e) {
+                            gsc.showPredictionPoints(mi.getText());
+                        }
+                    });
+                    vorhersagezeitpunkte.getItems().add(mi);
+                }
+            }});
+        
     	MenuItem itemImportV = new MenuItem("Importieren");
     	itemImportV.setOnAction(
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent e) {
 
-//                    	FileChooser fc = new FileChooser();
-//                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
-//                        File selectedFile = fc.showOpenDialog(null);
-//                        if (selectedFile != null) {
-//                        	System.out.println("Sieg.");
-//                        } else {
-//                        	System.out.println("Datei ist nicht valide.");
-//                        }
+                    	FileChooser fc = new FileChooser();
+                        fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
+                        File selectedFile = fc.showOpenDialog(null);
+                        if (selectedFile != null) {
+                        	try {
+                                CSVManager.copyPredictionPoints(selectedFile);
+                            } catch (FileNotFoundException ex) {
+                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        } else {
+                        	System.out.println("Keine Datei ausgewaehlt.");
+                        }
                     }
                 });
-    	vorhersagezeitpunkte.getItems().addAll(itemImportV);
+    	vorhersagezeitpunkte.getItems().addAll(itemImportV, new SeparatorMenuItem(),new SeparatorMenuItem());
         bar.getMenus().add(vorhersagezeitpunkte);
     }
     public void hide() {

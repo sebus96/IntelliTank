@@ -3,6 +3,13 @@ package model;
 import java.util.Date;
 import java.util.List;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class PredictionPoint implements IPredictionStation {
 	private GasStation station;
 	private Date priceKnownUntil, predictionTime;
@@ -17,6 +24,46 @@ public class PredictionPoint implements IPredictionStation {
 		this.priceKnownUntil = priceKnownUntil;
 		this.predictionTime = predictionTime;
 	}
+
+	public static class TableRow{
+		public TableRow(int id, String station, String knownTime, String predictionTime, double price) {
+			idProperty().set(id);
+			stationProperty().set(station);
+			knownTimeProperty().set(knownTime);
+			predictionTimeProperty().set(predictionTime);
+			priceProperty().set(price/1000);
+		}
+		
+	    private IntegerProperty id;
+	    public IntegerProperty idProperty() { 
+	        if (id == null) id = new SimpleIntegerProperty(this, "id");
+	        return id;
+	    }
+	    
+		private StringProperty station;
+	    public StringProperty stationProperty() { 
+	        if (station == null) station = new SimpleStringProperty(this, "station");
+	        return station;
+	    }
+
+		private StringProperty knownTime;
+	    public StringProperty knownTimeProperty() { 
+	        if (knownTime == null) knownTime = new SimpleStringProperty(this, "knownTime");
+	        return knownTime;
+	    }
+
+		private StringProperty predictionTime;
+	    public StringProperty predictionTimeProperty() { 
+	        if (predictionTime == null) predictionTime = new SimpleStringProperty(this, "predictionTime");
+	        return predictionTime;
+	    }
+		
+		private DoubleProperty price;
+	    public DoubleProperty priceProperty() { 
+	        if (price == null) price = new SimpleDoubleProperty(this, "price");
+	        return price;
+	    }
+	};
 
 	public GasStation getStation() {
 		return station;
@@ -52,5 +99,10 @@ public class PredictionPoint implements IPredictionStation {
     
     public void setPredictedPrices( List<Price> predicted) {
     	this.predictedPrices = predicted;
+    }
+    
+    @Override
+    public String toString() {
+    	return "(" + this.station + ": " + this.predictionTime + ")\n";
     }
 }

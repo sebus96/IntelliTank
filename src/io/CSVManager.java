@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -206,7 +206,7 @@ public class CSVManager {
         Reader r = null;
         BufferedReader br = null;
         try {
-            r = new FileReader(file);
+            r = new InputStreamReader(new FileInputStream(file),"UTF-8");
             br = new BufferedReader(r);
             String line;
             while ((line = br.readLine()) != null) {
@@ -269,9 +269,18 @@ public class CSVManager {
     }
 
     public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
-        InputStream is = new FileInputStream(selectedFile);
         Path path = Paths.get(routePath + selectedFile.getName());
-        Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+        copyFile(selectedFile, path);
+    }
+
+    public static void copyPredictionPoints(File selectedFile) throws FileNotFoundException, IOException {
+        Path path = Paths.get(predictionPath + selectedFile.getName());
+        copyFile(selectedFile, path);
+    }
+    
+    private static void copyFile(File selectedFile, Path dest) throws FileNotFoundException, IOException {
+    	InputStream is = new FileInputStream(selectedFile);
+        Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
         is.close();
     }
 }
