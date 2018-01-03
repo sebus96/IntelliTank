@@ -268,9 +268,15 @@ public class CSVManager {
         return listOfFiles;
     }
 
-    public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
+    public static void copyRouteFile(File selectedFile) throws FileNotFoundException, IOException {
         InputStream is = new FileInputStream(selectedFile);
         Path path = Paths.get(routePath + selectedFile.getName());
+        Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+        is.close();
+    }
+    public static void copyPredictionPointFile(File selectedFile) throws FileNotFoundException, IOException {
+        InputStream is = new FileInputStream(selectedFile);
+        Path path = Paths.get(predictionPath + selectedFile.getName());
         Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
         is.close();
     }

@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 import model.GasStation;
 import model.IPredictionStation;
 import model.IPredictionStations;
-//import model.MainModel;
 import model.PredictionPoints;
 import model.Route;
 import view.MainView;
@@ -101,7 +100,7 @@ public class GasStationController {
         new Thread(predictionThread).start();
     }
 
-    public void changeCurrentRoute(String routeName) {
+    public void switchToRoute(String routeName) {
         mainView.hide();
         route = CSVManager.importRoute(allStations, routeName);
         CSVManager.importPrices(route);
@@ -110,7 +109,7 @@ public class GasStationController {
         this.trainPrediction(route);
     }
 
-    public void showPredictionPoints(String predictionPointName) {
+    public void switchToPredictionPoints(String predictionPointName) {
         mainView.hide();
         predictionPoints = CSVManager.importPredictionPoints(allStations, predictionPointName);
         CSVManager.importPrices(predictionPoints);
