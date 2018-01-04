@@ -1,8 +1,10 @@
 package model;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,12 +27,14 @@ public class PredictionPoints implements IPredictionStations{
     	List<PredictionPoint.TableRow> result = new ArrayList<>();
     	int ctr = 1;
     	for(PredictionPoint p : this.predictionPoints) {
+    		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.GERMAN);
     		result.add(new PredictionPoint.TableRow(
     				ctr++,
     				p.getStation().getName(),
-    				p.getPriceKnownUntil().toString(),
-    				p.getTime().toString(),
-    				p.getPredictedPrice()
+    				df.format(p.getPriceKnownUntil()),
+    				df.format(p.getTime()),
+    				p.getPredictedPrice(),
+    				p.getStation().getHistoricPrice(p.getTime())
     			)
     		);
     	}

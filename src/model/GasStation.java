@@ -12,7 +12,6 @@ public class GasStation {
 	private FederalState state;
 	private double longitude, latitude; // Laengen- und Breitengrad
 	private List<Price> historicPrices;
-	//private List<Price> projectedPrices;
 	
 	public GasStation(int id, String name, String brand, String street, String houseNumber, int postcode, FederalState state, String location,
 			double longitude, double latitude) {
@@ -26,7 +25,6 @@ public class GasStation {
 		this.latitude = latitude; // Breite
 		this.longitude = longitude; // Laenge
 		this.historicPrices = new ArrayList<Price>();
-		//this.projectedPrices = new ArrayList<Price>();
 		this.state = state;
 	}
 
@@ -70,24 +68,6 @@ public class GasStation {
 		return latitude;
 	}
 	
-	/**
-	 * 
-	 * 
-	 * @param d Date for which the price is needed
-	 * @return the price at the specified date
-	 */
-	/*public int getProjectedPrice(Date d) {
-		int prevPrice = -1;
-		for(Price p: this.projectedPrices) {
-			if(p.getTime().after(d)) {
-				return prevPrice;
-			}
-			prevPrice = p.getPrice();
-			
-		}
-		return prevPrice;
-	}*/
-	
 	public int getHistoricPrice(Date d) {
 		int prevPrice = -1;
 		for(Price p: this.historicPrices) {
@@ -96,13 +76,6 @@ public class GasStation {
 			}
 			prevPrice = p.getPrice();
 		}
-		/*for(Price p: this.projectedPrices) {
-			if(p.getTime().after(d)) {
-				return prevPrice;
-			}
-			prevPrice = p.getPrice();
-			
-		}*/
 		return -1;//prevPrice;
 	}
 	
@@ -123,20 +96,6 @@ public class GasStation {
 	public void setPriceList(List<Price> prices) {
 		this.historicPrices = prices;
 	}
-
-    /**
-     * @return the historicPrices
-     *
-    public List<Price> getHistoricPrices() {
-        return historicPrices;
-    }*/
-
-    /**
-     * @return the projectedPrices
-     *
-    public List<Price> getProjectedPrices() {
-        return projectedPrices;
-    }*/
 	
 	@Override
 	public String toString() {

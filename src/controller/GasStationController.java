@@ -15,7 +15,8 @@ import view.MainView;
 import view.ProgressView;
 
 public class GasStationController {
-
+	private static final boolean initialImportRoute = true;
+	
     private Map<Integer, GasStation> allStations;
     private Route route;
     private PredictionPoints predictionPoints;
@@ -27,12 +28,19 @@ public class GasStationController {
     public GasStationController(Stage primaryStage) {
         allStations = CSVManager.importGasStations();
         route = CSVManager.importStandardRoute(allStations);
+        predictionPoints = CSVManager.importStandardPredictionPoints(allStations);
         CSVManager.importPrices(route);
+        CSVManager.importPrices(predictionPoints);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();
-        pw = new ProgressView(route);
-//        this.predictions = new ArrayList<>();
-        this.trainPrediction(route);
+//      this.predictions = new ArrayList<>();
+        if(initialImportRoute){
+        	pw = new ProgressView(route);
+            this.trainPrediction(route);
+        } else {
+        	pw = new ProgressView(predictionPoints);
+            this.trainPrediction(predictionPoints);
+        }
     }
 
 //    public void addGasStation(GasStation station) {
@@ -70,7 +78,7 @@ public class GasStationController {
                         System.err.println("Pricelist of " + gs + " does not exist");
                         continue;
                     }
-                    PredictionUnit pu = new PredictionUnit(gs, station.getTime());
+                    PredictionUnit pu = new PredictionUnit(gs, station.getTime()); // TODO: richtige Zeit benutzen
 //                    predictions.add(pu);
                     boolean trainSuccess = pu.train();
                     if (trainSuccess) {

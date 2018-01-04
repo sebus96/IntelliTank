@@ -127,6 +127,10 @@ public class CSVManager {
         System.out.println(route);
         return route;
     }
+    
+    public static PredictionPoints importStandardPredictionPoints(Map<Integer, GasStation> stations) {
+        return importPredictionPoints(stations, "Meine Tankstellen");
+    }
 
     public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
         File predictionFile = new File(predictionPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
@@ -269,7 +273,6 @@ public class CSVManager {
     }
 
     public static void copyRouteFile(File selectedFile) throws FileNotFoundException, IOException {
-        InputStream is = new FileInputStream(selectedFile);
         Path path = Paths.get(routePath + selectedFile.getName());
         copyFile(selectedFile, path);
     }

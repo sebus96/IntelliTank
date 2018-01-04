@@ -25,46 +25,6 @@ public class PredictionPoint implements IPredictionStation {
 		this.predictionTime = predictionTime;
 	}
 
-	public static class TableRow{
-		public TableRow(int id, String station, String knownTime, String predictionTime, double price) {
-			idProperty().set(id);
-			stationProperty().set(station);
-			knownTimeProperty().set(knownTime);
-			predictionTimeProperty().set(predictionTime);
-			priceProperty().set(price/1000);
-		}
-		
-	    private IntegerProperty id;
-	    public IntegerProperty idProperty() { 
-	        if (id == null) id = new SimpleIntegerProperty(this, "id");
-	        return id;
-	    }
-	    
-		private StringProperty station;
-	    public StringProperty stationProperty() { 
-	        if (station == null) station = new SimpleStringProperty(this, "station");
-	        return station;
-	    }
-
-		private StringProperty knownTime;
-	    public StringProperty knownTimeProperty() { 
-	        if (knownTime == null) knownTime = new SimpleStringProperty(this, "knownTime");
-	        return knownTime;
-	    }
-
-		private StringProperty predictionTime;
-	    public StringProperty predictionTimeProperty() { 
-	        if (predictionTime == null) predictionTime = new SimpleStringProperty(this, "predictionTime");
-	        return predictionTime;
-	    }
-		
-		private DoubleProperty price;
-	    public DoubleProperty priceProperty() { 
-	        if (price == null) price = new SimpleDoubleProperty(this, "price");
-	        return price;
-	    }
-	};
-
 	public GasStation getStation() {
 		return station;
 	}
@@ -105,4 +65,52 @@ public class PredictionPoint implements IPredictionStation {
     public String toString() {
     	return "(" + this.station + ": " + this.predictionTime + ")\n";
     }
+
+	public static class TableRow{
+		public TableRow(int id, String station, String knownTime, String predictionTime, double price, double realPrice) {
+			idProperty().set(id);
+			stationProperty().set(station);
+			knownTimeProperty().set(knownTime);
+			predictionTimeProperty().set(predictionTime);
+			priceProperty().set(price/1000);
+			realPriceProperty().set(realPrice/1000);
+			System.out.println("ff: " + realPriceProperty().get());
+		}
+		
+	    private IntegerProperty id;
+	    public IntegerProperty idProperty() { 
+	        if (id == null) id = new SimpleIntegerProperty(this, "id");
+	        return id;
+	    }
+	    
+		private StringProperty station;
+	    public StringProperty stationProperty() { 
+	        if (station == null) station = new SimpleStringProperty(this, "station");
+	        return station;
+	    }
+
+		private StringProperty knownTime;
+	    public StringProperty knownTimeProperty() { 
+	        if (knownTime == null) knownTime = new SimpleStringProperty(this, "knownTime");
+	        return knownTime;
+	    }
+
+		private StringProperty predictionTime;
+	    public StringProperty predictionTimeProperty() { 
+	        if (predictionTime == null) predictionTime = new SimpleStringProperty(this, "predictionTime");
+	        return predictionTime;
+	    }
+		
+		private DoubleProperty price;
+	    public DoubleProperty priceProperty() { 
+	        if (price == null) price = new SimpleDoubleProperty(this, "price");
+	        return price;
+	    }
+		
+		private DoubleProperty realPrice;
+	    public DoubleProperty realPriceProperty() { 
+	        if (realPrice == null) realPrice = new SimpleDoubleProperty(this, "realPrice");
+	        return realPrice;
+	    }
+	};
 }

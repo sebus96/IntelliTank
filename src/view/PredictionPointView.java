@@ -1,6 +1,7 @@
 package view;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -8,6 +9,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import model.PredictionPoint;
 import model.PredictionPoints;
@@ -16,7 +18,6 @@ public class PredictionPointView {
 
 	private Scene scene;
     private BorderPane border;
-    private Pane pane;
     private TableView<PredictionPoint.TableRow> table;
 
     public PredictionPointView(Scene scene, BorderPane border) {
@@ -30,31 +31,38 @@ public class PredictionPointView {
         label.setFont(new Font("Arial", 20));
 
         TableColumn<PredictionPoint.TableRow, Integer> nrColumn = new TableColumn<>("Nr.");
-//        nrColumn.setMinWidth(32);
         nrColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
         TableColumn<PredictionPoint.TableRow, String> gasStationColumn = new TableColumn<>("Tankstelle");
-//        gasStationColumn.setMinWidth(128);
         gasStationColumn.setCellValueFactory(new PropertyValueFactory<>("station"));
+        
         TableColumn<PredictionPoint.TableRow, String> knownTimeColumn = new TableColumn<>("Bekannte Zeit");
-//        knownTimeColumn.setMinWidth(128);
         knownTimeColumn.setCellValueFactory(new PropertyValueFactory<>("knownTime"));
-        TableColumn<PredictionPoint.TableRow, String> predictionTimeColumn = new TableColumn<>("Bekannte Zeit");
-//        predictionTimeColumn.setMinWidth(128);
+        
+        TableColumn<PredictionPoint.TableRow, String> predictionTimeColumn = new TableColumn<>("Vorhersagezeitpunkt");
         predictionTimeColumn.setCellValueFactory(new PropertyValueFactory<>("predictionTime"));
+        
         TableColumn<PredictionPoint.TableRow, Double> priceColumn = new TableColumn<>("Preis");
-//        priceColumn.setMinWidth(128);
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        
+        TableColumn<PredictionPoint.TableRow, Double> realPriceColumn = new TableColumn<>("Echter Preis");
+        realPriceColumn.setCellValueFactory(new PropertyValueFactory<>("realPrice"));
 
-        table.getColumns().addAll(nrColumn, gasStationColumn, knownTimeColumn, predictionTimeColumn, priceColumn);
+        table.getColumns().addAll(nrColumn, gasStationColumn, knownTimeColumn, predictionTimeColumn, priceColumn, realPriceColumn);
 
         ObservableList<PredictionPoint.TableRow> rows = predictionPoints.getList();
         table.setItems(rows);
-        table.setMinWidth(640);
+//        table.setMinWidth(scene.getWidth());
 
-        pane = new Pane();
-        pane.getChildren().add(table);
+        BorderPane titlePane = new BorderPane();
+        titlePane.setCenter(label);
         
-        border.setCenter(pane);       
+        VBox vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(5, 5, 5, 5));
+        vbox.getChildren().addAll(titlePane, table);
+        
+        border.setCenter(vbox);
         return scene;
     }
 }
