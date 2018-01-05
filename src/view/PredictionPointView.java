@@ -32,22 +32,28 @@ public class PredictionPointView {
 
         TableColumn<PredictionPoint.TableRow, Integer> nrColumn = new TableColumn<>("Nr.");
         nrColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nrColumn.setMinWidth(50);
         
         TableColumn<PredictionPoint.TableRow, String> gasStationColumn = new TableColumn<>("Tankstelle");
         gasStationColumn.setCellValueFactory(new PropertyValueFactory<>("station"));
+        gasStationColumn.setMinWidth(200);
         
         TableColumn<PredictionPoint.TableRow, String> knownTimeColumn = new TableColumn<>("Bekannte Zeit");
         knownTimeColumn.setCellValueFactory(new PropertyValueFactory<>("knownTime"));
+        knownTimeColumn.setMinWidth(100);
         
         TableColumn<PredictionPoint.TableRow, String> predictionTimeColumn = new TableColumn<>("Vorhersagezeitpunkt");
         predictionTimeColumn.setCellValueFactory(new PropertyValueFactory<>("predictionTime"));
+        predictionTimeColumn.setMinWidth(150);
         
         TableColumn<PredictionPoint.TableRow, Double> priceColumn = new TableColumn<>("Preis");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceColumn.setMinWidth(50);
         
         TableColumn<PredictionPoint.TableRow, Double> realPriceColumn = new TableColumn<>("Echter Preis");
         realPriceColumn.setCellValueFactory(new PropertyValueFactory<>("realPrice"));
-
+        realPriceColumn.setMinWidth(90);
+        
         table.getColumns().addAll(nrColumn, gasStationColumn, knownTimeColumn, predictionTimeColumn, priceColumn, realPriceColumn);
 
         ObservableList<PredictionPoint.TableRow> rows = predictionPoints.getList();
