@@ -1,18 +1,23 @@
 package io;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,10 +37,16 @@ import view.PopupBox;
 public class CSVManager {
 
     private static List<Postalcode> post2state;
-    public static final String inputPath = "Eingabedaten/";
-    public static final String routePath = inputPath + "Fahrzeugrouten/";
-    public static final String predictionPath = inputPath + "Vorhersagezeitpunkte/";
-    public static final String pricePath = inputPath + "Benzinpreise/";
+    private static final String inputPath = "Eingabedaten/";
+    private static final String routeInputPath = inputPath + "Fahrzeugrouten/";
+    private static final String predictionInputPath = inputPath + "Vorhersagezeitpunkte/";
+    private static final String pricePath = inputPath + "Benzinpreise/";
+    
+    private static final String outputPath = "Ausgabedaten/";
+    private static final String routeOutputPath = outputPath + "Tankstrategien/";
+    private static final String predictionOutputPath = outputPath + "Vorhersagen/";
+    
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssX");
 
     public static Map<Integer, GasStation> importGasStations() {
         String filename = inputPath + "Tankstellen.csv";
@@ -112,7 +123,7 @@ public class CSVManager {
     }
 
     public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
-    	File routeFile = new File(routePath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));
+    	File routeFile = new File(routeInputPath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));
     	List<String> lines = readCSV(routeFile);
     	System.out.println("import route: " + routeName);
         if (lines == null) {
@@ -132,12 +143,16 @@ public class CSVManager {
         return route;
     }
     
+    public static void exportPredictions(IPredictionStations stations) {
+    	writeCSV(stations);
+    }
+    
     public static PredictionPoints importStandardPredictionPoints(Map<Integer, GasStation> stations) {
         return importPredictionPoints(stations, "Meine Tankstellen");
     }
 
     public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
-        File predictionFile = new File(predictionPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
+        File predictionFile = new File(predictionInputPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
     	List<String> lines = readCSV(predictionFile);
     	System.out.println("import predictionpoints: " + predictionName);
         if (lines == null) {
@@ -232,6 +247,40 @@ public class CSVManager {
         return null;
     }
 
+    private static boolean writeCSV(IPredictionStations stations) {
+        String path = "";
+        if(stations instanceof Route) path = routeOutputPath;
+        else if (stations instanceof PredictionPoints) path = predictionOutputPath;
+        File file = new File(path + stations.getName() + (stations.getName().endsWith(".csv")? "" : ".csv"));
+        
+        Writer w = null;
+        BufferedWriter bw = null;
+        try {
+            w = new OutputStreamWriter(new FileOutputStream(file),"UTF-8");
+            bw = new BufferedWriter(w);
+            for(int i = 0; i < stations.getLength(); i++) {
+            	bw.write(stations.get(i).toCSVString());
+            	if(i+1 < stations.getLength()) bw.newLine();
+            }
+            bw.flush();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (w != null) {
+                    w.close();
+                }
+                if (bw != null) {
+                    bw.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     private static int getInteger(String s) {
         try {
             return Integer.parseInt(s);
@@ -250,7 +299,7 @@ public class CSVManager {
 
     private static Date getDate(String s) {
         try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ssX").parse(s);
+            return dateFormat.parse(s);
         } catch (ParseException e) {
             e.printStackTrace();
             return null;
@@ -258,25 +307,29 @@ public class CSVManager {
     }
 
     public static String[] readRouteNames() {
-    	return readFilenames(new File(routePath));
+    	return readFilenames(new File(routeInputPath));
     }
 
     public static String[] readPredictionPointNames() {
-    	return readFilenames(new File(predictionPath));
+    	return readFilenames(new File(predictionInputPath));
     }
     
     private static String[] readFilenames(File folder) {
     	String[] listOfFiles = folder.list(new PredictionFileFilter());
         return listOfFiles;
     }
+    
+    public static DateFormat getDateFormat() {
+    	return dateFormat;
+    }
 
     public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
-        Path path = Paths.get(routePath + selectedFile.getName());
+        Path path = Paths.get(routeInputPath + selectedFile.getName());
         copyFile(selectedFile, path);
     }
 
     public static void copyPredictionPoints(File selectedFile) throws FileNotFoundException, IOException {
-        Path path = Paths.get(predictionPath + selectedFile.getName());
+        Path path = Paths.get(predictionInputPath + selectedFile.getName());
         copyFile(selectedFile, path);
     }
     

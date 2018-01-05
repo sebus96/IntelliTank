@@ -1,9 +1,11 @@
 package model;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
 import controller.PredictionUnit;
+import io.CSVManager;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -27,6 +29,7 @@ public class PredictionPoint implements IPredictionStation {
 		this.predictionTime = predictionTime;
 	}
 
+    @Override
 	public GasStation getStation() {
 		return station;
 	}
@@ -34,20 +37,24 @@ public class PredictionPoint implements IPredictionStation {
 	public Date getPriceKnownUntil() {
 		return priceKnownUntil;
 	}
-	
+
+    @Override
 	public void setPrediction(PredictionUnit pu) {
 		this.predictionUnit = pu;
 		this.predictedPrices = this.predictionUnit.testAndSetHourSteps();
 	}
-	
+
+    @Override
 	public boolean isPredicted() {
 		return predictionUnit != null;
 	}
 
+    @Override
 	public Date getTime() {
 		return predictionTime;
 	}
-	
+
+    @Override
 	public int getPredictedPrice(Date d) {
     	int prevPrice = -1;
     	if(predictedPrices == null || predictedPrices.size() == 0) return -1;
@@ -60,7 +67,8 @@ public class PredictionPoint implements IPredictionStation {
 		System.err.println("Could not predict prices for more than 1 month!");
 		return -1;
     }
-    
+
+    @Override
     public int getPredictedPrice() {
     	if(predictedPrice == null || !predictedPrice.getTime().equals(this.predictionTime)) {
     		predictedPrice = new Price(this.predictionTime, this.getPredictedPrice(this.predictionTime));
@@ -71,6 +79,15 @@ public class PredictionPoint implements IPredictionStation {
 //    public void setPredictedPrices( List<Price> predicted) {
 //    	this.predictedPrices = predicted;
 //    }
+    
+    @Override
+    public String toCSVString() {
+    	DateFormat df = CSVManager.getDateFormat();
+    	return df.format(this.priceKnownUntil) + ";"
+    			+ df.format(this.predictionTime) + ";"
+    			+ this.station.getID() + ";"
+    			+ this.getPredictedPrice();
+    }
     
     @Override
     public String toString() {

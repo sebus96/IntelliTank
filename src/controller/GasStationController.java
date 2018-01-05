@@ -109,6 +109,7 @@ public class GasStationController {
                     @Override
                     public void run() {
                     	showPredictedStations(stations);
+                    	CSVManager.exportPredictions(stations);
                     }
                 });
                 return null;
