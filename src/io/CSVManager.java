@@ -27,6 +27,8 @@ import model.PredictionPoints;
 import model.Price;
 import model.Route;
 
+import view.PopupBox;
+
 public class CSVManager {
 
     private static List<Postalcode> post2state;
@@ -48,6 +50,7 @@ public class CSVManager {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 9) {
                 System.err.println("Input stations: Illegal Input row size");
+                PopupBox.displayWarning("Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
             }
             int postcode = getInteger(lineElements[5]);
             GasStation station = new GasStation(

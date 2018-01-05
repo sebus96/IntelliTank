@@ -13,10 +13,12 @@ import model.PredictionPoints;
 import model.Route;
 import view.MainView;
 import view.ProgressView;
+import view.PopupBox;
 
 public class GasStationController {
-	private static final boolean initialImportRoute = true;
-	
+
+    private static final boolean initialImportRoute = true;
+
     private Map<Integer, GasStation> allStations;
     private Route route;
     private PredictionPoints predictionPoints;
@@ -27,19 +29,27 @@ public class GasStationController {
 
     public GasStationController(Stage primaryStage) {
         allStations = CSVManager.importGasStations();
+        if (allStations == null) {
+            PopupBox.displayError("Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
+            return;
+        }
         route = CSVManager.importStandardRoute(allStations);
-        predictionPoints = CSVManager.importStandardPredictionPoints(allStations);
-        CSVManager.importPrices(route);
-        CSVManager.importPrices(predictionPoints);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();
-//      this.predictions = new ArrayList<>();
-        if(initialImportRoute){
-        	pw = new ProgressView(route);
-            this.trainPrediction(route);
+        if (route == null) {
+            PopupBox.displayWarning("Die Standartroute konnte nicht geöffnet werden.");
+            mainView.show();
         } else {
-        	pw = new ProgressView(predictionPoints);
-            this.trainPrediction(predictionPoints);
+            predictionPoints = CSVManager.importStandardPredictionPoints(allStations);
+            CSVManager.importPrices(route);
+            CSVManager.importPrices(predictionPoints);
+            if (initialImportRoute) {
+                pw = new ProgressView(route);
+                this.trainPrediction(route);
+            } else {
+                pw = new ProgressView(predictionPoints);
+                this.trainPrediction(predictionPoints);
+            }
         }
     }
 
@@ -49,31 +59,29 @@ public class GasStationController {
 //        }
 //        allStations.put(station.getID(), station);
 //    }
-
+/*
     public GasStation getStation(int id) {
         return allStations.get(id);
-    }
-
+    }*/
     public Route getRoute() {
         return route;
     }
-    
+
     public PredictionPoints getPredictionPoints() {
-    	return predictionPoints;
+        return predictionPoints;
     }
 
     /*public RefillStrategies getMainModel() {
         return refillStrategies;
     }*/
-
     public void trainPrediction(IPredictionStations stations) {
-    	Task<Void> predictionThread = new Task<Void>() {
+        Task<Void> predictionThread = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 System.out.println("Start prediction");
                 for (int i = 0; i < stations.getLength(); i++) {
-                	IPredictionStation station = stations.get(i);
-                	GasStation gs = station.getStation();
+                    IPredictionStation station = stations.get(i);
+                    GasStation gs = station.getStation();
                     if (gs.getPriceListSize() == 0) {
                         System.err.println("Pricelist of " + gs + " does not exist");
                         continue;
@@ -90,14 +98,14 @@ public class GasStationController {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                    	if(stations instanceof PredictionPoints) {
-	                        mainView.displayPredictionPoints((PredictionPoints)stations);
-	                        pw.close();
-                    	} else if(stations instanceof Route) {
-                    		refillStrategies.calculateGasUsage((Route)stations);
-                            mainView.displayRoute((Route)stations);
+                        if (stations instanceof PredictionPoints) {
+                            mainView.displayPredictionPoints((PredictionPoints) stations);
                             pw.close();
-                    	}
+                        } else if (stations instanceof Route) {
+                            refillStrategies.calculateGasUsage((Route) stations);
+                            mainView.displayRoute((Route) stations);
+                            pw.close();
+                        }
                     }
                 });
                 return null;
@@ -109,8 +117,13 @@ public class GasStationController {
     }
 
     public void switchToRoute(String routeName) {
+        Route routeTest = CSVManager.importRoute(allStations, routeName);
+        if (routeTest == null) {
+            PopupBox.displayError(routeName + " konnte nicht geladen werden. Datei fehlerhaft oder nicht mehr vorhanden.");
+            return;
+        }
         mainView.hide();
-        route = CSVManager.importRoute(allStations, routeName);
+        route = routeTest;
         CSVManager.importPrices(route);
         pw = new ProgressView(route);
 //        this.predictions = new ArrayList<>();
@@ -118,8 +131,13 @@ public class GasStationController {
     }
 
     public void switchToPredictionPoints(String predictionPointName) {
+        PredictionPoints predictionPointsTest = CSVManager.importPredictionPoints(allStations, predictionPointName);
+        if (predictionPointsTest == null) {
+            PopupBox.displayError(predictionPointName + " konnte nicht geladen werden. Datei fehlerhaft oder nicht mehr vorhanden.");
+            return;
+        }
         mainView.hide();
-        predictionPoints = CSVManager.importPredictionPoints(allStations, predictionPointName);
+        predictionPoints = predictionPointsTest;
         CSVManager.importPrices(predictionPoints);
         pw = new ProgressView(predictionPoints);
 //        this.predictions = new ArrayList<>();

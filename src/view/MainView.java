@@ -43,7 +43,7 @@ public class MainView {
         mainStage = primaryStage;
         this.gsc = gsc;
         //Create the foundation: borderPane -> Scrollpane -> Canvas
-        primaryStage.setTitle("IntelliTank");
+        mainStage.setTitle("IntelliTank");
         border = new BorderPane();
         scene = new Scene(border, 640, 600);
         mainStage.setResizable(false);
@@ -53,6 +53,7 @@ public class MainView {
         mainStage.getIcons().add(icon);
         rv = new RouteView(scene,border,this,gsc,bar.getHeight());
         ppv = new PredictionPointView(scene,border);
+        mainStage.setScene(scene);
     }
        
     public void displayRoute(Route route) {
@@ -62,7 +63,7 @@ public class MainView {
     }
     
     public void displayPredictionPoints(PredictionPoints predictionPoints) {
-    	// TODO show predictionpoint window
+        
         mainStage.setScene(ppv.buildPredictionPointView(predictionPoints));
         mainStage.show();
     }
@@ -173,19 +174,18 @@ public class MainView {
         border.setCenter(null);
         this.mainStage.hide();
     }
+    public void show() {
+        this.mainStage.show();
+    }
 
     private void setUpAboutTab() {
-        Menu about = new Menu("Über");
+        Menu about = new Menu("Uber");
     	MenuItem itemUeber = new MenuItem("Mitwirkende");
     	about.getItems().addAll(itemUeber);
     	itemUeber.setOnAction(new EventHandler<ActionEvent>() {
     		@Override
     		public void handle(ActionEvent arg0) {
-    			Alert alert = new Alert(AlertType.INFORMATION);
-    			alert.setTitle("Mitwirkende");
-    			alert.setHeaderText(null);
-    			alert.setContentText("Dieses Projekt wurde von Sebastian Drath, Sezer Dursun, Axel Claassen und Burak Kadioglu entwickelt.");
-    			alert.showAndWait();
+    			PopupBox.displayMessage("Dieses Projekt wurde von Sebastian Drath, Sezer Dursun, Axel Claassen und Burak Kadioglu entwickelt.");
     		}
 		});
         bar.getMenus().add(about);
