@@ -251,6 +251,7 @@ public class CSVManager {
         String path = "";
         if(stations instanceof Route) path = routeOutputPath;
         else if (stations instanceof PredictionPoints) path = predictionOutputPath;
+        new File(path).mkdirs(); // erstellt output ordner
         File file = new File(path + stations.getName() + (stations.getName().endsWith(".csv")? "" : ".csv"));
         
         Writer w = null;
