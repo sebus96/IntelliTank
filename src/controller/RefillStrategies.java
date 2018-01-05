@@ -269,13 +269,11 @@ public class RefillStrategies {
             }
             //Hier beginnt das eigentliche Tanken, vorher wurde nur gesetzt, für wieviel km getankt werden muss.
             //Falls das Ziel außerhalb der Reichweite liegt, tanke voll
-            System.out.println(i + " " + kmToNextTarget + " " + gasUsedPerKm + " " + currentTankStatus);
             if (kmToNextTarget * gasUsedPerKm > route.getTankCapacity()) {
                 route.get(i).setRefillAmount(route.getTankCapacity() - currentTankStatus);
                 currentTankStatus = route.getTankCapacity();
             } //Ansonsten Tanke so viel wie benötigt
             else {
-                System.out.println("moin");
                 double refillAmount = kmToNextTarget * gasUsedPerKm - currentTankStatus;
                 route.get(i).setRefillAmount(refillAmount);
                 currentTankStatus += refillAmount;
@@ -330,7 +328,6 @@ public class RefillStrategies {
         
         for(int i = 0; i<route.getLength();i++) {
             if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
-                System.out.println("ERROR BEI : " + i + " " + route.get(i).getFuelAmount(route) + " , " + route.get(i).getRefillAmount(route));
                 PopupBox.displayError("Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
             }
             
