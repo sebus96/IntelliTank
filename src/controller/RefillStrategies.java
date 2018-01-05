@@ -5,22 +5,25 @@ package controller;
  *
  * @author Admin
  */
-
 import model.Route;
 import model.RefuelStop;
 import model.Price;
+import view.PopupBox;
 
 public class RefillStrategies {
 
-    
+    final double gasUsedPerKm = 5.6 / 100;
+
     /**
      * Von hier aus werden alle Tankstrategien ausgeführt
+     *
      * @param route Die route, auf die die Tankstrategien angewendet werden
      * sollen
      */
     public void calculateGasUsage(Route route) {
         this.calculateFPGSP(route);
         this.calculateBasicGasUsage(route);
+        this.validateStrategy(route);
     }
 
     /**
@@ -32,7 +35,6 @@ public class RefillStrategies {
      */
     private void calculateBasicGasUsage(Route route) {
 
-        final double gasUsedPerKm = 5.6 / 100;
         final double maxDistance = route.getTankCapacity() / gasUsedPerKm;
         double totalEuros = 0;
         double currentFuelAmount = 0;
@@ -53,7 +55,7 @@ public class RefillStrategies {
                     route.get(i).setRefillAmountBasic(route.getTankCapacity() - currentFuelAmount);
                     totalEuros += ((route.getTankCapacity() - currentFuelAmount) * (double) route.get(i).getPredictedPrice() / 1000);
                     currentFuelAmount = route.getTankCapacity();
-                //Falls das Ziel mit einer Tankfüllung erreichbar wäre, tanke nur so viel wie nötig, um dorthin zu gelangen
+                    //Falls das Ziel mit einer Tankfüllung erreichbar wäre, tanke nur so viel wie nötig, um dorthin zu gelangen
                 } else {
                     route.get(i).setRefillAmountBasic((kmToGoal * gasUsedPerKm) - currentFuelAmount);
                     totalEuros += ((kmToGoal * gasUsedPerKm) - currentFuelAmount) * ((double) route.get(i).getPredictedPrice() / 1000);
@@ -66,13 +68,15 @@ public class RefillStrategies {
     }
 
     /**
-     * Berechnet die Tankstrategie für das Fixed Path Gas Station Problem(FPGSP): Es wird nur an den billigsten Tankstellen getankt, sodass der Gesamtpreis minimal ist.
-     * Zunächst werden Previous- und Nextstations für jede Tankstelle bestimmt, bevor diese dann abgefahren werden.
+     * Berechnet die Tankstrategie für das Fixed Path Gas Station
+     * Problem(FPGSP): Es wird nur an den billigsten Tankstellen getankt, sodass
+     * der Gesamtpreis minimal ist. Zunächst werden Previous- und Nextstations
+     * für jede Tankstelle bestimmt, bevor diese dann abgefahren werden.
+     *
      * @param route Die route, auf die die Tankstrategie angewendet werden soll
      */
     private void calculateFPGSP(Route route) {
 
-        final double gasUsedPerKm = 5.6 / 100;
         final double maxDistance = route.getTankCapacity() / gasUsedPerKm;
         //1. Go through all the stations i in the route and set prevStation and nextStation
         //  prevStation = the station before s(s included), which has the lowest gas price and would be in reach with a full tank
@@ -82,7 +86,7 @@ public class RefillStrategies {
         //System.out.println("Tank: " + route.getTankCapacity() + "\nMaxDistance: " + maxDistance);
         for (int i = 0; i < route.getLength(); i++) {
             route.get(i).setPrevStation(findPrevStation(route, i, maxDistance));
-            
+
             //Wenn die aktuelle Tankstelle die günstigste ist, markiere sie als Breakpoint
             if (route.get(i).equals(route.get(i).getPrevStation())) {
                 route.get(i).setBreakPoint(true);
@@ -104,11 +108,18 @@ public class RefillStrategies {
     }
 
     /**
-     * Finde die "PreviousStation" für eine Tankstelle. Das ist die aktuelle oder eine vorige Tankstelle in Reichweite(anhängig von der Tankgröße des Autos), die den günstigsten Preis hat
-     * @param route Die route, auf der die Tankstelle, für die die günstigste Prevstation gesucht werden soll, liegt.
+     * Finde die "PreviousStation" für eine Tankstelle. Das ist die aktuelle
+     * oder eine vorige Tankstelle in Reichweite(anhängig von der Tankgröße des
+     * Autos), die den günstigsten Preis hat
+     *
+     * @param route Die route, auf der die Tankstelle, für die die günstigste
+     * Prevstation gesucht werden soll, liegt.
      * @param i Die Nummer der Tankstelle auf der Route
-     * @param maxDistance Die Maximale reichweite in km bzw. wie viele km das Auto mit vollem Tank fahren könnte.
-     * @return Gibt die PreviousStation zurück. Das ist die aktuelle oder eine vorige Tankstelle in Reichweite(anhängig von der Tankgröße des Autos), die den günstigsten Preis hat.
+     * @param maxDistance Die Maximale reichweite in km bzw. wie viele km das
+     * Auto mit vollem Tank fahren könnte.
+     * @return Gibt die PreviousStation zurück. Das ist die aktuelle oder eine
+     * vorige Tankstelle in Reichweite(anhängig von der Tankgröße des Autos),
+     * die den günstigsten Preis hat.
      */
     private RefuelStop findPrevStation(Route route, int i, double maxDistance) {
         int prevStationNumber = i;
@@ -116,12 +127,11 @@ public class RefillStrategies {
         //Falls ein Preis für den gesuchten Zeitpunkt existiert, speichere ihn
         if (route.get(i).getPredictedPrice() != -1) {
             gasPrice = route.get(i).getPredictedPrice();
-        }
-        //Falls er nicht existiert, vermute den Preis anhand umliegender Tankstellen
+        } //Falls er nicht existiert, vermute den Preis anhand umliegender Tankstellen
         else {
             gasPrice = guessPrice(route, i);
         }
-        
+
         //Versucht nun die vorherigen Tankstellen abzulaufen, um zu sehen, ob dort eine günstiger ist
         double traveledDistance = 0;
         for (int j = i - 1; j >= 0; j--) {
@@ -133,12 +143,11 @@ public class RefillStrategies {
             //Falls der Preis an einer vorherigen Tankstelle günstiger ist
             if (route.get(j).getPredictedPrice() < gasPrice) {
                 //Prüfe, ob es tatsächlich einen Preis gibt
-                if(route.get(j).getPredictedPrice() > 0) {
+                if (route.get(j).getPredictedPrice() > 0) {
                     gasPrice = route.get(j).getPredictedPrice();
                     prevStationNumber = j;
-                }
-                //Falls nicht, vergleiche mit dem vermuteten Preis
-                else if(guessPrice(route, j) < gasPrice){
+                } //Falls nicht, vergleiche mit dem vermuteten Preis
+                else if (guessPrice(route, j) < gasPrice) {
                     gasPrice = guessPrice(route, j);
                     prevStationNumber = j;
                 }
@@ -148,11 +157,18 @@ public class RefillStrategies {
     }
 
     /**
-     * Finde die "NextStation" für eine Tankstelle. Das ist eine nachfolgende Tankstelle(nicht die aktuelle) in Reichweite(anhängig von der Tankgröße des Autos), die den günstigsten Preis hat.
-     * @param route Die route, auf der die Tankstelle, für die die günstigste Nextstation gesucht werden soll, liegt.
+     * Finde die "NextStation" für eine Tankstelle. Das ist eine nachfolgende
+     * Tankstelle(nicht die aktuelle) in Reichweite(anhängig von der Tankgröße
+     * des Autos), die den günstigsten Preis hat.
+     *
+     * @param route Die route, auf der die Tankstelle, für die die günstigste
+     * Nextstation gesucht werden soll, liegt.
      * @param i Die Nummer der Tankstelle auf der Route
-     * @param maxDistance Die Maximale reichweite in km bzw. wie viele km das Auto mit vollem Tank fahren könnte.
-     * @return Gibt die NextStation zurück. Das ist eine nachfolgende Tankstelle(nicht die aktuelle) in Reichweite(anhängig von der Tankgröße des Autos), die den günstigsten Preis hat.
+     * @param maxDistance Die Maximale reichweite in km bzw. wie viele km das
+     * Auto mit vollem Tank fahren könnte.
+     * @return Gibt die NextStation zurück. Das ist eine nachfolgende
+     * Tankstelle(nicht die aktuelle) in Reichweite(anhängig von der Tankgröße
+     * des Autos), die den günstigsten Preis hat.
      */
     private RefuelStop findNextStation(Route route, int i, double maxDistance) {
 
@@ -173,17 +189,15 @@ public class RefillStrategies {
                     continue;
                 }
                 nextStationNumber = j;
-            } 
-            //Falls es ein späterer Durchlauf ist, vergleiche den aktuellen mit dem aktuell günstigsten Tankpreis
+            } //Falls es ein späterer Durchlauf ist, vergleiche den aktuellen mit dem aktuell günstigsten Tankpreis
             else {
                 if (route.get(j).getPredictedPrice() <= gasPrice) {
                     //Prüfe, ob es tatsächlich einen Preis gibt
-                    if(route.get(j).getPredictedPrice() > 0) {
+                    if (route.get(j).getPredictedPrice() > 0) {
                         gasPrice = route.get(j).getPredictedPrice();
                         nextStationNumber = j;
-                    }
-                    //Falls nicht, vergleiche mit dem vermuteten Preis
-                    else if(guessPrice(route, j) <= gasPrice) {
+                    } //Falls nicht, vergleiche mit dem vermuteten Preis
+                    else if (guessPrice(route, j) <= gasPrice) {
                         gasPrice = guessPrice(route, j);
                         nextStationNumber = j;
                     }
@@ -192,8 +206,11 @@ public class RefillStrategies {
         }
         return route.get(nextStationNumber);
     }
+
     /**
-     * Berechnet den Abstand in km zwischen 2 Punkten anhand ihrer Längen- und Breitengrade
+     * Berechnet den Abstand in km zwischen 2 Punkten anhand ihrer Längen- und
+     * Breitengrade
+     *
      * @param latA Breitengrad Punkt A
      * @param longA Längengrad Punkt A
      * @param latB Breitengrad Punkt B
@@ -210,8 +227,11 @@ public class RefillStrategies {
     }
 
     /**
-     * Berechnet den günstigsten Preis, um vom Anfang bis zum Ende der Route zu gelangen. Previousstations und Nextstations müssen bekannt sein.
-     * @param route Die route, für die die günstigste Tankstrategie bestimmt werden soll
+     * Berechnet den günstigsten Preis, um vom Anfang bis zum Ende der Route zu
+     * gelangen. Previousstations und Nextstations müssen bekannt sein.
+     *
+     * @param route Die route, für die die günstigste Tankstrategie bestimmt
+     * werden soll
      * @param gasUsedPerKm Wieviel Benzin Pro km verbraucht wird
      */
     private void createRefillPlan(Route route, double gasUsedPerKm) {
@@ -219,7 +239,7 @@ public class RefillStrategies {
         double currentTankStatus = 0;
         double totalEuros = 0, totalKm = 0;
         for (int i = 0; i < route.getLength(); i++) {
-            
+
             //Falls es nicht die erste Tankstelle auf der Route ist, bestimme den Abstand zur vorherigen Tankstelle und aktualisiere den Tankstatus. Für erste Tankstelle nicht nötig, da man mit leerem Tank startet.
             if (i > 0) {
                 double distanceFromLastStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i - 1).getStation().getLatitude(), route.get(i - 1).getStation().getLongitude());
@@ -241,8 +261,7 @@ public class RefillStrategies {
                         break;
                     }
                 }
-            }
-            //Falls die "next" Tankstelle kein Breakpoint ist, bedeutet das, dass die aktuelle Tankstelle billiger ist. Also volltanken bzw so viel wie nötig, falls kurz vor Ende der Route.
+            } //Falls die "next" Tankstelle kein Breakpoint ist, bedeutet das, dass die aktuelle Tankstelle billiger ist. Also volltanken bzw so viel wie nötig, falls kurz vor Ende der Route.
             else {
                 for (int j = i + 1; j < route.getLength(); j++) {
                     kmToNextTarget += calculateDistance(route.get(j).getStation().getLatitude(), route.get(j).getStation().getLongitude(), route.get(j - 1).getStation().getLatitude(), route.get(j - 1).getStation().getLongitude());
@@ -250,21 +269,21 @@ public class RefillStrategies {
             }
             //Hier beginnt das eigentliche Tanken, vorher wurde nur gesetzt, für wieviel km getankt werden muss.
             //Falls das Ziel außerhalb der Reichweite liegt, tanke voll
-            if ((kmToNextTarget * gasUsedPerKm) + currentTankStatus > route.getTankCapacity()) {
+            System.out.println(i + " " + kmToNextTarget + " " + gasUsedPerKm + " " + currentTankStatus);
+            if (kmToNextTarget * gasUsedPerKm > route.getTankCapacity()) {
                 route.get(i).setRefillAmount(route.getTankCapacity() - currentTankStatus);
                 currentTankStatus = route.getTankCapacity();
-            } 
-            //Ansonsten Tanke so viel wie benötigt
+            } //Ansonsten Tanke so viel wie benötigt
             else {
+                System.out.println("moin");
                 double refillAmount = kmToNextTarget * gasUsedPerKm - currentTankStatus;
                 route.get(i).setRefillAmount(refillAmount);
                 currentTankStatus += refillAmount;
             }
             //Addiere den Preis zu den bisherigen Kosten. Nehme dafür entweder den projezierten Preis oder den vermuteten, je nachdem ob er bekannt ist.
-            if(route.get(i).getPredictedPrice() > 0) {
+            if (route.get(i).getPredictedPrice() > 0) {
                 totalEuros += route.get(i).getRefillAmount(route) * route.get(i).getPredictedPrice() / 1000;
-            }
-            else {
+            } else {
                 totalEuros += route.get(i).getRefillAmount(route) * guessPrice(route, i) / 1000;
             }
         }
@@ -272,16 +291,21 @@ public class RefillStrategies {
         route.setTotalLiters(totalKm * gasUsedPerKm);
         route.setTotalEuros(totalEuros);
     }
+
     /**
-     * Vermutet den Preis anhand aller anderen Tankstellen auf der Route. Je näher eine andere Tankstelle ist, desto höher ist ihr Einfluss bei der Preisbestimmung.
-     * @param route Die route, auf der die Tankstelle, für die der Preis vermutet werden soll, liegt.
+     * Vermutet den Preis anhand aller anderen Tankstellen auf der Route. Je
+     * näher eine andere Tankstelle ist, desto höher ist ihr Einfluss bei der
+     * Preisbestimmung.
+     *
+     * @param route Die route, auf der die Tankstelle, für die der Preis
+     * vermutet werden soll, liegt.
      * @param i Die Nummer der Tankstelle auf der Route
      * @return Gibt den vermuteten Preis in Euro zurück
      */
     private double guessPrice(Route route, int i) {
         double guessedPrice = 0;
         double divisor = 0;
-        
+
         //Iteriert durch alle Tankstellen der Route. Tankstellen, die keinen Preis haben, werden ausgelassen,da sie nichts zur Preisbestimmung beitragen können
         for (int j = 0; j < route.getLength(); j++) {
             if (route.get(j).getPredictedPrice(route.get(i).getTime()) < 0) {
@@ -297,5 +321,19 @@ public class RefillStrategies {
         int guessedPriceRounded = Price.roundPrice((int) guessedPrice);
         route.get(i).setGuessedPrice(guessedPriceRounded);
         return guessedPriceRounded;
+    }
+
+    /**
+     * Validiert die Berechnete Strategie
+     */
+    private void validateStrategy(Route route) {
+        
+        for(int i = 0; i<route.getLength();i++) {
+            if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
+                System.out.println("ERROR BEI : " + i + " " + route.get(i).getFuelAmount(route) + " , " + route.get(i).getRefillAmount(route));
+                PopupBox.displayError("Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
+            }
+            
+        }
     }
 }

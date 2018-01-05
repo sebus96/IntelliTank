@@ -3,17 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/MainView.java</file>
             <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/io/CSVManager.java</file>
-            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/RouteView.java</file>
-            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/PredictionPoints.java</file>
+            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/MainView.java</file>
             <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/controller/GasStationController.java</file>
-            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/PredictionPoint.java</file>
             <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/controller/RefillStrategies.java</file>
             <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/PredictionPointView.java</file>
-            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/model/RefuelStop.java</file>
-            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/controller/PredictionUnit.java</file>
-            <file>file:/D:/My%20Files/Dokumente/Netbeans%20Projects/IntelliTank/src/view/ProgressView.java</file>
         </group>
     </open-files>
 </project-private>
