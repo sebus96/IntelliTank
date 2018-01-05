@@ -30,7 +30,7 @@ public class PopupBox {
 
     public static void displayWarning(String content) {
 
-        if (!warnAlert.isShowing()) {
+        if (!warnAlert.isShowing() && content.equals(warnAlert.getContentText()) ) {
             warnAlert.setTitle("Warnung");
             warnAlert.setHeaderText(null);
             warnAlert.setContentText(content);
@@ -40,7 +40,7 @@ public class PopupBox {
 
     public static void displayError(String content) {
 
-        if (!errorAlert.isShowing()) {
+        if (!errorAlert.isShowing() && content.equals(errorAlert.getContentText())) {
             errorAlert.setTitle("Error");
             errorAlert.setHeaderText(null);
             errorAlert.setContentText(content);
