@@ -1,6 +1,7 @@
 package model;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import javafx.collections.ObservableList;
 public class PredictionPoints implements IPredictionStations{
     private String name;
     private List<PredictionPoint> predictionPoints;
+    private DateFormat dateFormat = new SimpleDateFormat("EE dd.MM.yyyy HH:mm");
 
     
     public PredictionPoints(String name) {
@@ -31,8 +33,8 @@ public class PredictionPoints implements IPredictionStations{
     		result.add(new PredictionPoint.TableRow(
     				ctr++,
     				p.getStation().getName(),
-    				df.format(p.getPriceKnownUntil()),
-    				df.format(p.getTime()),
+    				dateFormat.format(p.getPriceKnownUntil()),
+    				dateFormat.format(p.getTime()),
     				p.getPredictedPrice(),
     				p.getStation().getHistoricPrice(p.getTime())
     			)

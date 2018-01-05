@@ -19,4 +19,6 @@ public interface IPredictionStation {
     public void setPrediction(PredictionUnit pu);
 	
 	public boolean isPredicted();
+	
+	public String toCSVString();
 }
