@@ -143,7 +143,9 @@ public class RouteView {
 
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLUE);
-        String stationName = route.get(index).getStation().getName() + ", " + route.get(index).getStation().getPostcode() + " " + route.get(index).getStation().getLocation();
+        RefuelStop rs = route.get(index);
+        GasStation s = rs.getStation();
+        String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation() + " (echter Preis: " + (s.getHistoricPrice(rs.getTime()) / 1000.0) + " Ä)";
         gc.fillText(stationName, 220, circleStart + circleHeight / 2);
         gc.setFill(Color.BLACK);
         //f√ºge die Verlinkung zum Preisdiagramm ein

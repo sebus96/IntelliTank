@@ -23,10 +23,10 @@ import java.util.Map;
 
 import model.FederalState;
 import model.GasStation;
+import model.IPredictionStations;
 import model.PredictionPoints;
 import model.Price;
 import model.Route;
-
 import view.PopupBox;
 
 public class CSVManager {
@@ -114,6 +114,7 @@ public class CSVManager {
     public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
     	File routeFile = new File(routePath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));
     	List<String> lines = readCSV(routeFile);
+    	System.out.println("import route: " + routeName);
         if (lines == null) {
             System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
             return null;
@@ -138,6 +139,7 @@ public class CSVManager {
     public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
         File predictionFile = new File(predictionPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
     	List<String> lines = readCSV(predictionFile);
+    	System.out.println("import predictionpoints: " + predictionName);
         if (lines == null) {
             System.err.println("Could not import Prediction \"" + predictionFile.getName() + "\"!");
             return null;
@@ -153,24 +155,17 @@ public class CSVManager {
         return result;
     }
 
-    public static void importPrices(Route route) {
-        if (route == null) return;
-        for (int i = 0; i < route.getLength(); i++) {
-            importPrice(route.get(i).getStation());
-        }
-    }
-
-    public static void importPrices(PredictionPoints predictionPoints) {
-        if (predictionPoints == null) return;
-        for (int i = 0; i < predictionPoints.getLength(); i++) {
-            importPrice(predictionPoints.get(i).getStation());
+    public static void importPrices(IPredictionStations stations) {
+        if (stations == null) return;
+        for (int i = 0; i < stations.getLength(); i++) {
+            importPrice(stations.get(i).getStation());
         }
     }
 
     public static void importPrice(GasStation gs) {
 //		double start = System.nanoTime();
     	if(gs.hasPriceList()) {
-    		System.err.println("Prices for " + gs + " already imported.");
+    		System.out.println("Prices for " + gs + " already imported. (size=" + gs.getPriceListSize() + ")");
     		return;
     	}
         String filename = pricePath + gs.getID() + ".csv";
@@ -275,7 +270,7 @@ public class CSVManager {
         return listOfFiles;
     }
 
-    public static void copyRouteFile(File selectedFile) throws FileNotFoundException, IOException {
+    public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
         Path path = Paths.get(routePath + selectedFile.getName());
         copyFile(selectedFile, path);
     }
@@ -288,12 +283,6 @@ public class CSVManager {
     private static void copyFile(File selectedFile, Path dest) throws FileNotFoundException, IOException {
     	InputStream is = new FileInputStream(selectedFile);
         Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
-        is.close();
-    }
-    public static void copyPredictionPointFile(File selectedFile) throws FileNotFoundException, IOException {
-        InputStream is = new FileInputStream(selectedFile);
-        Path path = Paths.get(predictionPath + selectedFile.getName());
-        Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
         is.close();
     }
 }

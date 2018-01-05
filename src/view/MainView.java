@@ -12,8 +12,6 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -109,7 +107,7 @@ public class MainView {
                         File selectedFile = fc.showOpenDialog(null);
                         if (selectedFile != null) {
                             try {
-                                CSVManager.copyRouteFile(selectedFile);
+                                CSVManager.copyRoute(selectedFile);
                             } catch (FileNotFoundException ex) {
                                 Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                             } catch (IOException ex) {
@@ -155,7 +153,7 @@ public class MainView {
                         File selectedFile = fc.showOpenDialog(null);
                         if (selectedFile != null) {
                             try {
-                                CSVManager.copyPredictionPointFile(selectedFile);
+                                CSVManager.copyPredictionPoints(selectedFile);
                             } catch (FileNotFoundException ex) {
                                 Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                             } catch (IOException ex) {

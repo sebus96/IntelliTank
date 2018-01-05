@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.Date;
 import java.util.Map;
 
 import io.CSVManager;
@@ -9,11 +10,12 @@ import javafx.stage.Stage;
 import model.GasStation;
 import model.IPredictionStation;
 import model.IPredictionStations;
+import model.PredictionPoint;
 import model.PredictionPoints;
 import model.Route;
 import view.MainView;
-import view.ProgressView;
 import view.PopupBox;
+import view.ProgressView;
 
 public class GasStationController {
 
@@ -81,16 +83,24 @@ public class GasStationController {
                 System.out.println("Start prediction");
                 for (int i = 0; i < stations.getLength(); i++) {
                     IPredictionStation station = stations.get(i);
+                    if(station.isPredicted()) continue;
                     GasStation gs = station.getStation();
                     if (gs.getPriceListSize() == 0) {
                         System.err.println("Pricelist of " + gs + " does not exist");
                         continue;
                     }
-                    PredictionUnit pu = new PredictionUnit(gs, station.getTime()); // TODO: richtige Zeit benutzen
+                    Date until = null;
+                    if(stations instanceof Route) {
+                    	until = ((Route)stations).getPriceKnownUntil();
+                    } else if (station instanceof PredictionPoint) {
+                    	until = ((PredictionPoint)station).getPriceKnownUntil();
+                    }
+                    PredictionUnit pu = new PredictionUnit(gs, until);
 //                    predictions.add(pu);
                     boolean trainSuccess = pu.train();
                     if (trainSuccess) {
-                        station.setPredictedPrices(pu.testAndSetHourSteps());
+                    	station.setPrediction(pu);
+//                        station.setPredictedPrices(pu.testAndSetHourSteps());
                     }
                     updateProgress((i + 1) * 100 / stations.getLength(), 100);
                 }
@@ -98,14 +108,7 @@ public class GasStationController {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (stations instanceof PredictionPoints) {
-                            mainView.displayPredictionPoints((PredictionPoints) stations);
-                            pw.close();
-                        } else if (stations instanceof Route) {
-                            refillStrategies.calculateGasUsage((Route) stations);
-                            mainView.displayRoute((Route) stations);
-                            pw.close();
-                        }
+                    	showPredictedStations(stations);
                     }
                 });
                 return null;
@@ -115,6 +118,17 @@ public class GasStationController {
         pw.getProgressBar().progressProperty().bind(predictionThread.progressProperty());
         new Thread(predictionThread).start();
     }
+    
+    private void showPredictedStations(IPredictionStations stations) {
+    	if (stations instanceof PredictionPoints) {
+            mainView.displayPredictionPoints((PredictionPoints) stations);
+            pw.close();
+        } else if (stations instanceof Route) {
+            refillStrategies.calculateGasUsage((Route) stations);
+            mainView.displayRoute((Route) stations);
+            pw.close();
+        }
+    }
 
     public void switchToRoute(String routeName) {
         Route routeTest = CSVManager.importRoute(allStations, routeName);
@@ -122,9 +136,11 @@ public class GasStationController {
             PopupBox.displayError(routeName + " konnte nicht geladen werden. Datei fehlerhaft oder nicht mehr vorhanden.");
             return;
         }
+        if(!routeTest.equals(route)) {
+        	route = routeTest;
+            CSVManager.importPrices(route);
+        }
         mainView.hide();
-        route = routeTest;
-        CSVManager.importPrices(route);
         pw = new ProgressView(route);
 //        this.predictions = new ArrayList<>();
         this.trainPrediction(route);
@@ -136,9 +152,11 @@ public class GasStationController {
             PopupBox.displayError(predictionPointName + " konnte nicht geladen werden. Datei fehlerhaft oder nicht mehr vorhanden.");
             return;
         }
+        if(!predictionPointsTest.equals(predictionPoints)) {
+        	predictionPoints = predictionPointsTest;
+        	CSVManager.importPrices(predictionPoints);
+        }
         mainView.hide();
-        predictionPoints = predictionPointsTest;
-        CSVManager.importPrices(predictionPoints);
         pw = new ProgressView(predictionPoints);
 //        this.predictions = new ArrayList<>();
         this.trainPrediction(predictionPoints);

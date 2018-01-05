@@ -3,6 +3,8 @@ package model;
 import java.util.Date;
 import java.util.List;
 
+import controller.PredictionUnit;
+
 public class RefuelStop implements IPredictionStation {
 
     private Date time;
@@ -11,6 +13,7 @@ public class RefuelStop implements IPredictionStation {
     private boolean priceGuessed;
     
     private List<Price> predictedPrices;
+	private PredictionUnit predictionUnit;
 
     //Variables below are needed for the Fixed Path Gas Station Problem
     private RefuelStop prevStation;
@@ -62,9 +65,18 @@ public class RefuelStop implements IPredictionStation {
     	return this.getPredictedPrice(this.time);
     }
     
-    public void setPredictedPrices( List<Price> predicted) {
-    	this.predictedPrices = predicted;
-    }
+//    public void setPredictedPrices( List<Price> predicted) {
+//    	this.predictedPrices = predicted;
+//    }
+	
+	public void setPrediction(PredictionUnit pu) {
+		this.predictionUnit = pu;
+		this.predictedPrices = this.predictionUnit.testAndSetHourSteps();
+	}
+	
+	public boolean isPredicted() {
+		return predictionUnit != null;
+	}
 
     public int getGuessedPrice() {
         return guessedPrice;
@@ -157,4 +169,35 @@ public class RefuelStop implements IPredictionStation {
     public String toString() {
         return "(" + time + ": " + station + ")";
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((station == null) ? 0 : station.hashCode());
+		result = prime * result + ((time == null) ? 0 : time.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RefuelStop other = (RefuelStop) obj;
+		if (station == null) {
+			if (other.station != null)
+				return false;
+		} else if (!station.equals(other.station))
+			return false;
+		if (time == null) {
+			if (other.time != null)
+				return false;
+		} else if (!time.equals(other.time))
+			return false;
+		return true;
+	}
 }

@@ -3,6 +3,7 @@ package model;
 import java.util.Date;
 import java.util.List;
 
+import controller.PredictionUnit;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -15,6 +16,7 @@ public class PredictionPoint implements IPredictionStation {
 	private Date priceKnownUntil, predictionTime;
 	private List<Price> predictedPrices;
 	private Price predictedPrice;
+	private PredictionUnit predictionUnit;
 	
 	public PredictionPoint(GasStation station, Date priceKnownUntil, Date predictionTime) {
 		this.station = station;
@@ -31,6 +33,15 @@ public class PredictionPoint implements IPredictionStation {
 
 	public Date getPriceKnownUntil() {
 		return priceKnownUntil;
+	}
+	
+	public void setPrediction(PredictionUnit pu) {
+		this.predictionUnit = pu;
+		this.predictedPrices = this.predictionUnit.testAndSetHourSteps();
+	}
+	
+	public boolean isPredicted() {
+		return predictionUnit != null;
 	}
 
 	public Date getTime() {
@@ -57,14 +68,52 @@ public class PredictionPoint implements IPredictionStation {
     	return predictedPrice.getPrice();
     }
     
-    public void setPredictedPrices( List<Price> predicted) {
-    	this.predictedPrices = predicted;
-    }
+//    public void setPredictedPrices( List<Price> predicted) {
+//    	this.predictedPrices = predicted;
+//    }
     
     @Override
     public String toString() {
     	return "(" + this.station + ": " + this.predictionTime + ")\n";
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((predictedPrice == null) ? 0 : predictedPrice.hashCode());
+		result = prime * result + ((predictionTime == null) ? 0 : predictionTime.hashCode());
+		result = prime * result + ((priceKnownUntil == null) ? 0 : priceKnownUntil.hashCode());
+		result = prime * result + ((station == null) ? 0 : station.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PredictionPoint other = (PredictionPoint) obj;
+		if (predictionTime == null) {
+			if (other.predictionTime != null)
+				return false;
+		} else if (!predictionTime.equals(other.predictionTime))
+			return false;
+		if (priceKnownUntil == null) {
+			if (other.priceKnownUntil != null)
+				return false;
+		} else if (!priceKnownUntil.equals(other.priceKnownUntil))
+			return false;
+		if (station == null) {
+			if (other.station != null)
+				return false;
+		} else if (!station.equals(other.station))
+			return false;
+		return true;
+	}
 
 	public static class TableRow{
 		public TableRow(int id, String station, String knownTime, String predictionTime, double price, double realPrice) {
@@ -74,7 +123,6 @@ public class PredictionPoint implements IPredictionStation {
 			predictionTimeProperty().set(predictionTime);
 			priceProperty().set(price/1000);
 			realPriceProperty().set(realPrice/1000);
-			System.out.println("ff: " + realPriceProperty().get());
 		}
 		
 	    private IntegerProperty id;

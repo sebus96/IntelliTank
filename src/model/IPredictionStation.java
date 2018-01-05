@@ -1,7 +1,8 @@
 package model;
 
 import java.util.Date;
-import java.util.List;
+
+import controller.PredictionUnit;
 
 public interface IPredictionStation {
 	
@@ -13,5 +14,9 @@ public interface IPredictionStation {
     
     public int getPredictedPrice();
     
-    public void setPredictedPrices( List<Price> predicted);
+//    public void setPredictedPrices( List<Price> predicted);
+    
+    public void setPrediction(PredictionUnit pu);
+	
+	public boolean isPredicted();
 }

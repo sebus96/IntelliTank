@@ -64,4 +64,35 @@ public class PredictionPoints implements IPredictionStations{
     public String toString() {
     	return "(" + this.name + ": " + this.predictionPoints + ")";
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((predictionPoints == null) ? 0 : predictionPoints.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PredictionPoints other = (PredictionPoints) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (predictionPoints == null) {
+			if (other.predictionPoints != null)
+				return false;
+		} else if (!predictionPoints.equals(other.predictionPoints))
+			return false;
+		return true;
+	}
 }
