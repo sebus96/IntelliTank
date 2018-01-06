@@ -5,12 +5,14 @@
  */
 package view;
 
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import model.IPredictionStations;
 import model.PredictionPoints;
 import model.Route;
@@ -30,6 +32,13 @@ public class ProgressView {
     public ProgressView(IPredictionStations predictionStations) {
     	this.name = predictionStations.getName();
         progressStage = new Stage();
+        progressStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
+			@Override
+			public void handle(WindowEvent evt) {
+				System.exit(0); // schlieﬂe Programm
+			}
+        	
+        });
         BorderPane bp = new BorderPane();
         Scene scene = new Scene(bp, 300, 45);
         progressStage.setResizable(false);

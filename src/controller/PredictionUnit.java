@@ -14,11 +14,15 @@ public class PredictionUnit {
 	private Date trainUntil;
 	private Perceptron p;
 	
-	private boolean PRINT_RESULTS = false;
+	public enum Mode {SINGLE_LAYER, MULTI_LAYER};
+	private Mode mode;
+	
+	private final boolean PRINT_RESULTS = true;
 
-	public PredictionUnit(GasStation gs, Date trainUntil) {
+	public PredictionUnit(GasStation gs, Date trainUntil, Mode mode) {
 		this.gs = gs;
 		this.trainUntil = trainUntil;
+		this.mode = mode;
 	}
 	
 	public boolean train() {
@@ -26,8 +30,10 @@ public class PredictionUnit {
 			System.err.println("No historic prices available for " + gs + "!");
 			return false;
 		}
-		int epoch = 100;
-		p = new Perceptron(gs, 0.05, epoch);
+		if(this.mode == Mode.SINGLE_LAYER)
+			p = new SingleLayerPerceptron(gs, 0.05, 100);
+		else
+			p = new MultiLayerPerceptron(gs, 0.05, 100);
 		boolean trainResult = p.train( trainUntil);
 		if(PRINT_RESULTS) System.out.println("Trainigsziel erreicht: " + (trainResult ? "Ja": "Nein"));
 		return true;
@@ -59,7 +65,7 @@ public class PredictionUnit {
 		}
 		for(int i = 0; i < 24*7*5; i++) { // 5 Wochen
 			ctr++;
-			double out = p.output(c.getTime(), lastPrices);
+			double out = p.feedForward(c.getTime(), lastPrices);
 			double real = gs.getHistoricPrice(c.getTime());
 			if(real < 0) System.err.println("Could not compare to real data. Real data is not available for " + gs + " at " + c.getTime());
 			predictedPriceList.add(new Price(c.getTime() , (int)Math.round(out)));
@@ -87,37 +93,4 @@ public class PredictionUnit {
 				+ "Minimalpreis: " + ((int)minPrice/1000.0) + "  (real: " + ((int)realMinPrice/1000.0) + " )\n");
 		return predictedPriceList;
 	}
-	
-//	public void startNetwork() {
-//
-//        Network network = new Network();
-//        network.train(gs);
-//        /*int counter = 0;
-//        network.feedForward(data);*/
-//	}
-	
-//	public void test(Date after) {
-//		double avgDiff = 0;
-//		double maxDiff = Double.MIN_VALUE;
-//		int ctr = 0;
-//		int[] lastPrice = {gs.getPriceListElement(0).getPrice()};
-//		for(int i = 0; i < gs.getPriceListSize(); i++) {
-//			Price pr = gs.getPriceListElement(i);
-//			if(pr.getTime().before(after)){
-//				lastPrice[0] = pr.getPrice();
-//				continue;
-//			}
-//			ctr++;
-//			double out = p.output(pr.getTime(), lastPrice); //TODO real price
-//			double diff = Math.abs(out-pr.getPrice());
-//			if(diff > maxDiff) {
-//				maxDiff = diff;
-//			}
-//			avgDiff += diff;
-//			lastPrice[0] = pr.getPrice();
-//		}
-//		System.out.println(ctr);
-//		avgDiff /= ctr;
-//		System.out.println("Average: " + ((int)avgDiff/1000.0) + " �" + "\nMaximum: " + ((int)maxDiff/1000.0) + " �");
-//	}
 }

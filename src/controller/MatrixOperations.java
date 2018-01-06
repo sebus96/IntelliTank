@@ -85,6 +85,33 @@ public class MatrixOperations {
     }
 
     /**
+     * Matrix Sum
+     *
+     * @param mA First Input Matrix
+     * @param mB Second Input Matrix
+     * @return the result of the sum operation
+     */
+    public static Matrix matMult(double a, Matrix b) {
+
+    	double[][] matrix = b.getMatrix();
+
+        int rows = matrix.length;
+        int columns = matrix[0].length;
+
+        double[][] matrixRes = new double[rows][columns];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+
+                matrixRes[i][j] = matrix[i][j] * a;
+
+            }
+        }
+
+        return new Matrix(matrixRes);
+
+    }
+
+    /**
      * Shows the matrix as output
      *
      * @param m The matrix the user wants to show

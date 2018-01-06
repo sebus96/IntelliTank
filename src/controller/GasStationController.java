@@ -3,6 +3,7 @@ package controller;
 import java.util.Date;
 import java.util.Map;
 
+import controller.PredictionUnit.Mode;
 import io.CSVManager;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -95,7 +96,7 @@ public class GasStationController {
                     } else if (station instanceof PredictionPoint) {
                     	until = ((PredictionPoint)station).getPriceKnownUntil();
                     }
-                    PredictionUnit pu = new PredictionUnit(gs, until);
+                    PredictionUnit pu = new PredictionUnit(gs, until, Mode.SINGLE_LAYER);
 //                    predictions.add(pu);
                     boolean trainSuccess = pu.train();
                     if (trainSuccess) {
