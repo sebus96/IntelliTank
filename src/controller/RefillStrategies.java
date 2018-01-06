@@ -327,7 +327,7 @@ public class RefillStrategies {
     private void validateStrategy(Route route) {
         
         for(int i = 0; i<route.getLength();i++) {
-            if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
+            if(route.get(i).getFuelAmount(route) < 0.001 || route.get(i).getRefillAmount(route) < 0.001) {
                 PopupBox.displayError("Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
             }
             
