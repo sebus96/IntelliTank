@@ -3,4 +3,6 @@
 /nbproject/private/
 /Eingabedaten/Benzinpreise/*
 /Eingabedaten/Tankstellen.csv
+/Ausgabedaten/Tankstrategien/*
+/Ausgabedaten/Vorhersagen/*
 /bin/

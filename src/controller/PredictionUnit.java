@@ -10,14 +10,14 @@ import model.GasStation;
 import model.Price;
 
 public class PredictionUnit {
+	private boolean PRINT_RESULTS = false;
+	
 	private GasStation gs;
 	private Date trainUntil;
 	private Perceptron p;
 	
 	public enum Mode {SINGLE_LAYER, MULTI_LAYER};
 	private Mode mode;
-	
-	private final boolean PRINT_RESULTS = true;
 
 	public PredictionUnit(GasStation gs, Date trainUntil, Mode mode) {
 		this.gs = gs;

@@ -9,7 +9,8 @@ import model.GasStation;
 public abstract class Perceptron {
 	private int epochs;
 	protected final int precision = 13;
-	protected final int oldPriceNumber = 1;
+	protected final int oldPriceNumber = 5;
+//	protected final int hourSteps = 1;
 	private GasStation station;
 	
 	/**
@@ -52,7 +53,7 @@ public abstract class Perceptron {
 		c.add(Calendar.HOUR_OF_DAY, -1 * oldPriceNumber);
 		for(int i = 0; i < oldPriceNumber; i++) {
 			res[i] = station.getHistoricPrice(c.getTime());
-			if(res[i] < 0) return null;
+//			if(res[i] < 0) return null;
 			c.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		return res;
