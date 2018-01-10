@@ -223,7 +223,7 @@ public class RefillStrategies {
         double latitudeB = Math.toRadians(latB);
         double longitudeB = Math.toRadians(longB);
         double dist = 6378.388 * Math.acos((Math.sin(latitudeA) * Math.sin(latitudeB)) + (Math.cos(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA)));
-        return dist;
+        return Math.ceil(Math.pow(10, 10) * dist)/Math.pow(10, 10);
     }
 
     /**
@@ -327,7 +327,7 @@ public class RefillStrategies {
     private void validateStrategy(Route route) {
         
         for(int i = 0; i<route.getLength();i++) {
-            if(route.get(i).getFuelAmount(route) < 0.001 || route.get(i).getRefillAmount(route) < 0.001) {
+            if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
                 PopupBox.displayError("Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
             }
             

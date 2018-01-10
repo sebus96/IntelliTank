@@ -35,7 +35,7 @@ public class ProgressView {
         progressStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
 			@Override
 			public void handle(WindowEvent evt) {
-				System.exit(0); // schlieﬂe Programm
+				System.exit(0); // schliesse Programm
 			}
         	
         });
