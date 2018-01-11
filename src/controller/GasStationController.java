@@ -33,7 +33,7 @@ public class GasStationController {
     public GasStationController(Stage primaryStage) {
         allStations = CSVManager.importGasStations();
         if (allStations == null) {
-            PopupBox.displayError("Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
+            PopupBox.displayError(301);
             return;
         }
         //route = CSVManager.importStandardRoute(allStations);
@@ -137,7 +137,7 @@ public class GasStationController {
     public void switchToRoute(String routeName) {
         Route routeTest = CSVManager.importRoute(allStations, routeName);
         if (routeTest == null) {
-            PopupBox.displayError(routeName + " konnte nicht geladen werden. Datei fehlerhaft oder nicht mehr vorhanden.");
+            PopupBox.displayError(302);
             return;
         }
         if(!routeTest.equals(route)) {
@@ -153,7 +153,7 @@ public class GasStationController {
     public void switchToPredictionPoints(String predictionPointName) {
         PredictionPoints predictionPointsTest = CSVManager.importPredictionPoints(allStations, predictionPointName);
         if (predictionPointsTest == null) {
-            PopupBox.displayError(predictionPointName + " konnte nicht geladen werden. Datei fehlerhaft oder nicht mehr vorhanden.");
+            PopupBox.displayError(303);
             return;
         }
         if(!predictionPointsTest.equals(predictionPoints)) {

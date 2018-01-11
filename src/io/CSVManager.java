@@ -61,7 +61,7 @@ public class CSVManager {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 9) {
                 System.err.println("Input stations: Illegal Input row size");
-                PopupBox.displayWarning("Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
+                PopupBox.displayWarning(201);
             }
             int postcode = getInteger(lineElements[5]);
             GasStation station = new GasStation(
@@ -116,11 +116,11 @@ public class CSVManager {
             post2state.add(code);
         }
     }
-
+    /*
     public static Route importStandardRoute(Map<Integer, GasStation> stations) {
     	String[] routes = {"Bertha Benz Memorial Route", "Hildesheim Harz", "Oldenburg Hannover", "Hannover Hildesheim", "Kiel Celle"};
         return importRoute(stations, routes[4]);
-    }
+    }*/
 
     public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
     	File routeFile = new File(routeInputPath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));

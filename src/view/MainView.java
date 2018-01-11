@@ -186,7 +186,7 @@ public class MainView {
     	itemUeber.setOnAction(new EventHandler<ActionEvent>() {
     		@Override
     		public void handle(ActionEvent arg0) {
-    			PopupBox.displayMessage("Dieses Projekt wurde von Axel Claassen, Burak Kadioglu und Sebastian Drath entwickelt.");
+    			PopupBox.displayMessage(101);
     		}
 		});
         bar.getMenus().add(about);
