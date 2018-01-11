@@ -5,14 +5,18 @@
  */
 package view;
 
-import com.sun.javafx.tk.FontLoader;
-import com.sun.javafx.tk.Toolkit;
-import controller.GasStationController;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import com.sun.javafx.tk.FontLoader;
+import com.sun.javafx.tk.Toolkit;
+
+import controller.GasStationController;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
@@ -145,7 +149,12 @@ public class RouteView {
         gc.setFill(Color.BLUE);
         RefuelStop rs = route.get(index);
         GasStation s = rs.getStation();
-        String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation() + " (echter Preis: " + (s.getHistoricPrice(rs.getTime()) / 1000.0) + " Eur)";
+//        String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation() + " (echter Preis: " + (s.getHistoricPrice(rs.getTime()) / 1000.0) + " Eur)";
+        String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation();
+        if(stationName.length() > 50) {
+        	stationName.substring(0, 50);
+        	stationName += "...";
+        }
         gc.fillText(stationName, 220, circleStart + circleHeight / 2);
         gc.setFill(Color.BLACK);
         //füge die Verlinkung zum Preisdiagramm ein
@@ -221,13 +230,13 @@ public class RouteView {
         gc.strokeLine(126, 42, 126, 74);
         gc.strokeLine(222, 42, 222, 74);
         Image imgRoute = new Image(getClass().getResourceAsStream("/img/route.png"));
-        gc.drawImage(imgRoute, 30, 26);
+        gc.drawImage(imgRoute, 31, 27);
         Image imgKm = new Image(getClass().getResourceAsStream("/img/route-a-b.png"));
-        gc.drawImage(imgKm, 30, 42);
+        gc.drawImage(imgKm, 31, 43);
         Image imgFuelGauge = new Image(getClass().getResourceAsStream("/img/fuel-gauge.png"));
-        gc.drawImage(imgFuelGauge, 126, 42);
+        gc.drawImage(imgFuelGauge, 127, 41);
         Image imgEuro = new Image(getClass().getResourceAsStream("/img/euro.png"));
-        gc.drawImage(imgEuro, 222, 42);
+        gc.drawImage(imgEuro, 223, 43);
         gc.strokeLine(30, 42, 318, 42);
         gc.strokeLine(30, 26, 30, 74);
         gc.strokeLine(30, 26, 288, 26);
@@ -243,19 +252,21 @@ public class RouteView {
         gc.setFont(Font.getDefault());
         String outputEuro = "";
         if (route.showBasicStrategy()) {
-            outputEuro += f.format(route.getTotalEurosBasic()) + " Eur";
+            outputEuro += f.format(route.getTotalEurosBasic()) + " \u20ac";
             gc.setFont(new Font(15));
             gc.fillText(outputEuro, 254, 58);
             gc.setFont(Font.getDefault());
         } else {
-            outputEuro += f.format(route.getTotalEuros()) + " Eur";
+            outputEuro += f.format(route.getTotalEuros()) + " \u20ac";
             gc.setFont(new Font(15));
             gc.fillText(outputEuro, 254, 58);
             gc.setFont(Font.getDefault());
         }
-        String nameOfRoute = route.getName();
+        String nameAndTimeOfRoute = "Route: \"" + route.getName();
+        Date date = route.getPriceKnownUntil();
+        nameAndTimeOfRoute += "\" am " + new SimpleDateFormat("dd.MM.yyyy").format(date);
         gc.setFill(Color.BROWN);
-        gc.fillText(nameOfRoute, 46, 34);
+        gc.fillText(nameAndTimeOfRoute, 46, 34);
         gc.setFill(Color.BLACK);
     }
 

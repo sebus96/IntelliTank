@@ -28,13 +28,13 @@ import model.Route;
  */
 public class MainView {
 
-        Scene scene;
+    Scene scene;
 	BorderPane border;
-        MenuBar bar;
-        RouteView rv;
-        PredictionPointView ppv;
-        GasStationController gsc;
-        Stage mainStage;
+    MenuBar bar;
+    RouteView rv;
+    PredictionPointView ppv;
+    GasStationController gsc;
+    Stage mainStage;
         
     public MainView(Stage primaryStage,GasStationController gsc) {
         
@@ -55,13 +55,11 @@ public class MainView {
     }
        
     public void displayRoute(Route route) {
-
         mainStage.setScene(rv.buildRouteView(route));
         mainStage.show();
     }
     
     public void displayPredictionPoints(PredictionPoints predictionPoints) {
-        
         mainStage.setScene(ppv.buildPredictionPointView(predictionPoints));
         mainStage.show();
     }
@@ -76,7 +74,6 @@ public class MainView {
     }
     
     private void setUpRouteTab() {
-        
         Menu routes = new Menu("Routen");
         //Wenn der "Route"-Reiter gedrueckt wird, aktualisiere die Liste der Routen in dem Ordner (evtl setOnShowing?)
         routes.setOnShowing(new EventHandler<Event>() {
@@ -177,13 +174,13 @@ public class MainView {
     }
 
     private void setUpAboutTab() {
-        Menu about = new Menu("Uber");
+        Menu about = new Menu("\u00dcber");
     	MenuItem itemUeber = new MenuItem("Mitwirkende");
     	about.getItems().addAll(itemUeber);
     	itemUeber.setOnAction(new EventHandler<ActionEvent>() {
     		@Override
     		public void handle(ActionEvent arg0) {
-    			PopupBox.displayMessage("Dieses Projekt wurde von Sebastian Drath, Sezer Dursun, Axel Claassen und Burak Kadioglu entwickelt.");
+    			PopupBox.displayMessage("Dieses Projekt wurde von Axel Claassen, Burak Kadioglu und Sebastian Drath entwickelt.");
     		}
 		});
         bar.getMenus().add(about);

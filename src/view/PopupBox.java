@@ -7,6 +7,9 @@ package view;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 
 /**
  *
@@ -19,11 +22,17 @@ public class PopupBox {
     private static Alert errorAlert = new Alert(AlertType.ERROR);
 
     public static void displayMessage(String content) {
-
+    	Image teamImg = new Image("/img/team.png");
+    	ImageView teamView = new ImageView(teamImg);
+    	Stage stage = (Stage) infoAlert.getDialogPane().getScene().getWindow();
+    	Image iconImg = new Image("/img/gas-station.png");
+        stage.getIcons().add(iconImg);
+    	
         if (!infoAlert.isShowing()) {
-            infoAlert.setTitle("Information");
+            infoAlert.setTitle("Mitwirkende");
             infoAlert.setHeaderText(null);
             infoAlert.setContentText(content);
+            infoAlert.setGraphic(teamView);
             infoAlert.showAndWait();
         }
     }
