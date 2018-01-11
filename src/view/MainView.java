@@ -12,12 +12,14 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.PredictionPoints;
@@ -52,6 +54,10 @@ public class MainView {
         rv = new RouteView(scene,border,this,gsc,bar.getHeight());
         ppv = new PredictionPointView(scene,border);
         mainStage.setScene(scene);
+        Label l = new Label("Klicken Sie auf einen der oberen Reiter, \num sich eine Route oder Vorhersagepunkte anzeigen zu lassen.");
+        l.setTextAlignment(TextAlignment.CENTER);
+        border.setCenter(l);
+        mainStage.show();
     }
        
     public void displayRoute(Route route) {

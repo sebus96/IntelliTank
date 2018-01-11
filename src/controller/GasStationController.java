@@ -36,10 +36,11 @@ public class GasStationController {
             PopupBox.displayError("Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
             return;
         }
-        route = CSVManager.importStandardRoute(allStations);
+        //route = CSVManager.importStandardRoute(allStations);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();
-        if (route == null) {
+        mainView.show();
+        /*if (route == null) {
             PopupBox.displayWarning("Die Standartroute konnte nicht geöffnet werden.");
             mainView.show();
         } else {
@@ -53,7 +54,8 @@ public class GasStationController {
                 pw = new ProgressView(predictionPoints);
                 this.trainPrediction(predictionPoints);
             }
-        }
+        }*/
+        
     }
 
 //    public void addGasStation(GasStation station) {
