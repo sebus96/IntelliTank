@@ -327,7 +327,8 @@ public class RefillStrategies {
     private void validateStrategy(Route route) {
         
         for(int i = 0; i<route.getLength();i++) {
-            if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
+            if(route.get(i).getFuelAmount(route) < -0.0001 || route.get(i).getRefillAmount(route) < -0.0001) {
+                System.out.println(i + " " + route.get(i).getFuelAmount(route) + " " + route.get(i).getRefillAmount(route));
                 PopupBox.displayError(304);
             }
             
