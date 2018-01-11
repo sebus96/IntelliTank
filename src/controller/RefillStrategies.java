@@ -223,6 +223,7 @@ public class RefillStrategies {
         double latitudeB = Math.toRadians(latB);
         double longitudeB = Math.toRadians(longB);
         double dist = 6378.388 * Math.acos((Math.sin(latitudeA) * Math.sin(latitudeB)) + (Math.cos(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA)));
+        //System.out.println("# " + Math.ceil(Math.pow(10, 10) * dist)/Math.pow(10, 10));
         return Math.ceil(Math.pow(10, 10) * dist)/Math.pow(10, 10);
     }
 
@@ -239,11 +240,12 @@ public class RefillStrategies {
         double currentTankStatus = 0;
         double totalEuros = 0, totalKm = 0;
         for (int i = 0; i < route.getLength(); i++) {
-
+            
             //Falls es nicht die erste Tankstelle auf der Route ist, bestimme den Abstand zur vorherigen Tankstelle und aktualisiere den Tankstatus. Für erste Tankstelle nicht nötig, da man mit leerem Tank startet.
             if (i > 0) {
                 double distanceFromLastStation = calculateDistance(route.get(i).getStation().getLatitude(), route.get(i).getStation().getLongitude(), route.get(i - 1).getStation().getLatitude(), route.get(i - 1).getStation().getLongitude());
                 currentTankStatus -= gasUsedPerKm * distanceFromLastStation;
+                currentTankStatus = Math.ceil(Math.pow(10, 10) * currentTankStatus)/Math.pow(10, 10);
                 route.get(i).setFuelAmount(currentTankStatus);
                 totalKm += distanceFromLastStation;
             }
@@ -327,8 +329,7 @@ public class RefillStrategies {
     private void validateStrategy(Route route) {
         
         for(int i = 0; i<route.getLength();i++) {
-            if(route.get(i).getFuelAmount(route) < -0.0001 || route.get(i).getRefillAmount(route) < -0.0001) {
-                System.out.println(i + " " + route.get(i).getFuelAmount(route) + " " + route.get(i).getRefillAmount(route));
+            if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
                 PopupBox.displayError(304);
             }
             

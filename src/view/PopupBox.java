@@ -53,7 +53,7 @@ public class PopupBox {
             infoAlert.setTitle("Mitwirkende");
             infoAlert.setHeaderText(null);
             infoAlert.setContentText(messages.get(textId));
-            infoAlert.showAndWait();
+            infoAlert.show();
         }
     }
 
@@ -64,7 +64,7 @@ public class PopupBox {
             warnAlert.setTitle("Warnung");
             warnAlert.setHeaderText(null);
             warnAlert.setContentText(messages.get(textId));
-            warnAlert.showAndWait();
+            warnAlert.show();
         }
     }
 
@@ -75,7 +75,7 @@ public class PopupBox {
             errorAlert.setTitle("Error");
             errorAlert.setHeaderText(null);
             errorAlert.setContentText(messages.get(textId));
-            errorAlert.showAndWait();
+            errorAlert.show();
         }
     }
 

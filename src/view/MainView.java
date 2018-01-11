@@ -46,7 +46,7 @@ public class MainView {
         mainStage.setTitle("IntelliTank");
         border = new BorderPane();
         scene = new Scene(border, 640, 600);
-        mainStage.setResizable(false);
+        //mainStage.setResizable(false);
         //Methods to fill each part with content
         displayMenubar(border);
         Image icon = new Image("/img/gas-station.png");

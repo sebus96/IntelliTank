@@ -17,6 +17,7 @@ import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
 import controller.GasStationController;
+import java.util.concurrent.TimeUnit;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
@@ -185,7 +186,7 @@ public class RouteView {
                     //System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
                     //System.out.println(gsc.getRoute().get(indexTmp) == null);// (gsc.getRoute().get(indexTmp) == null) + (gsc.getRoute().get(indexTmp).getStation() == null) + (gsc.getRoute().get(indexTmp).getStation().getName() == null));
                     String gasStationName = gsc.getRoute().get(indexTmp).getStation().getName() + ", " + gsc.getRoute().get(indexTmp).getStation().getPostcode() + " " + gsc.getRoute().get(indexTmp).getStation().getLocation();
-                    if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()/*TODO: textbreite einbeziehen*/) && (yPosition > yCoordinate - gc.getFont().getSize() / 2) && (yPosition < yCoordinate + gc.getFont().getSize() / 2)) {
+                    if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()) && (yPosition > yCoordinate - (gc.getFont().getSize()+4) / 2) && (yPosition < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
                         //System.out.println("index von methode: " + index);
                         //System.out.println("index gespeichert: " + indexTmp);
                         GasStation gs = gsc.getRoute().get(indexTmp).getStation();
@@ -214,7 +215,11 @@ public class RouteView {
             gc.strokeLine(180, lineStart, 180, lineEnd/*TODO: Should length depend on distance between stations*/);
             GasStation a = route.get(index - 1).getStation();
             GasStation b = route.get(index).getStation();
-            gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km", 200, (lineStart + lineEnd) / 2);
+            long diff = Math.abs(route.get(index).getTime().getTime() - route.get(index-1).getTime().getTime());
+            String time = Long.toString(TimeUnit.MILLISECONDS.toMinutes(diff)).substring(0,1);
+            if(time.equals("0"))
+                time = "<1";
+            gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km\t" + time + " min", 200, (lineStart + lineEnd) / 2);
         }
     }
 
