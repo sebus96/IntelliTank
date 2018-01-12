@@ -45,7 +45,7 @@ public class MainView {
         //Create the foundation: borderPane -> Scrollpane -> Canvas
         mainStage.setTitle("IntelliTank");
         border = new BorderPane();
-        scene = new Scene(border, 640, 600);
+        scene = new Scene(border, 800, 600);
         //mainStage.setResizable(false);
         //Methods to fill each part with content
         displayMenubar(border);
