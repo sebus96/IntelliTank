@@ -1,6 +1,5 @@
 package view;
 
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,10 +8,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import model.PredictionPoint;
 import model.PredictionPoints;
 
@@ -25,7 +21,7 @@ public class PredictionPointView {
     private BorderPane innerBorder;
 
     public PredictionPointView(Scene scene, BorderPane border) {
-        table = new TableView<>();
+
         this.scene = scene;
         this.border = border;
         this.innerBorder = new BorderPane();
@@ -36,24 +32,19 @@ public class PredictionPointView {
         createTable();
         innerBorder.setTop(title);
         innerBorder.setCenter(table);
-        
     }
     public Scene buildPredictionPointView(PredictionPoints predictionPoints) {
      
         title.setText(predictionPoints.getName());
         table.setItems(predictionPoints.getList());
-/*
-        VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.setPadding(new Insets(5, 5, 5, 5));
-        vbox.getChildren().addAll(title, table);
-        */
+
         border.setCenter(innerBorder);
         return scene;
     }
 
     private void createTable() {
 
+        table = new TableView<>();
         TableColumn<PredictionPoint.TableRow, Integer> nrColumn = new TableColumn<>("Nr.");
         nrColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nrColumn.setMinWidth(25);

@@ -46,7 +46,6 @@ public class MainView {
         mainStage.setTitle("IntelliTank");
         border = new BorderPane();
         scene = new Scene(border, 800, 600);
-        //mainStage.setResizable(false);
         //Methods to fill each part with content
         displayMenubar(border);
         Image icon = new Image("/img/gas-station.png");
@@ -77,6 +76,7 @@ public class MainView {
         setUpRouteTab();
     	setUpPredictionPointTab();
     	setUpAboutTab();
+        setUpValidateButton();
     }
     
     private void setUpRouteTab() {
@@ -190,5 +190,16 @@ public class MainView {
     		}
 		});
         bar.getMenus().add(about);
+    }
+
+    private void setUpValidateButton() {
+        Menu validateItem = new Menu("Validieren");
+        validateItem.setOnShowing(new EventHandler<Event>() {
+                    @Override
+                    public void handle(Event e) {
+                        PopupBox.displayMessage(102);
+                    }
+                });
+        bar.getMenus().add(validateItem);
     }
 }
