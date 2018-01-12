@@ -7,6 +7,7 @@ package view;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
@@ -22,20 +23,24 @@ public class PopupBox {
     private static Alert infoAlert = new Alert(AlertType.INFORMATION);
     private static Alert warnAlert = new Alert(AlertType.WARNING);
     private static Alert errorAlert = new Alert(AlertType.ERROR);
-    private static Map<Integer, String> messages = new HashMap<Integer, String>() {{
+    private static Map<Integer, String> messages = new HashMap<Integer, String>() {
+		private static final long serialVersionUID = -6975514177601226819L;
+
+		{
+			put(0, "[ Die angezeigte Nachricht konnte nicht gefunden werden! ]");
+	        //1XX = Informationen
+	        put(101, "Dieses Projekt wurde von Axel Claassen, Burak Kadioglu und Sebastian Drath entwickelt.");
+	        put(102,"Hier wird angezeigt, wie gut die Route vorhergesagt wurde. Methodenaufruf in view/MainView setUpValidateButton()");
+	        //2XX = Warnungen
+	        put(201, "Warnung 201: Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
+	        //3XX = Errors
+	        put(301, "Error 301: Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
+	        put(302, "Error 302: Die ausgewählte Route konnte nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
+	        put(303, "Error 303: Vorhersagezeitpunkte konnten nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
+	        put(304, "Error 304: Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
     
-        put(0, "[ Die angezeigte Nachricht konnte nicht gefunden werden! ]");
-        //1XX = Informationen
-        put(101, "Dieses Projekt wurde von Axel Claassen, Burak Kadioglu und Sebastian Drath entwickelt.");
-        put(102,"Hier wird angezeigt, wie gut die Route vorhergesagt wurde. Methodenaufruf in view/MainView setUpValidateButton()");
-        //2XX = Warnungen
-        put(201, "Warnung 201: Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
-        //3XX = Errors
-        put(301, "Error 301: Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
-        put(302, "Error 302: Die ausgewählte Route konnte nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
-        put(303, "Error 303: Vorhersagezeitpunkte konnten nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
-        put(304, "Error 304: Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
-    };};
+		};
+	};
     
     
     
@@ -54,7 +59,7 @@ public class PopupBox {
             
             infoAlert.setTitle("Mitwirkende");
             infoAlert.setHeaderText(null);
-            if(messages.containsKey(messages.get(textId)))
+            if(messages.containsKey(textId))
                 infoAlert.setContentText(messages.get(textId));
             else
                 infoAlert.setContentText(messages.get(0));
@@ -68,7 +73,7 @@ public class PopupBox {
         if (!warnAlert.isShowing() || (warnAlert.isShowing() && !messages.get(textId).equals(warnAlert.getContentText()))) {
             warnAlert.setTitle("Warnung");
             warnAlert.setHeaderText(null);
-            if(messages.containsKey(messages.get(textId)))
+            if(messages.containsKey(textId))
                 warnAlert.setContentText(messages.get(textId));
             else
                 warnAlert.setContentText(messages.get(0));
@@ -82,7 +87,7 @@ public class PopupBox {
         if (!errorAlert.isShowing() || (errorAlert.isShowing() && !messages.get(textId).equals(errorAlert.getContentText()))) {
             errorAlert.setTitle("Error");
             errorAlert.setHeaderText(null);
-            if(messages.containsKey(messages.get(textId)))
+            if(messages.containsKey(textId))
                 errorAlert.setContentText(messages.get(textId));
             else
                 errorAlert.setContentText(messages.get(0));
