@@ -69,6 +69,11 @@ public class PredictionPointView {
         realPriceColumn.setCellValueFactory(new PropertyValueFactory<>("realPrice"));
         realPriceColumn.setMinWidth(90);
         
-        table.getColumns().addAll(nrColumn, gasStationColumn, knownTimeColumn, predictionTimeColumn, priceColumn, realPriceColumn);
+        table.getColumns().add(nrColumn);
+        table.getColumns().add(gasStationColumn);
+        table.getColumns().add(knownTimeColumn);
+        table.getColumns().add(predictionTimeColumn);
+        table.getColumns().add(priceColumn);
+        table.getColumns().add(realPriceColumn);
     }
 }

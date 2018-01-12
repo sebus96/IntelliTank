@@ -20,7 +20,7 @@ import view.ProgressView;
 
 public class GasStationController {
 
-    private static final boolean initialImportRoute = true;
+//    private static final boolean initialImportRoute = true;
 
     private Map<Integer, GasStation> allStations;
     private Route route;

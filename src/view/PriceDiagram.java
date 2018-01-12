@@ -106,7 +106,8 @@ public class PriceDiagram {
             sum += lastPrice.getPrice() * timeBetween;
             ctr += timeBetween;
             if (p.getTime().after(c.getTime())) {
-                c.add(Calendar.WEEK_OF_YEAR, 1);
+            	while(p.getTime().after(c.getTime())) // wenn die Lücke zwischen zwei Preisen größer als eine Woche ist muss der Kalender um mehr als 1 Woche weitergesetzt werden
+            		c.add(Calendar.WEEK_OF_YEAR, 1);
                 if (ctr > 0) {
                     series.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), sum / ctr));
                 }
