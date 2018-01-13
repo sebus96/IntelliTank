@@ -32,6 +32,7 @@ public class GasStationController {
 
     public GasStationController(Stage primaryStage) {
         allStations = CSVManager.importGasStations();
+        CSVManager.importHolidays();
         if (allStations == null) {
             PopupBox.displayError(301);
             return;

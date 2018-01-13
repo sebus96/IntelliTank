@@ -4,7 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import model.FederalState;
 import model.GasStation;
+import model.Holidays;
 
 public abstract class Perceptron {
 	private int epochs;
@@ -57,6 +59,10 @@ public abstract class Perceptron {
 			c.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		return res;
+	}
+	
+	protected int getHoliday(Date date, FederalState state) {
+		return (Holidays.isHoliday(date, state)? 1 : 0);
 	}
 	
 	/**

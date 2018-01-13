@@ -14,7 +14,7 @@ import model.Price;
 public class SingleLayerPerceptron extends Perceptron {
 	
 	private double rate;
-	private double[] weights = new double[7+24+oldPriceNumber];
+	private double[] weights = new double[7+24+oldPriceNumber+1];
 	
 	/**
 	* Konstruktor zum Perzeptron mit Eingabeparameter Lernrate und Anzahl der Epochen.
@@ -53,6 +53,7 @@ public class SingleLayerPerceptron extends Perceptron {
 				int[] hourVector = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 				int[] weekdayVector = getDayVector(c.get(Calendar.DAY_OF_WEEK));
 				int[] lastPrices = getPriceVector(c);
+				int isHoliday = getHoliday(p.getTime(), getStation().getState());
 				if(lastPrices == null) continue;
 				double out = output(p.getTime(), lastPrices);
 				double dif = p.getPrice() - out;
@@ -62,6 +63,7 @@ public class SingleLayerPerceptron extends Perceptron {
 					weights[j+7] += rate * dif * hourVector[j];
 				for(int j = 0; j < lastPrices.length; j++)
 					weights[j+7+24] += rate * dif * (lastPrices[j] / 1000.0);
+				weights[7+24+lastPrices.length] += rate * dif * isHoliday;
 				totalDifference += Math.abs(dif);
 				//if(epochCounter < 4 && i==0) System.out.println(out + " " + hour + " " + weekday + " " + dif + " (" + p.getPrice() + ")");
 			}
@@ -77,7 +79,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		System.out.print("]\n");*/
 		return totalDifference/listCounter <= precision;
 	}
-	
+
 	/**
 	* Berechnet das Skalarprodukt zwischen den Gewichten und dem Eingabevektor.
 	* @param input Datum fuer das der Preis bestimmt werden soll
@@ -89,6 +91,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		c.setTime(d);
 		int[] hour = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 		int[] weekday = getDayVector(c.get(Calendar.DAY_OF_WEEK));
+		int isHoliday = getHoliday(d, getStation().getState());
 		double res = 0;
 		for(int i = 0; i < weekday.length; i++) {
 			res += weekday[i]*weights[i];
@@ -98,6 +101,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		}
 		for(int i = 0; i < lastPrices.length; i++)
 			res += (lastPrices[i] / 1000.0)*weights[i+24+7];
+		res += isHoliday*weights[24+7+lastPrices.length];
 		return res;
 	}
 	
@@ -113,6 +117,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		c.setTime(d);
 		int[] hour = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 		int[] weekday = getDayVector(c.get(Calendar.DAY_OF_WEEK));
+		int isHoliday = getHoliday(d, getStation().getState());
 		double res = 0;
 		for(int i = 0; i < weekday.length; i++) {
 			res += weekday[i]*weights[i];
@@ -122,6 +127,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		}
 		for(int i = 0; i < lastPrices.size(); i++)
 			res += ((double)lastPrices.get(i) / 1000.0)*weights[i+24+7];
+		res += isHoliday*weights[24+7+lastPrices.size()];
 		return res;
 	}
 }

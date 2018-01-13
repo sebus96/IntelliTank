@@ -28,7 +28,9 @@ import java.util.Map;
 
 import model.FederalState;
 import model.GasStation;
+import model.Holidays;
 import model.IPredictionStations;
+import model.Postalcodes;
 import model.PredictionPoints;
 import model.Price;
 import model.Route;
@@ -36,11 +38,11 @@ import view.PopupBox;
 
 public class CSVManager {
 
-    private static List<Postalcode> post2state;
     private static final String inputPath = "Eingabedaten/";
     private static final String routeInputPath = inputPath + "Fahrzeugrouten/";
     private static final String predictionInputPath = inputPath + "Vorhersagezeitpunkte/";
     private static final String pricePath = inputPath + "Benzinpreise/";
+    private static final String holidayPath = inputPath + "Ferien/";
     
     private static final String outputPath = "Ausgabedaten/";
     private static final String routeOutputPath = outputPath + "Tankstrategien/";
@@ -51,7 +53,7 @@ public class CSVManager {
     public static Map<Integer, GasStation> importGasStations() {
         String filename = inputPath + "Tankstellen.csv";
         importPostalcodes();
-        List<String> lines = readCSV(filename);
+        List<String> lines = readFile(filename);
         if (lines == null) {
             System.err.println("Could not import gasstations!");
             return null;
@@ -71,7 +73,7 @@ public class CSVManager {
                     lineElements[3],// street
                     lineElements[4],// houseNumber
                     postcode,// postcode
-                    getState(postcode), // state
+                    Postalcodes.getState(postcode), // state
                     lineElements[6],// location
                     getDouble(lineElements[7]),// longitude
                     getDouble(lineElements[8])// latitude
@@ -81,22 +83,12 @@ public class CSVManager {
         return stations;
     }
 
-    public static FederalState getState(int postalCode) {
-        for (Postalcode pc : post2state) {
-            if (pc.isInArea(postalCode)) {
-                return pc.getState();
-            }
-        }
-        return null;
-    }
-
     private static void importPostalcodes() {
-        if (post2state != null) {
+        if (Postalcodes.isImported()) {
             return;
         }
         String filename = inputPath + "postalcode2federalstate.csv";
-        post2state = new ArrayList<>();
-        List<String> lines = readCSV(filename);
+        List<String> lines = readFile(filename);
         if (lines == null) {
             System.err.println("Could not import Postalcodes!");
             return;
@@ -108,12 +100,11 @@ public class CSVManager {
                 System.err.println("Input postalcode: Illegal Input row size");
                 continue;
             }
-            Postalcode code = new Postalcode(
-                    getInteger(lineElements[0]),// lower
+            Postalcodes.addPostcodeRange(
+            		getInteger(lineElements[0]),// lower
                     getInteger(lineElements[1]),// upper
                     lineElements[2]// state
-            );
-            post2state.add(code);
+            		);
         }
     }
     /*
@@ -124,7 +115,7 @@ public class CSVManager {
 
     public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
     	File routeFile = new File(routeInputPath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));
-    	List<String> lines = readCSV(routeFile);
+    	List<String> lines = readFile(routeFile);
     	System.out.println("import route: " + routeName);
         if (lines == null) {
             System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
@@ -153,7 +144,7 @@ public class CSVManager {
 
     public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
         File predictionFile = new File(predictionInputPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
-    	List<String> lines = readCSV(predictionFile);
+    	List<String> lines = readFile(predictionFile);
     	System.out.println("import predictionpoints: " + predictionName);
         if (lines == null) {
             System.err.println("Could not import Prediction \"" + predictionFile.getName() + "\"!");
@@ -184,7 +175,7 @@ public class CSVManager {
     		return;
     	}
         String filename = pricePath + gs.getID() + ".csv";
-        List<String> lines = readCSV(new File(filename));
+        List<String> lines = readFile(new File(filename));
         if (lines == null) {
             System.err.println("Could not import prices for " + gs);
             return;
@@ -201,6 +192,49 @@ public class CSVManager {
 //		double time = (System.nanoTime() - start) / 1000 / 1000 / 1000;
 //		System.out.println("time: " + time);
     }
+    
+    public static void importHolidays() {
+    	String[] holidayNames = {"Winter","Ostern","Pfingsten","Sommer","Herbst","Weihnachten"};
+    	for(String filename: readFilenames(new File(holidayPath), ".txt")) {
+    		int year = getInteger(filename.substring(0, 4));
+    		if(year < 0) System.err.println("Unecpected holiday filename: " + filename);
+    		List<String> lines = readFile(holidayPath + filename);
+    		int ctr = 0;
+    		FederalState curState = null;
+    		for(String line: lines) {
+    			if(ctr == 0) {
+    				curState = FederalState.getFederalState(line);
+    				if(curState == FederalState.DEF) {
+    					System.err.println("Illegal federal state: " + line);
+    				}
+    			} else if (ctr > 0 && ctr <= holidayNames.length) {
+    				if(curState == null) {
+    					System.err.println("Current State should not be null: " + line);
+    				}
+    				Holidays.addHoliday(year, curState, holidayNames[ctr-1], line);
+    			} else {
+    				System.err.println("Count to high (" + ctr + ")");
+    			}
+    			ctr++;
+    			ctr %= holidayNames.length + 1;
+    		}
+    	}
+    	// überprüfe importierte Daten
+    	/*System.out.println("Holiday check: " + Holidays.checkIntegrity());
+    	DateFormat test = new SimpleDateFormat("dd.MM.yyyy/HH:mm");
+    	try {
+			System.out.println("Holiday ja " + Holidays.isHoliday(test.parse("10.05.2013" + "/12:00"), FederalState.NI));
+			System.out.println("Holiday ja " + Holidays.isHoliday(test.parse("20.03.2013" + "/12:00"), FederalState.NI));
+			System.out.println("Holiday ja " + Holidays.isHoliday(test.parse("30.12.2015" + "/12:00"), FederalState.BB));
+			System.out.println("Holiday ja " + Holidays.isHoliday(test.parse("01.01.2016" + "/12:00"), FederalState.BB));
+			System.out.println("Holiday ja " + Holidays.isHoliday(test.parse("02.01.2016" + "/12:00"), FederalState.BB));
+			System.out.println("Holiday nein " + Holidays.isHoliday(test.parse("10.02.2018" + "/12:00"), FederalState.BY));
+			System.out.println("Holiday ja " + Holidays.isHoliday(test.parse("18.11.2015" + "/12:00"), FederalState.BY));
+			System.out.println("Holiday nein " + Holidays.isHoliday(test.parse("19.11.2015" + "/12:00"), FederalState.BY));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}*/
+    }
 
     private static String[] prepareRowData(String row) {
         String[] res = row.split(";");
@@ -210,11 +244,11 @@ public class CSVManager {
         return res;
     }
     
-    private static List<String> readCSV(String filename) {
-        return readCSV(new File(filename));
+    private static List<String> readFile(String filename) {
+        return readFile(new File(filename));
     }
 
-    private static List<String> readCSV(File file) {
+    private static List<String> readFile(File file) {
         List<String> lines = new ArrayList<>();
         if (file == null || !file.exists()) {
             System.err.println("File \"" + file + "\" does not exist!");
@@ -308,15 +342,15 @@ public class CSVManager {
     }
 
     public static String[] readRouteNames() {
-    	return readFilenames(new File(routeInputPath));
+    	return readFilenames(new File(routeInputPath), ".csv");
     }
 
     public static String[] readPredictionPointNames() {
-    	return readFilenames(new File(predictionInputPath));
+    	return readFilenames(new File(predictionInputPath), ".csv");
     }
     
-    private static String[] readFilenames(File folder) {
-    	String[] listOfFiles = folder.list(new PredictionFileFilter());
+    private static String[] readFilenames(File folder, String ending) {
+    	String[] listOfFiles = folder.list(new InputFileFilter(ending));
         return listOfFiles;
     }
     
@@ -341,65 +375,16 @@ public class CSVManager {
     }
 }
 
-class Postalcode {
-
-    private int upper, lower;
-    private String state;
-
-    public Postalcode(int lower, int upper, String state) {
-        this.upper = upper;
-        this.lower = lower;
-        this.state = state;
-    }
-
-    public boolean isInArea(int postcode) {
-        return postcode <= upper && postcode >= lower;
-    }
-
-    public FederalState getState() {
-        switch (this.state) {
-            case "Baden-Württemberg":
-                return FederalState.BW;
-            case "Bayern":
-                return FederalState.BY;
-            case "Berlin":
-                return FederalState.BE;
-            case "Brandenburg":
-                return FederalState.BB;
-            case "Bremen":
-                return FederalState.HB;
-            case "Hamburg":
-                return FederalState.HH;
-            case "Hessen":
-                return FederalState.HE;
-            case "Mecklenburg-Vorpommern":
-                return FederalState.MV;
-            case "Niedersachsen":
-                return FederalState.NI;
-            case "Nordrhein-Westfalen":
-                return FederalState.NW;
-            case "Rheinland-Pfalz":
-                return FederalState.RP;
-            case "Saarland":
-                return FederalState.SL;
-            case "Sachsen":
-                return FederalState.SN;
-            case "Sachsen-Anhalt":
-                return FederalState.ST;
-            case "Schleswig-Holstein":
-                return FederalState.SH;
-            case "Thüringen":
-                return FederalState.TH;
-            default:
-                return FederalState.DEF;
-        }
-    }
-}
-
-class PredictionFileFilter implements FilenameFilter {
+class InputFileFilter implements FilenameFilter {
+	private String ending;
+	
+	public InputFileFilter(String ending) {
+		this.ending = ending;
+	}
+	
 	@Override
 	public boolean accept(File dir, String name) {
 		File f = new File(dir.getPath() + File.separator + name);
-		return f.isFile() && name.endsWith(".csv");
+		return f.isFile() && name.endsWith(this.ending);
 	}
 }
