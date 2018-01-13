@@ -76,6 +76,18 @@ public class PredictionPoint implements IPredictionStation {
     	return predictedPrice.getPrice();
     }
     
+    @Override
+    public int getPredictedPriceListSize(){
+    	return this.predictedPrices.size();
+    }
+    
+    @Override
+	public Price getPredictedPriceListElement(int index) {
+		if(index < this.predictedPrices.size() && index >= 0)
+			return this.predictedPrices.get(index);
+		return null;
+	}
+    
 //    public void setPredictedPrices( List<Price> predicted) {
 //    	this.predictedPrices = predicted;
 //    }
@@ -133,13 +145,20 @@ public class PredictionPoint implements IPredictionStation {
 	}
 
 	public static class TableRow{
-		public TableRow(int id, String station, String knownTime, String predictionTime, double price, double realPrice) {
+		private PredictionPoint predictionPoint;
+		
+		public TableRow(int id, PredictionPoint station, String knownTime, String predictionTime, double price, double realPrice) {
+			this.predictionPoint = station;
 			idProperty().set(id);
-			stationProperty().set(station);
+			stationProperty().set(station.getStation().getName());
 			knownTimeProperty().set(knownTime);
 			predictionTimeProperty().set(predictionTime);
 			priceProperty().set(price/1000);
 			realPriceProperty().set(realPrice/1000);
+		}
+		
+		public PredictionPoint getPredictionPoint(){
+			return predictionPoint;
 		}
 		
 	    private IntegerProperty id;

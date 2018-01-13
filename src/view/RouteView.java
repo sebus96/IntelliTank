@@ -189,9 +189,8 @@ public class RouteView {
                     if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()) && (yPosition > yCoordinate - (gc.getFont().getSize()+4) / 2) && (yPosition < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
                         //System.out.println("index von methode: " + index);
                         //System.out.println("index gespeichert: " + indexTmp);
-                        GasStation gs = gsc.getRoute().get(indexTmp).getStation();
 
-                        PriceDiagram.displayGasStation(gs);
+                        PriceDiagram.displayGasStation(gsc.getRoute().get(indexTmp));
                         /*PriceDiagram diagramm = new PriceDiagram(gs);
             			diagramm.generateDiagramm();*/
 

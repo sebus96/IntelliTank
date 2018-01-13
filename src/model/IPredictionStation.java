@@ -14,6 +14,10 @@ public interface IPredictionStation {
     
     public int getPredictedPrice();
     
+    public int getPredictedPriceListSize();
+    
+    public Price getPredictedPriceListElement(int index);
+    
 //    public void setPredictedPrices( List<Price> predicted);
     
     public void setPrediction(PredictionUnit pu);

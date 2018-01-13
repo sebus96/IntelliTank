@@ -69,9 +69,19 @@ public class RefuelStop implements IPredictionStation {
     	return this.getPredictedPrice(this.time);
     }
     
-//    public void setPredictedPrices( List<Price> predicted) {
-//    	this.predictedPrices = predicted;
-//    }
+    @Override
+    public int getPredictedPriceListSize(){
+    	if(isPredicted())
+    		return this.predictedPrices.size();
+    	else return 0;
+    }
+    
+    @Override
+	public Price getPredictedPriceListElement(int index) {
+		if(isPredicted() && index < this.predictedPrices.size() && index >= 0)
+			return this.predictedPrices.get(index);
+		return null;
+	}
 
     @Override
 	public void setPrediction(PredictionUnit pu) {

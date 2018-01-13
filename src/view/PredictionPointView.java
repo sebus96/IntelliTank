@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -68,6 +69,17 @@ public class PredictionPointView {
         TableColumn<PredictionPoint.TableRow, Double> realPriceColumn = new TableColumn<>("Echter Preis");
         realPriceColumn.setCellValueFactory(new PropertyValueFactory<>("realPrice"));
         realPriceColumn.setMinWidth(90);
+        
+        table.setRowFactory(tv -> {
+        	TableRow<PredictionPoint.TableRow> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (! row.isEmpty()) {
+                	PredictionPoint.TableRow rowData = row.getItem();
+                	PriceDiagram.displayGasStation(rowData.getPredictionPoint());
+                }
+            });
+            return row ;
+        });
         
         table.getColumns().add(nrColumn);
         table.getColumns().add(gasStationColumn);

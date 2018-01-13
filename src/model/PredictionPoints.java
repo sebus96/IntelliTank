@@ -30,7 +30,7 @@ public class PredictionPoints implements IPredictionStations{
     	for(PredictionPoint p : this.predictionPoints) {
     		result.add(new PredictionPoint.TableRow(
     				ctr++,
-    				p.getStation().getName(),
+    				p,
     				dateFormat.format(p.getPriceKnownUntil()),
     				dateFormat.format(p.getTime()),
     				p.getPredictedPrice(),
