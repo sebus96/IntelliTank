@@ -50,16 +50,17 @@ public class PopupBox {
         //Verhindert, dass die selbe Meldung durch z.B. Schleifen mehrfach übereinander angezeigt wird
         if (!infoAlert.isShowing() || (infoAlert.isShowing() && !messages.get(textId).equals(infoAlert.getContentText()))) {
             
-            if(textId == 101 && infoAlert.getDialogPane().getScene() != null) {
+            if(textId == 101) {
+                infoAlert.setTitle("Mitwirkende");
                 Image teamImg = new Image("/img/team.png");
                 ImageView teamView = new ImageView(teamImg);
-                Stage stage = (Stage) infoAlert.getDialogPane().getScene().getWindow();
-                Image iconImg = new Image("/img/gas-station.png");
-                stage.getIcons().add(iconImg);
                 infoAlert.setGraphic(teamView);
+            } else {
+            	infoAlert = new Alert(AlertType.INFORMATION);
+            	infoAlert.setTitle("Nachricht");
             }
+            setIcon(infoAlert);
             
-            infoAlert.setTitle("Mitwirkende");
             infoAlert.setHeaderText(null);
             if(messages.containsKey(textId))
                 infoAlert.setContentText(messages.get(textId));
@@ -73,7 +74,9 @@ public class PopupBox {
 
         //Verhindert, dass die selbe Meldung durch z.B. Schleifen mehrfach übereinander angezeigt wird
         if (!warnAlert.isShowing() || (warnAlert.isShowing() && !messages.get(textId).equals(warnAlert.getContentText()))) {
-            warnAlert.setTitle("Warnung");
+        	setIcon(warnAlert);
+        	
+        	warnAlert.setTitle("Warnung");
             warnAlert.setHeaderText(null);
             if(messages.containsKey(textId))
                 warnAlert.setContentText(messages.get(textId));
@@ -87,7 +90,9 @@ public class PopupBox {
 
         //Verhindert, dass die selbe Meldung durch z.B. Schleifen mehrfach übereinander angezeigt wird
         if (!errorAlert.isShowing() || (errorAlert.isShowing() && !messages.get(textId).equals(errorAlert.getContentText()))) {
-            errorAlert.setTitle("Error");
+        	setIcon(errorAlert);
+        	
+        	errorAlert.setTitle("Error");
             errorAlert.setHeaderText(null);
             if(messages.containsKey(textId))
                 errorAlert.setContentText(messages.get(textId));
@@ -97,4 +102,11 @@ public class PopupBox {
         }
     }
 
+    private static void setIcon(Alert a) {
+    	if(a.getDialogPane().getScene() != null) {
+            Stage stage = (Stage) a.getDialogPane().getScene().getWindow();
+            Image iconImg = new Image("/img/gas-station.png");
+            stage.getIcons().add(iconImg);
+        }
+    }
 }

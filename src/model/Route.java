@@ -99,7 +99,7 @@ public class Route implements IPredictionStations {
     public Validation getValidation() {
     	Validation res = new Validation();
     	for(RefuelStop r: this.route) {
-    		res.add(r.getStation().getValidation());
+    		res.add(r.getValidation());
     	}
     	return res;
     }

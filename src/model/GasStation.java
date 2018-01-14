@@ -13,8 +13,6 @@ public class GasStation {
 	private double longitude, latitude; // Laengen- und Breitengrad
 	private List<Price> historicPrices;
 	
-	private Validation validation;
-	
 	public GasStation(int id, String name, String brand, String street, String houseNumber, int postcode, FederalState state, String location,
 			double longitude, double latitude) {
 		this.id = id;
@@ -97,14 +95,6 @@ public class GasStation {
 	
 	public void setPriceList(List<Price> prices) {
 		this.historicPrices = prices;
-	}
-	
-	public void setValidation(Validation v) {
-		this.validation = v;
-	}
-	
-	public Validation getValidation() {
-		return this.validation;
 	}
 	
 	@Override

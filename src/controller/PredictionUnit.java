@@ -7,26 +7,28 @@ import java.util.LinkedList;
 import java.util.List;
 
 import model.GasStation;
+import model.IPredictionStation;
 import model.Price;
 import model.Validation;
 
 public class PredictionUnit {
 	private boolean PRINT_RESULTS = false;
 	
-	private GasStation gs;
+	private IPredictionStation station;
 	private Date trainUntil;
 	private Perceptron p;
 	
 	public enum Mode {SINGLE_LAYER, MULTI_LAYER};
 	private Mode mode;
 
-	public PredictionUnit(GasStation gs, Date trainUntil, Mode mode) {
-		this.gs = gs;
+	public PredictionUnit(IPredictionStation station, Date trainUntil, Mode mode) {
+		this.station = station;
 		this.trainUntil = trainUntil;
 		this.mode = mode;
 	}
 	
 	public boolean train() {
+		GasStation gs = station.getStation();
 		if(trainUntil.before(gs.getPriceListElement(0).getTime())) {
 			System.err.println("No historic prices available for " + gs + "!");
 			return false;
@@ -45,6 +47,7 @@ public class PredictionUnit {
 			System.err.println("Train before using prediction!");
 			return null;
 		}
+		GasStation gss = station.getStation();
 		double avgDiff = 0;
 		double maxDiff = Double.MIN_VALUE;
 		double avgPrice = 0;
@@ -58,17 +61,17 @@ public class PredictionUnit {
 		List<Price> predictedPriceList = new ArrayList<>();
 		Calendar c = Calendar.getInstance();
 		c.setTime(trainUntil);
-		predictedPriceList.add(new Price(c.getTime(), gs.getHistoricPrice(c.getTime()))); // letzter bekannter Preis zu Beginn der Route eingefügt
+		predictedPriceList.add(new Price(c.getTime(), gss.getHistoricPrice(c.getTime()))); // letzter bekannter Preis zu Beginn der Route eingefügt
 		c.add(Calendar.HOUR_OF_DAY, (-1)*(p.getOldPriceNumber()-1));
 		for(int i = 0; i < p.getOldPriceNumber(); i++) {
-			lastPrices.add((double)gs.getHistoricPrice(c.getTime()));
+			lastPrices.add((double)gss.getHistoricPrice(c.getTime()));
 			c.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		for(int i = 0; i < 24*7*5; i++) { // 5 Wochen
 			ctr++;
 			double out = p.feedForward(c.getTime(), lastPrices);
-			double real = gs.getHistoricPrice(c.getTime());
-			if(real < 0) System.err.println("Could not compare to real data. Real data is not available for " + gs + " at " + c.getTime());
+			double real = gss.getHistoricPrice(c.getTime());
+			if(real < 0) System.err.println("Could not compare to real data. Real data is not available for " + gss + " at " + c.getTime());
 			predictedPriceList.add(new Price(c.getTime() , (int)Math.round(out)));
 			double diff = Math.abs(out-real);
 			if(diff > maxDiff) maxDiff = diff;
@@ -86,8 +89,8 @@ public class PredictionUnit {
 		avgDiff /= ctr;
 		avgPrice /= ctr;
 		realAvgPrice /= ctr;
-		gs.setValidation(new Validation(avgDiff, maxDiff, avgPrice, minPrice, maxPrice, realAvgPrice, realMinPrice, realMaxPrice, ctr));
-		if(PRINT_RESULTS) System.out.println(gs + "\n"
+		station.setValidation(new Validation(avgDiff, maxDiff, avgPrice, minPrice, maxPrice, realAvgPrice, realMinPrice, realMaxPrice, ctr));
+		if(PRINT_RESULTS) System.out.println(gss + "\n"
 				+ "Durchschnittsabweichung: " + ((int)avgDiff/1000.0) + " \n"
 				+ "Maximale Abweichung: " + ((int)maxDiff/1000.0) + " \n"
 				+ "Durchschnittspreis: " + ((int)avgPrice/1000.0) + "  (real: " + ((int)realAvgPrice/1000.0) + " )\n"

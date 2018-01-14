@@ -99,7 +99,7 @@ public class GasStationController {
                     } else if (station instanceof PredictionPoint) {
                     	until = ((PredictionPoint)station).getPriceKnownUntil();
                     }
-                    PredictionUnit pu = new PredictionUnit(gs, until, Mode.SINGLE_LAYER);
+                    PredictionUnit pu = new PredictionUnit(station, until, Mode.SINGLE_LAYER);
 //                    predictions.add(pu);
                     boolean trainSuccess = pu.train();
                     if (trainSuccess) {

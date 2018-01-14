@@ -19,6 +19,7 @@ public class PredictionPoint implements IPredictionStation {
 	private List<Price> predictedPrices;
 	private Price predictedPrice;
 	private PredictionUnit predictionUnit;
+	private Validation validation;
 	
 	public PredictionPoint(GasStation station, Date priceKnownUntil, Date predictionTime) {
 		this.station = station;
@@ -100,6 +101,16 @@ public class PredictionPoint implements IPredictionStation {
     			+ this.station.getID() + ";"
     			+ this.getPredictedPrice();
     }
+	
+    @Override
+	public void setValidation(Validation v) {
+		this.validation = v;
+	}
+	
+    @Override
+	public Validation getValidation() {
+		return this.validation;
+	}
     
     @Override
     public String toString() {
