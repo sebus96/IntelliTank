@@ -31,10 +31,10 @@ import model.Route;
 public class MainView {
 
     Scene scene;
-	BorderPane border;
+    BorderPane border;
     MenuBar bar;
-    RouteView rv;
-    PredictionPointView ppv;
+    //RouteView rv;
+    //PredictionPointView ppv;
     GasStationController gsc;
     Stage mainStage;
         
@@ -50,8 +50,8 @@ public class MainView {
         displayMenubar(border);
         Image icon = new Image("/img/gas-station.png");
         mainStage.getIcons().add(icon);
-        rv = new RouteView(scene,border,this,gsc,bar.getHeight());
-        ppv = new PredictionPointView(scene,border);
+        //rv = new RouteView(//scene,border,this,gsc,bar.getHeight());
+        //ppv = new PredictionPointView(scene,border);
         mainStage.setScene(scene);
         Label l = new Label("Klicken Sie auf einen der oberen Reiter, \num sich eine Route oder Vorhersagepunkte anzeigen zu lassen.");
         l.setTextAlignment(TextAlignment.CENTER);
@@ -60,12 +60,12 @@ public class MainView {
     }
        
     public void displayRoute(Route route) {
-        mainStage.setScene(rv.buildRouteView(route));
+        border.setCenter(new RouteView(this,gsc,bar.getHeight()));
         mainStage.show();
     }
     
     public void displayPredictionPoints(PredictionPoints predictionPoints) {
-        mainStage.setScene(ppv.buildPredictionPointView(predictionPoints));
+        border.setCenter(new PredictionPointView(this,predictionPoints));
         mainStage.show();
     }
        
@@ -201,5 +201,12 @@ public class MainView {
                     }
                 });
         bar.getMenus().add(validateItem);
+    }
+    public Scene getScene() {
+        return scene;
+    }
+
+    public BorderPane getBorder() {
+        return border;
     }
 }

@@ -28,6 +28,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -41,7 +42,7 @@ import model.Route;
  *
  * @author Admin
  */
-public class RouteView {
+public class RouteView extends ScrollPane {
 
     ScrollPane sp;
     Scene scene;
@@ -54,35 +55,32 @@ public class RouteView {
     double menuBarHeight;
     GasStationController gsc;
     
-    public RouteView(Scene scene, BorderPane border,MainView mainView,GasStationController gsc, double menuBarHeight) {
-        sp = new ScrollPane();
-        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        this.scene = scene;
-        this.border = border;
+    public RouteView(MainView mainView,GasStationController gsc, double menuBarHeight) {
+        sp = this;
+        this.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         this.mainView = mainView;
+        this.scene = mainView.getScene();
+        this.border = mainView.getBorder();
         if(menuBarHeight == 0)
             this.menuBarHeight = 25;
         else
             this.menuBarHeight = menuBarHeight;
         this.gsc = gsc;
-    }
-
-    public Scene buildRouteView(Route route) {
-        border.setCenter(sp);
-        canvas = new Canvas(640, 150 + 100 * route.getLength());//Canvas dimensions scale with the length of the route
-        sp.setContent(canvas);
+        //border.setCenter(this);
+        canvas = new Canvas(mainView.getScene().getWidth(), 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
+        this.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
         //Erstellt einen Button, mit dem man zwischen den Tankstrategien wechseln kann
-        switchButton = new SwitchButton(route, gc,/*(int)scene.getWidth() - 120*/ 640 - 125, 10);
+        switchButton = new SwitchButton(gsc.getRoute(), gc,(int)scene.getWidth() - 140, 10);
         //Iterates through the entire list
-        for (int i = 0; i < route.getLength(); i++) {
-            displayGasStation(route, i);
+        for (int i = 0; i < gsc.getRoute().getLength(); i++) {
+            displayGasStation(gsc.getRoute(), i);
         }
-        displayResult(route);
-        return scene;
+        displayResult(gsc.getRoute());
     }
-    //gets repeatedly called by the displayroute function. Creates an elipse and a line for a specific gas station
 
+    
+    //gets repeatedly called by the displayroute function. Creates an elipse and a line for a specific gas station
     private void displayGasStation(Route route, int index) {
 
         int circleStart = 100 + 100 * index;
@@ -168,7 +166,7 @@ public class RouteView {
         scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent me) {
-                if (border.getCenter() == null) {
+                if (!(border.getCenter() instanceof ScrollPane)) {
                     return;
                 }
                 //System.out.println("POSS: " + me.getY() + " " + sp.getVvalue() + " CANVAS HEIGHT" + canvas.getHeight());

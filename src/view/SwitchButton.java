@@ -27,6 +27,13 @@ public class SwitchButton {
     public int getY() {
         return y;
     }
+    /**
+     * 
+     * @param r Die Route
+     * @param gc
+     * @param x
+     * @param y 
+     */
     public SwitchButton(Route r, GraphicsContext gc,int x, int y) {
         this.route = r;
         this.gc = gc;

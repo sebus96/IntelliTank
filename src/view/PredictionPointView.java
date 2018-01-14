@@ -16,7 +16,7 @@ import javafx.scene.text.Font;
 import model.PredictionPoint;
 import model.PredictionPoints;
 
-public class PredictionPointView {
+public class PredictionPointView extends BorderPane {
 
     private Scene scene;
     private BorderPane border;
@@ -24,26 +24,21 @@ public class PredictionPointView {
     private Label title;
     private BorderPane innerBorder;
 
-    public PredictionPointView(Scene scene, BorderPane border) {
+    public PredictionPointView(MainView mainView, PredictionPoints predictionPoints) {
 
-        this.scene = scene;
-        this.border = border;
-        this.innerBorder = new BorderPane();
+        this.scene = mainView.getScene();
+        this.border = mainView.getBorder();
         this.title = new Label();
         this.title.setFont(new Font("Arial", 20));
         this.title.setPadding(new Insets(5, 5, 5, 5));
         BorderPane.setAlignment(title, Pos.CENTER);
         createTable();
-        innerBorder.setTop(title);
-        innerBorder.setCenter(table);
-    }
-    public Scene buildPredictionPointView(PredictionPoints predictionPoints) {
-     
+        this.setTop(title);
+        this.setCenter(table);
         title.setText(predictionPoints.getName());
         table.setItems(predictionPoints.getList());
         
         border.setCenter(innerBorder);
-        return scene;
     }
 
     private void createTable() {
