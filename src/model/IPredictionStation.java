@@ -25,4 +25,8 @@ public interface IPredictionStation {
 	public boolean isPredicted();
 	
 	public String toCSVString();
+	
+	public void setValidation(Validation v);
+	
+	public Validation getValidation();
 }

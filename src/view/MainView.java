@@ -193,14 +193,17 @@ public class MainView {
     }
 
     private void setUpValidateButton() {
-        Menu validateItem = new Menu("Validieren");
-        validateItem.setOnShowing(new EventHandler<Event>() {
+    	Label menuLabel = new Label("Validieren");
+    	menuLabel.setOnMouseClicked(new EventHandler<Event>() {
                     @Override
                     public void handle(Event e) {
                         PopupBox.displayMessage(102);
                     }
                 });
-        bar.getMenus().add(validateItem);
+    	
+        Menu validateMenu = new Menu();
+        validateMenu.setGraphic(menuLabel);
+        bar.getMenus().add(validateMenu);
     }
     public Scene getScene() {
         return scene;

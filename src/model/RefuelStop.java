@@ -16,6 +16,7 @@ public class RefuelStop implements IPredictionStation {
     
     private List<Price> predictedPrices;
 	private PredictionUnit predictionUnit;
+	private Validation validation;
 
     //Variables below are needed for the Fixed Path Gas Station Problem
     private RefuelStop prevStation;
@@ -87,6 +88,16 @@ public class RefuelStop implements IPredictionStation {
 	public void setPrediction(PredictionUnit pu) {
 		this.predictionUnit = pu;
 		this.predictedPrices = this.predictionUnit.testAndSetHourSteps();
+	}
+	
+    @Override
+	public void setValidation(Validation v) {
+		this.validation = v;
+	}
+	
+    @Override
+	public Validation getValidation() {
+		return this.validation;
 	}
 
     @Override

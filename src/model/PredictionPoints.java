@@ -63,7 +63,7 @@ public class PredictionPoints implements IPredictionStations{
     public Validation getValidation() {
     	Validation res = new Validation();
     	for(PredictionPoint p: this.predictionPoints) {
-    		res.add(p.getStation().getValidation());
+    		res.add(p.getValidation());
     	}
     	return res;
     }
