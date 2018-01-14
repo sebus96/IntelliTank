@@ -66,12 +66,11 @@ public class RouteView extends ScrollPane {
         else
             this.menuBarHeight = menuBarHeight;
         this.gsc = gsc;
-        //border.setCenter(this);
         canvas = new Canvas(mainView.getScene().getWidth(), 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
         this.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
         //Erstellt einen Button, mit dem man zwischen den Tankstrategien wechseln kann
-        switchButton = new SwitchButton(gsc.getRoute(), gc,(int)scene.getWidth() - 140, 10);
+        switchButton = new SwitchButton(gsc.getRoute(), gc,800 - 140, 10);
         //Iterates through the entire list
         for (int i = 0; i < gsc.getRoute().getLength(); i++) {
             displayGasStation(gsc.getRoute(), i);

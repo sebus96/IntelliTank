@@ -46,18 +46,16 @@ public class ProgressView {
         progressStage.setScene(scene);
         progressStage.setTitle("Preise werden berechnet..");
         if(predictionStations instanceof Route) {
-        	l = new Label("Lade Route:\t" + this.name);
+        	l = new Label(" Lade Route:\t" + this.name);
         } else if(predictionStations instanceof PredictionPoints) {
-        	l = new Label("Lade Vorhersagezeitpunkte:\t" + this.name);
+        	l = new Label(" Lade Vorhersagezeitpunkte:\t" + this.name);
         } else {
-        	l = new Label("Lade:\t" + this.name);
+        	l = new Label(" Lade:\t" + this.name);
         }
         progressBar = new ProgressBar(0);
         progressBar.setPrefSize(300, 28);
         bp.setTop(l);
         bp.setBottom(progressBar);
-        //progressStage.initModality(Modality.WINDOW_MODAL);
-        //progressStage.initOwner(primaryStage);
         progressStage.show();
         progressStage.setAlwaysOnTop(true);
     }
