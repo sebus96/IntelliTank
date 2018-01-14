@@ -60,6 +60,14 @@ public class PredictionPoints implements IPredictionStations{
     	predictionPoints.add(new PredictionPoint(station, priceKnownUntil, predictionTime));
     }
     
+    public Validation getValidation() {
+    	Validation res = new Validation();
+    	for(PredictionPoint p: this.predictionPoints) {
+    		res.add(p.getStation().getValidation());
+    	}
+    	return res;
+    }
+    
     @Override
     public String toString() {
     	return "(" + this.name + ": " + this.predictionPoints + ")";

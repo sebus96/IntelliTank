@@ -147,10 +147,10 @@ public class PredictionPoint implements IPredictionStation {
 	public static class TableRow{
 		private PredictionPoint predictionPoint;
 		
-		public TableRow(int id, PredictionPoint station, String knownTime, String predictionTime, double price, double realPrice) {
-			this.predictionPoint = station;
+		public TableRow(int id, PredictionPoint pp, String knownTime, String predictionTime, double price, double realPrice) {
+			this.predictionPoint = pp;
 			idProperty().set(id);
-			stationProperty().set(station.getStation().getName());
+			stationProperty().set(pp.getStation().getName());
 			knownTimeProperty().set(knownTime);
 			predictionTimeProperty().set(predictionTime);
 			priceProperty().set(price/1000);

@@ -8,6 +8,7 @@ import java.util.List;
 
 import model.GasStation;
 import model.Price;
+import model.Validation;
 
 public class PredictionUnit {
 	private boolean PRINT_RESULTS = false;
@@ -85,6 +86,7 @@ public class PredictionUnit {
 		avgDiff /= ctr;
 		avgPrice /= ctr;
 		realAvgPrice /= ctr;
+		gs.setValidation(new Validation(avgDiff, maxDiff, avgPrice, minPrice, maxPrice, realAvgPrice, realMinPrice, realMaxPrice, ctr));
 		if(PRINT_RESULTS) System.out.println(gs + "\n"
 				+ "Durchschnittsabweichung: " + ((int)avgDiff/1000.0) + " \n"
 				+ "Maximale Abweichung: " + ((int)maxDiff/1000.0) + " \n"

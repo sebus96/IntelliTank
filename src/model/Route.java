@@ -95,6 +95,14 @@ public class Route implements IPredictionStations {
     public void addRouteElement(GasStation station, Date time) {
         route.add(new RefuelStop(station, time));
     }
+    
+    public Validation getValidation() {
+    	Validation res = new Validation();
+    	for(RefuelStop r: this.route) {
+    		res.add(r.getStation().getValidation());
+    	}
+    	return res;
+    }
 
     @Override
     public String toString() {

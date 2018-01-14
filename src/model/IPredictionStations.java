@@ -6,4 +6,6 @@ public interface IPredictionStations {
     public int getLength();
 
     public IPredictionStation get(int i);
+    
+    public Validation getValidation();
 }
