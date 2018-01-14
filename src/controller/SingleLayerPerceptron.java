@@ -44,8 +44,11 @@ public class SingleLayerPerceptron extends Perceptron {
 		do {
 			totalDifference = 0;
 			listCounter = 0;
+//			Calendar cal = Calendar.getInstance();
 			for(int i = 0; i < getStation().getPriceListSize(); i++) {
+//			for(cal.setTime(getStation().getPriceListElement(0).getTime()); cal.getTime().before(getStation().getPriceListElement(getStation().getPriceListSize()-1).getTime()); cal.add(Calendar.HOUR_OF_DAY, 1)) {
 				Price p = getStation().getPriceListElement(i);
+//				Price p = new Price(cal.getTime(),getStation().getHistoricPrice(cal.getTime()));
 				if(p.getTime().after(until)) break;
 				listCounter++;
 				Calendar c = Calendar.getInstance();
@@ -53,7 +56,7 @@ public class SingleLayerPerceptron extends Perceptron {
 				int[] hourVector = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 				int[] weekdayVector = getDayVector(c.get(Calendar.DAY_OF_WEEK));
 				int[] lastPrices = getPriceVector(c);
-				int isHoliday = getHoliday(p.getTime(), getStation().getState());
+				double isHoliday = getHoliday(p.getTime(), getStation().getState());
 				if(lastPrices == null) continue;
 				double out = output(p.getTime(), lastPrices);
 				double dif = p.getPrice() - out;
@@ -61,8 +64,11 @@ public class SingleLayerPerceptron extends Perceptron {
 					weights[j] += rate * dif * weekdayVector[j];
 				for(int j = 0; j < hourVector.length; j++)
 					weights[j+7] += rate * dif * hourVector[j];
-				for(int j = 0; j < lastPrices.length; j++)
+				for(int j = 0; j < lastPrices.length; j++){
 					weights[j+7+24] += rate * dif * (lastPrices[j] / 1000.0);
+					if(lastPrices[j] < 0) System.out.println(dif + " " + listCounter);
+				}
+					
 				weights[7+24+lastPrices.length] += rate * dif * isHoliday;
 				totalDifference += Math.abs(dif);
 				//if(epochCounter < 4 && i==0) System.out.println(out + " " + hour + " " + weekday + " " + dif + " (" + p.getPrice() + ")");
@@ -91,7 +97,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		c.setTime(d);
 		int[] hour = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 		int[] weekday = getDayVector(c.get(Calendar.DAY_OF_WEEK));
-		int isHoliday = getHoliday(d, getStation().getState());
+		double isHoliday = getHoliday(d, getStation().getState());
 		double res = 0;
 		for(int i = 0; i < weekday.length; i++) {
 			res += weekday[i]*weights[i];
@@ -117,7 +123,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		c.setTime(d);
 		int[] hour = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 		int[] weekday = getDayVector(c.get(Calendar.DAY_OF_WEEK));
-		int isHoliday = getHoliday(d, getStation().getState());
+		double isHoliday = getHoliday(d, getStation().getState());
 		double res = 0;
 		for(int i = 0; i < weekday.length; i++) {
 			res += weekday[i]*weights[i];

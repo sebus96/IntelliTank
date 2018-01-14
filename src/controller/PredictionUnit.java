@@ -31,9 +31,9 @@ public class PredictionUnit {
 			return false;
 		}
 		if(this.mode == Mode.SINGLE_LAYER)
-			p = new SingleLayerPerceptron(gs, 0.05, 100);
+			p = new SingleLayerPerceptron(gs,0.08, 120);
 		else
-			p = new MultiLayerPerceptron(gs, 0.05, 100);
+			p = new MultiLayerPerceptron(gs, 100);
 		boolean trainResult = p.train( trainUntil);
 		if(PRINT_RESULTS) System.out.println("Trainigsziel erreicht: " + (trainResult ? "Ja": "Nein"));
 		return true;

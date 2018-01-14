@@ -46,7 +46,21 @@ public abstract class Perceptron {
 	protected int[] getHourVector(int hour) {
 		if(hour >= 24 || hour < 0) return null;
 		int[] res = new int[24];
-		res[hour] = 1;
+		// nächtliche Stunden werden zusammengefasst
+		if(hour > 21 && hour <= 23) {
+			res[22] = 1;
+			res[23] = 1;
+		} else if(hour >= 0 && hour < 4) {
+			res[0] = 1;
+			res[1] = 1;
+			res[2] = 1;
+			res[3] = 1;
+		} else if(hour >= 4 && hour < 6) {
+			res[4] = 1;
+			res[5] = 1;
+		} else { 
+			res[hour] = 1;
+		}
 		return res;
 	}
 	
@@ -55,14 +69,14 @@ public abstract class Perceptron {
 		c.add(Calendar.HOUR_OF_DAY, -1 * oldPriceNumber);
 		for(int i = 0; i < oldPriceNumber; i++) {
 			res[i] = station.getHistoricPrice(c.getTime());
-//			if(res[i] < 0) return null;
+			if(res[i] < 0) return null; // not enough data available
 			c.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		return res;
 	}
 	
-	protected int getHoliday(Date date, FederalState state) {
-		return (Holidays.isHoliday(date, state)? 1 : 0);
+	protected double getHoliday(Date date, FederalState state) {
+		return (Holidays.isHoliday(date, state)? 0.2 : 0);
 	}
 	
 	/**

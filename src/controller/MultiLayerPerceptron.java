@@ -9,17 +9,15 @@ import model.Price;
 
 public class MultiLayerPerceptron extends Perceptron {
 
-	private final int inputlength = 7 + 24 + oldPriceNumber;
+	private final int inputlength = 7 + 24 + oldPriceNumber + 1;
 	//7+24+oldPriceNumber
 	private final int hiddenLayerSize = 10;
-//	private final double rate;
 
     private Matrix weightsInputToHidden;
     private Matrix weightsHiddenToOutput;
 
-    public MultiLayerPerceptron(GasStation gs, double rate, int epochs) {
+    public MultiLayerPerceptron(GasStation gs, int epochs) {
 		super(gs, epochs);
-//		this.rate = rate;
     }
 
     /**
@@ -57,7 +55,7 @@ public class MultiLayerPerceptron extends Perceptron {
 //                Matrix outputLayer = MatrixOperations.matMult(hiddenLayer, this.weightsHiddenToOutput);
 
                 // calculate error
-                Matrix outputLayerError = calcError(convertPrice(p.getPrice()) , outputLayer.getMatrix()[0][0]);
+                Matrix outputLayerError = calcError(convertPrice(p.getPrice(), "A") , outputLayer.getMatrix()[0][0]);
                 totalDifference += Math.abs(outputLayerError.getValue(0, 0));
                 listCounter++;
 
@@ -111,10 +109,12 @@ public class MultiLayerPerceptron extends Perceptron {
 		c.setTime(date);
 		int[] hourVector = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 		int[] weekdayVector = getDayVector(c.get(Calendar.DAY_OF_WEEK));
+		double isHoliday = getHoliday(date, getStation().getState());
 		int ctr = 0;
 		for(int hour: hourVector) inputLayer.setValue(0, ctr++, hour);
 		for(int weekday: weekdayVector) inputLayer.setValue(0, ctr++, weekday);
-		for(double price: lastPrices) inputLayer.setValue(0, ctr++, convertPrice(price));
+		for(double price: lastPrices) inputLayer.setValue(0, ctr++, convertPrice(price, "B"));
+		inputLayer.setValue(0, ctr++, isHoliday);
 
         Matrix hiddenLayer = MatrixOperations.sigmoid( MatrixOperations.matMult(inputLayer, this.weightsInputToHidden));
         Matrix outputLayer = MatrixOperations.sigmoid( MatrixOperations.matMult(hiddenLayer, this.weightsHiddenToOutput));
@@ -131,11 +131,13 @@ public class MultiLayerPerceptron extends Perceptron {
 		int[] hourVector = getHourVector(c.get(Calendar.HOUR_OF_DAY));
 		int[] weekdayVector = getDayVector(c.get(Calendar.DAY_OF_WEEK));
 		int[] lastPrices = getPriceVector(c);
+		double isHoliday = getHoliday(d, getStation().getState());
 		if(lastPrices == null) return null;
 		int ctr = 0;
 		for(int hour: hourVector) res.setValue(0, ctr++, hour);
 		for(int weekday: weekdayVector) res.setValue(0, ctr++, weekday);
-		for(int price: lastPrices) res.setValue(0, ctr++, convertPrice(price));
+		for(int price: lastPrices) res.setValue(0, ctr++, convertPrice(price, "C"));
+		res.setValue(0, ctr++, isHoliday);
 		assert ctr == inputlength;
 		return res;
     }
@@ -144,8 +146,8 @@ public class MultiLayerPerceptron extends Perceptron {
     	return (price*1000)+1000;
     }
     
-    private double convertPrice(double price) {
-    	if(price < 1000 || price > 2000) System.err.println("Price not in range: " + price);
+    private double convertPrice(double price, String pos) {
+    	if(price < 1000 || price > 2000) System.err.println("Price not in range: " + price + "(" + pos + ")");
     	return (price-1000)/1000;
     }
 }
