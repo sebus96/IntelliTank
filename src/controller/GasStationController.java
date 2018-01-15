@@ -37,6 +37,7 @@ public class GasStationController {
             PopupBox.displayError(301);
             return;
         }
+        PopupBox.displayRouteWarnings(CSVManager.checkRoutes(allStations));
         //route = CSVManager.importStandardRoute(allStations);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();

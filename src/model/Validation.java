@@ -6,6 +6,25 @@ public class Validation {
 	private double realAvgPrice , realMinPrice, realMaxPrice;
 	private int counter;
 	
+	public Validation() {
+		this.avgDiff = 0;
+		this.maxDiff = Double.MIN_VALUE;
+		this.avgPrice = 0;
+		this.minPrice = Double.MAX_VALUE;
+		this.maxPrice = Double.MIN_VALUE;
+		this.realAvgPrice = 0;
+		this.realMinPrice = Double.MAX_VALUE;
+		this.realMaxPrice = Double.MIN_VALUE;
+		this.counter = 0;
+	}
+	
+	public Validation(double avgPrice, double minPrice, double maxPrice, int counter) {
+		this();
+		this.avgPrice = avgPrice;
+		this.minPrice = minPrice;
+		this.maxPrice = maxPrice;
+		this.counter = counter;
+	}
 	public Validation(double avgDiff, double maxDiff, double avgPrice, double minPrice, double maxPrice,
 			double realAvgPrice, double realMinPrice, double realMaxPrice, int counter) {
 		this.avgDiff = avgDiff;
@@ -17,18 +36,6 @@ public class Validation {
 		this.realMinPrice = realMinPrice;
 		this.realMaxPrice = realMaxPrice;
 		this.counter = counter;
-	}
-	
-	public Validation() {
-		this.avgDiff = 0;
-		this.maxDiff = Double.MIN_VALUE;
-		this.avgPrice = 0;
-		this.minPrice = Double.MAX_VALUE;
-		this.maxPrice = Double.MIN_VALUE;
-		this.realAvgPrice = 0;
-		this.realMinPrice = Double.MAX_VALUE;
-		this.realMaxPrice = Double.MIN_VALUE;
-		this.counter = 0;
 	}
 	
 	public void setDifference(double avgDiff, double maxDiff) {
@@ -53,6 +60,7 @@ public class Validation {
 	}
 	
 	public void add(Validation v) {
+		if(v == null) return;
 		this.avgDiff = (this.avgDiff * this.counter + v.avgDiff * v.counter);
 		this.maxDiff = Math.max(this.maxDiff, v.maxDiff);
 		this.avgPrice = (this.avgPrice * this.counter + v.avgPrice * v.counter);
@@ -69,11 +77,57 @@ public class Validation {
 	
 	@Override
 	public String toString() {
-		return "Validierung" + "\n"
-				+ "Durchschnittsabweichung: " + ((int)avgDiff/1000.0) + " \n"
-				+ "Maximale Abweichung: " + ((int)maxDiff/1000.0) + " \n"
-				+ "Durchschnittspreis: " + ((int)avgPrice/1000.0) + "  (real: " + ((int)realAvgPrice/1000.0) + " )\n"
-				+ "Maximalpreis: " + ((int)maxPrice/1000.0) + "  (real: " + ((int)realMaxPrice/1000.0) + " )\n"
-				+ "Minimalpreis: " + ((int)minPrice/1000.0) + "  (real: " + ((int)realMinPrice/1000.0) + " )\n";
+		if(this.avgDiff == 0 && this.maxDiff == Double.MIN_VALUE &&
+				this.realAvgPrice == 0 && this.realMinPrice == Double.MAX_VALUE && this.realMaxPrice == Double.MIN_VALUE) {
+			if(this.avgPrice == 0 && this.minPrice == Double.MAX_VALUE && this.maxPrice == Double.MIN_VALUE && this.counter == 0) {
+				return null;
+			} else {
+				return "Es sind keine Vergleichsdaten vorhanden." + "\n\n"
+						+ "Durchschnittspreis: " + ((int)avgPrice/1000.0) + "\n"
+						+ "Maximalpreis: " + ((int)maxPrice/1000.0) + "\n"
+						+ "Minimalpreis: " + ((int)minPrice/1000.0) + "\n";
+			}
+			
+		}
+		return "Durchschnittsabweichung:\t" + ((int)avgDiff/1000.0) + " \n"
+				+ "Maximale Abweichung:\t\t" + ((int)maxDiff/1000.0) + " \n"
+				+ "Durchschnittspreis:\t\t\t" + ((int)avgPrice/1000.0) + "  (real: " + ((int)realAvgPrice/1000.0) + " )\n"
+				+ "Maximalpreis:\t\t\t\t" + ((int)maxPrice/1000.0) + "  (real: " + ((int)realMaxPrice/1000.0) + " )\n"
+				+ "Minimalpreis:\t\t\t\t" + ((int)minPrice/1000.0) + "  (real: " + ((int)realMinPrice/1000.0) + " )\n";
+	}
+	
+	public String toHTMLString() {
+		String tableHeader = "<table style=\"font-size:12;\">";
+		String row = "<tr><td><b>--name--:</b></td><td>--value--</td><td>€</td></tr>";
+		String rowlong = "<tr><td><b>--name--:</b></td><td>--value--</td><td>€</td><td>(real: --realvalue--</td><td>€)</td></tr>";
+		String[] names = {	"Durchschnittsabweichung"	, "Maximale Abweichung"	, "Durchschnittspreis"		, "Maximalpreis"			, "Minimalpreis"			};
+		double[] values = {((int)avgDiff/1000.0)		, ((int)maxDiff/1000.0)	, ((int)avgPrice/1000.0)	, ((int)maxPrice/1000.0)	, ((int)minPrice/1000.0)	};
+		double[] realValues = {((int)realAvgPrice/1000.0), ((int)realMaxPrice/1000.0),((int)realMinPrice/1000.0)};
+		if(this.avgDiff == 0 && this.maxDiff == Double.MIN_VALUE &&
+				this.realAvgPrice == 0 && this.realMinPrice == Double.MAX_VALUE && this.realMaxPrice == Double.MIN_VALUE) {
+			if(this.avgPrice == 0 && this.minPrice == Double.MAX_VALUE && this.maxPrice == Double.MIN_VALUE && this.counter == 0) {
+				return "Keine Validierung möglich.";
+			} else {
+				String res = "Es sind keine Vergleichsdaten vorhanden." + "<br><br>" + tableHeader;
+				for(int i = 2; i < 5; i++) {
+					res += row.replaceAll("--name--",names[i]).replaceAll("--value--", ""+values[i]);
+				}
+				return res + "</table>";
+			}
+			
+		}
+		String res = tableHeader;
+		for(int i = 0; i < 2; i++) {
+			res += row.replaceAll("--name--",names[i]).replaceAll("--value--", ""+values[i]);
+		}
+		for(int i = 2; i < 5; i++) {
+			res += rowlong.replaceAll("--name--", names[i]).replaceAll("--value--", ""+values[i]).replaceAll("--realvalue--",""+realValues[i-2]);
+		}
+		return res + "</table>";
+		/*return "<b>Durchschnittsabweichung:</b>&emsp;" + ((int)avgDiff/1000.0) + " <br>"
+				+ "<b>Maximale Abweichung:</b>&emsp;&emsp;" + ((int)maxDiff/1000.0) + " <br>"
+				+ "<b>Durchschnittspreis:</b>&emsp;&emsp;&emsp;" + ((int)avgPrice/1000.0) + "  (real: " + ((int)realAvgPrice/1000.0) + " )<br>"
+				+ "<b>Maximalpreis:</b>&emsp;&emsp;&emsp;&emsp;" + ((int)maxPrice/1000.0) + "  (real: " + ((int)realMaxPrice/1000.0) + " )<br>"
+				+ "<b>Minimalpreis:</b>&emsp;&emsp;&emsp;&emsp;" + ((int)minPrice/1000.0) + "  (real: " + ((int)realMinPrice/1000.0) + " )<br>";*/
 	}
 }

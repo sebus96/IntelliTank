@@ -43,6 +43,7 @@ public class RefuelStop implements IPredictionStation {
     public RefuelStop(GasStation station, Date time) {
         this.station = station;
         this.time = time;
+		this.validation = new Validation();
 //        this.predictedPrices = new ArrayList<>();
     }
     

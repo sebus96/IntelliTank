@@ -28,55 +28,52 @@ import model.Route;
  *
  * @author Admin
  */
-public class MainView {
+public class MainView extends BorderPane {
 
-    Scene scene;
-    BorderPane border;
-    MenuBar bar;
-    //RouteView rv;
-    //PredictionPointView ppv;
-    GasStationController gsc;
-    Stage mainStage;
+    private MenuBar bar;
+    private GasStationController gsc;
+    private Stage mainStage;
+    
+    private Menu validateMenu;
         
     public MainView(Stage primaryStage,GasStationController gsc) {
-        
+        super();
         mainStage = primaryStage;
         this.gsc = gsc;
         //Create the foundation: borderPane -> Scrollpane -> Canvas
         mainStage.setTitle("IntelliTank");
-        border = new BorderPane();
-        scene = new Scene(border, 800, 600);
+        Scene scene = new Scene(this, 800, 600);
         //Methods to fill each part with content
-        displayMenubar(border);
+        displayMenubar();
         Image icon = new Image("/img/gas-station.png");
         mainStage.getIcons().add(icon);
-        //rv = new RouteView(//scene,border,this,gsc,bar.getHeight());
-        //ppv = new PredictionPointView(scene,border);
         mainStage.setScene(scene);
         Label l = new Label("Klicken Sie auf einen der oberen Reiter, \num sich eine Route oder Vorhersagepunkte anzeigen zu lassen.");
         l.setTextAlignment(TextAlignment.CENTER);
-        border.setCenter(l);
+        setCenter(l);
         mainStage.show();
     }
        
     public void displayRoute(Route route) {
-        border.setCenter(new RouteView(this,gsc,bar.getHeight()));
+        setCenter(new RouteView(mainStage, route));
         mainStage.show();
+        validateMenu.setVisible(true);
     }
     
     public void displayPredictionPoints(PredictionPoints predictionPoints) {
-        border.setCenter(new PredictionPointView(this,predictionPoints));
+        setCenter(new PredictionPointView(mainStage, predictionPoints));
         mainStage.show();
+        validateMenu.setVisible(true);
     }
        
     //displays menu bar on the top
-    private void displayMenubar(BorderPane border) {    
+    private void displayMenubar() {
         bar = new MenuBar();
-        border.setTop(bar);
+        setTop(bar);
         setUpRouteTab();
     	setUpPredictionPointTab();
-    	setUpAboutTab();
         setUpValidateButton();
+    	setUpAboutTab();
     }
     
     private void setUpRouteTab() {
@@ -172,7 +169,7 @@ public class MainView {
     }
     
     public void hide() {
-        border.setCenter(null);
+        setCenter(null);
         this.mainStage.hide();
     }
     public void show() {
@@ -197,19 +194,22 @@ public class MainView {
     	menuLabel.setOnMouseClicked(new EventHandler<Event>() {
                     @Override
                     public void handle(Event e) {
-                        PopupBox.displayMessage(102);
+                        //PopupBox.displayMessage(102);
+                        if(getCenter() instanceof RouteView) {
+                        	Route r = gsc.getRoute();
+                        	PopupBox.displayValidation(r);
+                        } else if(getCenter() instanceof PredictionPointView) {
+                        	PredictionPoints p = gsc.getPredictionPoints();
+                        	PopupBox.displayValidation(p);
+                        } else {
+                        	System.out.println("Nothing loaded");
+                        }
                     }
                 });
     	
-        Menu validateMenu = new Menu();
+        validateMenu = new Menu();
+        validateMenu.setVisible(false);
         validateMenu.setGraphic(menuLabel);
         bar.getMenus().add(validateMenu);
-    }
-    public Scene getScene() {
-        return scene;
-    }
-
-    public BorderPane getBorder() {
-        return border;
     }
 }

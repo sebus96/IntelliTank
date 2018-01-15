@@ -6,13 +6,18 @@
 package view;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import model.IPredictionStation;
+import model.IPredictionStations;
+import model.Validation;
 
 /**
  *
@@ -100,6 +105,55 @@ public class PopupBox {
                 errorAlert.setContentText(messages.get(0));
             errorAlert.show();
         }
+    }
+    
+    /**
+     * Zeigt die Validierung einer IPredictionStation an.
+     * 
+     * @param station Die IPredictionStation zu der die Validierung angezeigt werden soll
+     */
+    public static void displayValidation(IPredictionStation station) {
+    	displayValidation(station.getStation().getName() + " (" + station.getStation().getID() +")", station.getValidation());
+    }
+    
+    public static void displayValidation(IPredictionStations stations) {
+    	displayValidation(stations.getType() + " " + stations.getName(), stations.getValidation());
+    }
+    
+    private static void displayValidation(String title, Validation validation) {
+    	Alert a = new Alert(AlertType.INFORMATION);
+        a.setTitle("Validierung");
+        a.setHeaderText("Validierung " + title);
+        Image validImg = new Image("/img/validation.png");
+        ImageView validView = new ImageView(validImg);
+        validView.setFitWidth(64);
+        validView.setFitHeight(64);
+        a.setGraphic(validView);
+        PopupBox.setIcon(a);
+
+//        a.setContentText(validation.toString());
+        WebView wv = new WebView();
+        wv.prefHeightProperty().bind(a.heightProperty());
+        wv.prefWidthProperty().bind(a.widthProperty());
+        wv.setMinWidth(300);
+        wv.getEngine().loadContent("<body style=\"background:#f4f4f4;font-family:system;font-size:12;\">" + validation.toHTMLString() + "</body>");
+        a.getDialogPane().setContent(wv);
+        
+        a.show();
+    }
+    
+    public static void displayRouteWarnings(List<String> warnings) {
+    	if(warnings == null || warnings.isEmpty()) return;
+    	Alert a = new Alert(AlertType.WARNING);
+        a.setTitle("Routenwarnungen");
+        a.setHeaderText(null);
+        PopupBox.setIcon(a);
+        String res = "";
+        for(String e: warnings) {
+        	res += e + "\n";
+        }
+        a.setContentText(res);
+        a.showAndWait();
     }
 
     private static void setIcon(Alert a) {

@@ -28,6 +28,7 @@ public class PredictionPoint implements IPredictionStation {
 		}
 		this.priceKnownUntil = priceKnownUntil;
 		this.predictionTime = predictionTime;
+		this.validation = new Validation();
 	}
 
     @Override

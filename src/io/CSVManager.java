@@ -37,7 +37,9 @@ import model.Route;
 import view.PopupBox;
 
 public class CSVManager {
-
+	
+	private static boolean printMessages = true;
+	
     private static final String inputPath = "Eingabedaten/";
     private static final String routeInputPath = inputPath + "Fahrzeugrouten/";
     private static final String predictionInputPath = inputPath + "Vorhersagezeitpunkte/";
@@ -116,7 +118,7 @@ public class CSVManager {
     public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
     	File routeFile = new File(routeInputPath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));
     	List<String> lines = readFile(routeFile);
-    	System.out.println("import route: " + routeName);
+    	if(printMessages) System.out.println("import route: " + routeName);
         if (lines == null) {
             System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
             return null;
@@ -130,8 +132,36 @@ public class CSVManager {
             }
             route.addRouteElement(stations.get(getInteger(lineElements[1])), getDate(lineElements[0]));
         }
-        System.out.println(route);
+        if(printMessages) System.out.println(route);
         return route;
+    }
+    
+    public static List<String> checkRoutes(Map<Integer, GasStation> stations) {
+    	List<String> routeWarnings = new ArrayList<>();
+    	boolean backup = printMessages;
+    	printMessages = false;
+    	for(String filename: readRouteNames()) {
+    		Route cur = importRoute(stations,filename);
+    		if(cur.getTankCapacity() <= 0) {
+    			routeWarnings.add(cur.getName() + ": Tankkapazität zu gering.");
+    		}
+    		if(cur.getLength() == 0) {
+    			routeWarnings.add(cur.getName() + ": Keine Elemente enthalten.");
+    			continue;
+    		}
+    		Date lastDate = new Date(0);
+    		for(int i = 0; i < cur.getLength(); i++) {
+    			if(cur.get(i).getStation() == null) {
+    				routeWarnings.add(cur.getName() + ": Tankstelle in Routenelement " + (i+1) + " konnte nicht gefunden werden.");
+    			}
+    			if(!cur.get(i).getTime().after(lastDate)) {
+    				routeWarnings.add(cur.getName() + ": Tankstop mit ID " + cur.get(i).getStation().getID() + " liegt zeitlich vor dem vorherigen.");
+    			}
+    			lastDate = cur.get(i).getTime();
+    		}
+    	}
+    	printMessages = backup;
+    	return routeWarnings;
     }
     
     public static void exportPredictions(IPredictionStations stations) {
@@ -145,7 +175,7 @@ public class CSVManager {
     public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
         File predictionFile = new File(predictionInputPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
     	List<String> lines = readFile(predictionFile);
-    	System.out.println("import predictionpoints: " + predictionName);
+    	if(printMessages) System.out.println("import predictionpoints: " + predictionName);
         if (lines == null) {
             System.err.println("Could not import Prediction \"" + predictionFile.getName() + "\"!");
             return null;

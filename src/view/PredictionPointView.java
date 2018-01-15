@@ -1,8 +1,8 @@
 package view;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -10,24 +10,26 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import model.PredictionPoint;
 import model.PredictionPoints;
 
 public class PredictionPointView extends BorderPane {
 
-    private Scene scene;
-    private BorderPane border;
-    private TableView<PredictionPoint.TableRow> table;
+    private static TableView<PredictionPoint.TableRow> table;
     private Label title;
-    private BorderPane innerBorder;
+	private Stage parent;
+//	private PredictionPoints predictionPoints;
 
-    public PredictionPointView(MainView mainView, PredictionPoints predictionPoints) {
-
-        this.scene = mainView.getScene();
-        this.border = mainView.getBorder();
+    public PredictionPointView(Stage parent, PredictionPoints predictionPoints) {
+    	super();
+        this.parent = parent;
+//        this.predictionPoints = predictionPoints;
         this.title = new Label();
         this.title.setFont(new Font("Arial", 20));
         this.title.setPadding(new Insets(5, 5, 5, 5));
@@ -37,12 +39,10 @@ public class PredictionPointView extends BorderPane {
         this.setCenter(table);
         title.setText(predictionPoints.getName());
         table.setItems(predictionPoints.getList());
-        
-        border.setCenter(innerBorder);
     }
 
     private void createTable() {
-
+    	if(table != null) return;
         table = new TableView<>();
         TableColumn<PredictionPoint.TableRow, Integer> nrColumn = new TableColumn<>("Nr.");
         nrColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -118,11 +118,20 @@ public class PredictionPointView extends BorderPane {
         table.setRowFactory(tv -> {
         	TableRow<PredictionPoint.TableRow> row = new TableRow<>();
         	// MouseListener für das öffnen des Preisdiagramms aus der Vorhersagezeitpunkttabelle
-            row.setOnMouseClicked(event -> {
-                if (! row.isEmpty()) {
-                	PredictionPoint.TableRow rowData = row.getItem();
-                	PriceDiagram.displayGasStation(rowData.getPredictionPoint());
-                }
+            row.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent event) {
+					if (! row.isEmpty()) {
+	                	PredictionPoint.TableRow rowData = row.getItem();
+	                	
+	                	if(event.getButton() == MouseButton.PRIMARY)
+	                		PriceDiagram.displayGasStation(rowData.getPredictionPoint());
+	                	else if(event.getButton() == MouseButton.SECONDARY)
+	                		new ValidationContextMenu(rowData.getPredictionPoint()).show(parent, event.getScreenX(), event.getScreenY());
+	                }
+				}
+                
             });
             return row ;
         });

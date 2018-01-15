@@ -12,28 +12,26 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
-import controller.GasStationController;
-import java.util.concurrent.TimeUnit;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 import model.GasStation;
 import model.RefuelStop;
 import model.Route;
@@ -44,55 +42,50 @@ import model.Route;
  */
 public class RouteView extends ScrollPane {
 
-    ScrollPane sp;
-    Scene scene;
-    Canvas canvas;
-    GraphicsContext gc;
-    Map<Integer, Double> indexWithYCoordinate = new HashMap<>();
-    SwitchButton switchButton;
-    MainView mainView;
-    BorderPane border;
-    double menuBarHeight;
-    GasStationController gsc;
+	private Canvas canvas;
+	private GraphicsContext gc;
+	private Map<Integer, Double> indexWithYCoordinate = new HashMap<>();
+	private SwitchButton switchButton;
+	private Stage parent;
+	private Route route;
     
-    public RouteView(MainView mainView,GasStationController gsc, double menuBarHeight) {
-        sp = this;
+    public RouteView(Stage parent, Route route) {
+        super();
+        this.parent = parent;
+        this.route=route;
         this.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        this.mainView = mainView;
-        this.scene = mainView.getScene();
-        this.border = mainView.getBorder();
-        if(menuBarHeight == 0)
-            this.menuBarHeight = 25;
-        else
-            this.menuBarHeight = menuBarHeight;
-        this.gsc = gsc;
-        canvas = new Canvas(mainView.getScene().getWidth(), 150 + 100 * gsc.getRoute().getLength());//Canvas dimensions scale with the length of the route
+        init();
+    }
+    
+    private void init() {
+    	canvas = new Canvas(0, 150 + 100 * route.getLength());//Canvas dimensions scale with the length of the route
+        canvas.widthProperty().bind(parent.widthProperty());
         this.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
+        switchButton = new SwitchButton(route, gc,800 - 140, 10);
         //Erstellt einen Button, mit dem man zwischen den Tankstrategien wechseln kann
-        switchButton = new SwitchButton(gsc.getRoute(), gc,800 - 140, 10);
         //Iterates through the entire list
-        for (int i = 0; i < gsc.getRoute().getLength(); i++) {
-            displayGasStation(gsc.getRoute(), i);
+        for (int i = 0; i < route.getLength(); i++) {
+            displayGasStation(i);
         }
-        displayResult(gsc.getRoute());
+        displayResult();
     }
 
     
     //gets repeatedly called by the displayroute function. Creates an elipse and a line for a specific gas station
-    private void displayGasStation(Route route, int index) {
+    private void displayGasStation(int index) {
 
         int circleStart = 100 + 100 * index;
         int circleWidth = 40;
         int circleHeight = 25;
 
-        drawLineBetweenNodes(route, index, circleHeight);
-        createGasPriceNode(route, index, circleStart, circleWidth, circleHeight);
-        createFuelStatusRectangle(route, index, circleStart, circleHeight);
-        createHyperlinkStationText(route, index, circleStart, circleHeight);
+        drawLineBetweenNodes(index, circleHeight);
+        createGasPriceNode(index, circleStart, circleWidth, circleHeight);
+        createFuelStatusRectangle(index, circleStart, circleHeight);
+        createHyperlinkStationText(index, circleStart, circleHeight);
     }
 
-    private void createGasPriceNode(Route route, int index, int circleStart, int circleWidth, int circleHeight) {
+    private void createGasPriceNode( int index, int circleStart, int circleWidth, int circleHeight) {
         //Create an elipse with gas price in it(position dependent on counter)
         gc.setFill(Color.WHITE);
         gc.fillOval(180 - circleWidth / 2, circleStart, circleWidth, circleHeight);
@@ -110,7 +103,7 @@ public class RouteView extends ScrollPane {
         }
     }
 
-    private void createFuelStatusRectangle(Route route, int index, int circleStart, int circleHeight) {
+    private void createFuelStatusRectangle( int index, int circleStart, int circleHeight) {
         RefuelStop rs = route.get(index);
         double currentGasPercentage = rs.getFuelAmount(route) / route.getTankCapacity() * 100;
         double currentRefillPercentage = rs.getRefillAmount(route) / route.getTankCapacity() * 100;
@@ -141,7 +134,7 @@ public class RouteView extends ScrollPane {
         gc.strokeRect(30, circleStart, 100, circleHeight);
     }
 
-    private void createHyperlinkStationText(Route route, int index, int circleStart, int circleHeight) {
+    private void createHyperlinkStationText( int index, int circleStart, int circleHeight) {
 
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLUE);
@@ -162,32 +155,28 @@ public class RouteView extends ScrollPane {
         //Implementierung mit der DrawImage-Methode. �ffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
         //das rechte Zeichen
         gc.drawImage(imageDecline, 220 + 10 + getTextWidth(stationName), circleStart + circleHeight / 2 - imageDecline.getHeight() / 2);
-        scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent me) {
-                if (!(border.getCenter() instanceof ScrollPane)) {
-                    return;
-                }
-                //System.out.println("POSS: " + me.getY() + " " + sp.getVvalue() + " CANVAS HEIGHT" + canvas.getHeight());
-                int offsetPosition = (int) Math.round((canvas.getHeight() + menuBarHeight - scene.getHeight()) * sp.getVvalue());
-                //System.out.println("Viewable: min: " + offsetPosition + " max: " + (offsetPosition + scene.getHeight()) + " Total pos: " + ((int)me.getY() + offsetPosition) + " " + ((int)me.getSceneY() + offsetPosition));
-                int yPosition = (int) me.getY() + offsetPosition - (int) menuBarHeight;
                 Set<Integer> indexSet = indexWithYCoordinate.keySet();
                 Iterator<Integer> iter = indexSet.iterator();
                 while (iter.hasNext()) {
                     int indexTmp = iter.next();
-                    if (gsc.getRoute().get(indexTmp) == null) {
+                    if (route.get(indexTmp) == null) {
                         continue;
                     }
                     double yCoordinate = indexWithYCoordinate.get(indexTmp);
                     //System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
                     //System.out.println(gsc.getRoute().get(indexTmp) == null);// (gsc.getRoute().get(indexTmp) == null) + (gsc.getRoute().get(indexTmp).getStation() == null) + (gsc.getRoute().get(indexTmp).getStation().getName() == null));
-                    String gasStationName = gsc.getRoute().get(indexTmp).getStation().getName() + ", " + gsc.getRoute().get(indexTmp).getStation().getPostcode() + " " + gsc.getRoute().get(indexTmp).getStation().getLocation();
-                    if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()) && (yPosition > yCoordinate - (gc.getFont().getSize()+4) / 2) && (yPosition < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
+                    String gasStationName = route.get(indexTmp).getStation().getName() + ", " + route.get(indexTmp).getStation().getPostcode() + " " + route.get(indexTmp).getStation().getLocation();
+                    if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()) && (me.getY() > yCoordinate - (gc.getFont().getSize()+4) / 2) && (me.getY() < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
                         //System.out.println("index von methode: " + index);
                         //System.out.println("index gespeichert: " + indexTmp);
 
-                        PriceDiagram.displayGasStation(gsc.getRoute().get(indexTmp));
+                    	if(me.getButton() == MouseButton.PRIMARY)
+                    		PriceDiagram.displayGasStation(route.get(indexTmp));
+                    	else if(me.getButton() == MouseButton.SECONDARY)
+                    		new ValidationContextMenu(route.get(indexTmp)).show(parent, me.getScreenX(), me.getScreenY());
                         /*PriceDiagram diagramm = new PriceDiagram(gs);
             			diagramm.generateDiagramm();*/
 
@@ -195,15 +184,56 @@ public class RouteView extends ScrollPane {
                     }
                 }
                 //Falls der Button zum switchen der Tankstrategie gedrückt wurde
-                if (switchButton.wasClicked((int) me.getX(), yPosition)) {
+                if (switchButton.wasClicked((int) me.getX(), (int)me.getY())) {
                     switchButton.buttonPressed();
-                    mainView.displayRoute(gsc.getRoute());
+                    init();//mainView.displayRoute(gsc.getRoute());
                 }
             }
         });
+        
+        /*setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent me) {
+//                if (!(border.getCenter() instanceof ScrollPane)) {
+//                    return;
+//                }
+                //System.out.println("POSS: " + me.getY() + " " + sp.getVvalue() + " CANVAS HEIGHT" + canvas.getHeight());
+                int offsetPosition = (int) Math.round((canvas.getHeight() - getHeight()) * getVvalue());
+                //System.out.println("Viewable: min: " + offsetPosition + " max: " + (offsetPosition + scene.getHeight()) + " Total pos: " + ((int)me.getY() + offsetPosition) + " " + ((int)me.getSceneY() + offsetPosition));
+                int yPosition = (int) me.getY() + offsetPosition;
+                Set<Integer> indexSet = indexWithYCoordinate.keySet();
+                Iterator<Integer> iter = indexSet.iterator();
+                while (iter.hasNext()) {
+                    int indexTmp = iter.next();
+                    if (route.get(indexTmp) == null) {
+                        continue;
+                    }
+                    double yCoordinate = indexWithYCoordinate.get(indexTmp);
+                    //System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
+                    //System.out.println(gsc.getRoute().get(indexTmp) == null);// (gsc.getRoute().get(indexTmp) == null) + (gsc.getRoute().get(indexTmp).getStation() == null) + (gsc.getRoute().get(indexTmp).getStation().getName() == null));
+                    String gasStationName = route.get(indexTmp).getStation().getName() + ", " + route.get(indexTmp).getStation().getPostcode() + " " + route.get(indexTmp).getStation().getLocation();
+                    if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()) && (yPosition > yCoordinate - (gc.getFont().getSize()+4) / 2) && (yPosition < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
+                        //System.out.println("index von methode: " + index);
+                        //System.out.println("index gespeichert: " + indexTmp);
+
+                    	if(me.getButton() == MouseButton.PRIMARY)
+                    		PriceDiagram.displayGasStation(route.get(indexTmp));
+                    	else if(me.getButton() == MouseButton.SECONDARY)
+                    		System.out.println(route.get(indexTmp).getStation().getName() + ": " + route.get(indexTmp).getValidation());
+                       
+                        break;
+                    }
+                }
+                //Falls der Button zum switchen der Tankstrategie gedrückt wurde
+                if (switchButton.wasClicked((int) me.getX(), yPosition)) {
+                    switchButton.buttonPressed();
+                    //mainView.displayRoute(gsc.getRoute());
+                }
+            }
+        });*/
     }
 
-    private void drawLineBetweenNodes(Route route, int index, int circleHeight) {
+    private void drawLineBetweenNodes( int index, int circleHeight) {
         //If this is the first entry, dont add a line + Add distance next to it
         if (index != 0) {
             int lineStart = 100 + circleHeight + (index - 1) * 100;
@@ -212,14 +242,14 @@ public class RouteView extends ScrollPane {
             GasStation a = route.get(index - 1).getStation();
             GasStation b = route.get(index).getStation();
             long diff = Math.abs(route.get(index).getTime().getTime() - route.get(index-1).getTime().getTime());
-            String time = Long.toString(TimeUnit.MILLISECONDS.toMinutes(diff)).substring(0,1);
+            String time = Long.toString(TimeUnit.MILLISECONDS.toMinutes(diff));//.substring(0,1); //TODO Warum Substring?
             if(time.equals("0"))
                 time = "<1";
             gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km\t" + time + " min", 200, (lineStart + lineEnd) / 2);
         }
     }
 
-    private void displayResult(Route route) {
+    private void displayResult() {
         gc.setFill(Color.WHITE);
         gc.fillRect(30, 42, 288, 32);
         gc.setFill(Color.BLACK);

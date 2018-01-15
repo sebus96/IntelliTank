@@ -8,4 +8,6 @@ public interface IPredictionStations {
     public IPredictionStation get(int i);
     
     public Validation getValidation();
+	
+	public String getType();
 }

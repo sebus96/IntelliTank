@@ -103,6 +103,11 @@ public class Route implements IPredictionStations {
     	}
     	return res;
     }
+	
+    @Override
+	public String getType() {
+    	return "Route";
+    }
 
     @Override
     public String toString() {

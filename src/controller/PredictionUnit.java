@@ -47,7 +47,7 @@ public class PredictionUnit {
 			System.err.println("Train before using prediction!");
 			return null;
 		}
-		GasStation gss = station.getStation();
+		GasStation gs = station.getStation();
 		double avgDiff = 0;
 		double maxDiff = Double.MIN_VALUE;
 		double avgPrice = 0;
@@ -61,18 +61,19 @@ public class PredictionUnit {
 		List<Price> predictedPriceList = new ArrayList<>();
 		Calendar c = Calendar.getInstance();
 		c.setTime(trainUntil);
-		predictedPriceList.add(new Price(c.getTime(), gss.getHistoricPrice(c.getTime()))); // letzter bekannter Preis zu Beginn der Route eingefügt
+		predictedPriceList.add(new Price(c.getTime(), gs.getHistoricPrice(c.getTime()))); // letzter bekannter Preis zu Beginn der Route eingefügt
 		c.add(Calendar.HOUR_OF_DAY, (-1)*(p.getOldPriceNumber()-1));
 		for(int i = 0; i < p.getOldPriceNumber(); i++) {
-			lastPrices.add((double)gss.getHistoricPrice(c.getTime()));
+			lastPrices.add((double)gs.getHistoricPrice(c.getTime()));
 			c.add(Calendar.HOUR_OF_DAY, 1);
 		}
+		boolean realDataAvailable = true;
 		for(int i = 0; i < 24*7*5; i++) { // 5 Wochen
 			ctr++;
 			double out = p.feedForward(c.getTime(), lastPrices);
-			double real = gss.getHistoricPrice(c.getTime());
-			if(real < 0) System.err.println("Could not compare to real data. Real data is not available for " + gss + " at " + c.getTime());
+			double real = gs.getHistoricPrice(c.getTime());
 			predictedPriceList.add(new Price(c.getTime() , (int)Math.round(out)));
+			if(real < 0) realDataAvailable = false;
 			double diff = Math.abs(out-real);
 			if(diff > maxDiff) maxDiff = diff;
 			if(out < minPrice) minPrice = out;
@@ -89,13 +90,8 @@ public class PredictionUnit {
 		avgDiff /= ctr;
 		avgPrice /= ctr;
 		realAvgPrice /= ctr;
-		station.setValidation(new Validation(avgDiff, maxDiff, avgPrice, minPrice, maxPrice, realAvgPrice, realMinPrice, realMaxPrice, ctr));
-		if(PRINT_RESULTS) System.out.println(gss + "\n"
-				+ "Durchschnittsabweichung: " + ((int)avgDiff/1000.0) + " \n"
-				+ "Maximale Abweichung: " + ((int)maxDiff/1000.0) + " \n"
-				+ "Durchschnittspreis: " + ((int)avgPrice/1000.0) + "  (real: " + ((int)realAvgPrice/1000.0) + " )\n"
-				+ "Maximalpreis: " + ((int)maxPrice/1000.0) + "  (real: " + ((int)realMaxPrice/1000.0) + " )\n"
-				+ "Minimalpreis: " + ((int)minPrice/1000.0) + "  (real: " + ((int)realMinPrice/1000.0) + " )\n");
+		if(realDataAvailable) station.setValidation(new Validation(avgDiff, maxDiff, avgPrice, minPrice, maxPrice, realAvgPrice, realMinPrice, realMaxPrice, ctr));
+		else station.setValidation(new Validation(avgPrice, minPrice, maxPrice, ctr));
 		return predictedPriceList;
 	}
 }

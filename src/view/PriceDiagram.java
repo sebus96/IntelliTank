@@ -27,11 +27,19 @@ public class PriceDiagram {
     private static List<IPredictionStation> gasStations = new ArrayList<>();
     private static Stage priceStage;
     private static boolean showHistoric = true;
+    private static CheckMenuItem predictionItem;
 
     public static void displayGasStation(IPredictionStation gs) {
+    	boolean showWarning = false;
     	if(!showHistoric && !gs.isPredicted()) {
-    		PopupBox.displayWarning(202);
-    		return;
+    		if(gasStations.isEmpty()) {
+    			showHistoric = true; // zeige Warnung am Ende, damit sie nicht von der priceStage verdeckt wird
+    			showWarning = true;
+    			setContextMenuSelection();
+    		} else {
+        		PopupBox.displayWarning(202);
+    			return;
+    		}
     	}
         if (priceStage == null) {
             gasStations = new ArrayList<>();
@@ -50,6 +58,7 @@ public class PriceDiagram {
         if(!priceStage.isShowing()) {
             priceStage.show();
         }
+        if(showWarning) PopupBox.displayWarning(202);
     }
 
     public static void generateDiagram() {
@@ -205,8 +214,9 @@ public class PriceDiagram {
         series.setName(ps.getStation().getName());
         for (int i = 0; i < ps.getPredictedPriceListSize(); i++) {
             Price p = ps.getPredictedPriceListElement(i);
+            double p_real = ps.getStation().getHistoricPrice(p.getTime());
             seriesPred.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), p.getPrice()));
-            series.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), ps.getStation().getHistoricPrice(p.getTime())));
+            if(p_real > 0 ) series.getData().add(new XYChart.Data<Number, Number>(p.getTime().getTime(), p_real ));
         }
         lc.getData().add(seriesPred);
         lc.getData().add(series);
@@ -273,19 +283,20 @@ public class PriceDiagram {
     
     private static void setContextMenu(Scene scene) {
         ContextMenu contextMenu = new ContextMenu();
+        if(predictionItem == null) {
+	        predictionItem = new CheckMenuItem("Zeige Vorhersage");
+	        predictionItem.setSelected(!showHistoric);
+	        predictionItem.setOnAction(new EventHandler<ActionEvent>() {
+	            @Override
+	            public void handle(ActionEvent event) {
+	            	boolean before = showHistoric;
+	            	showHistoric = !predictionItem.isSelected();
+	            	if(before != showHistoric) generateDiagram();
+	            }
+	        });
+        }
  
-        CheckMenuItem prediction = new CheckMenuItem("Zeige Vorhersage");
-        prediction.setSelected(!showHistoric);
-        prediction.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-            	boolean before = showHistoric;
-            	showHistoric = !prediction.isSelected();
-            	if(before != showHistoric) generateDiagram();
-            }
-        });
- 
-        contextMenu.getItems().addAll(prediction);
+        contextMenu.getItems().addAll(predictionItem);
     	
     	scene.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
             @Override
@@ -293,5 +304,10 @@ public class PriceDiagram {
                 contextMenu.show(priceStage, event.getScreenX(), event.getScreenY());
             }
         });
+    }
+    
+    private static void setContextMenuSelection() {
+    	if(predictionItem == null) return;
+    	else predictionItem.setSelected(!showHistoric);
     }
 }
