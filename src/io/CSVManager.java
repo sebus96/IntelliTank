@@ -40,15 +40,15 @@ public class CSVManager {
 	
 	private static boolean printMessages = true;
 	
-    private static final String inputPath = "Eingabedaten/";
-    private static final String routeInputPath = inputPath + "Fahrzeugrouten/";
-    private static final String predictionInputPath = inputPath + "Vorhersagezeitpunkte/";
-    private static final String pricePath = inputPath + "Benzinpreise/";
-    private static final String holidayPath = inputPath + "Ferien/";
+    private static final String inputPath = "Eingabedaten" + File.separator;
+    private static final String routeInputPath = inputPath + "Fahrzeugrouten" + File.separator;
+    private static final String predictionInputPath = inputPath + "Vorhersagezeitpunkte" + File.separator;
+    private static final String pricePath = inputPath + "Benzinpreise" + File.separator;
+    private static final String holidayPath = inputPath + "Ferien" + File.separator;
     
-    private static final String outputPath = "Ausgabedaten/";
-    private static final String routeOutputPath = outputPath + "Tankstrategien/";
-    private static final String predictionOutputPath = outputPath + "Vorhersagen/";
+    private static final String outputPath = "Ausgabedaten" + File.separator;
+    private static final String routeOutputPath = outputPath + "Tankstrategien" + File.separator;
+    private static final String predictionOutputPath = outputPath + "Vorhersagen" + File.separator;
     
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssX");
 
