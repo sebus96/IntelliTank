@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.CSVManager;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
@@ -28,6 +29,7 @@ public class PopupBox {
     private static Alert infoAlert = new Alert(AlertType.INFORMATION);
     private static Alert warnAlert = new Alert(AlertType.WARNING);
     private static Alert errorAlert = new Alert(AlertType.ERROR);
+    
     private static Map<Integer, String> messages = new HashMap<Integer, String>() {
 		private static final long serialVersionUID = -6975514177601226819L;
 
@@ -37,19 +39,24 @@ public class PopupBox {
                     put(101, "Dieses Projekt wurde von Axel Claassen, Burak Kadioglu und Sebastian Drath entwickelt.");
                     put(102,"Hier wird angezeigt, wie gut die Route vorhergesagt wurde. Methodenaufruf in view/MainView setUpValidateButton()");
                     //2XX = Warnungen
-                    put(201, "Warnung 201: Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
-                    put(202, "Warnung 202: Für die ausgewählte Tankstelle konnte keine Vorhersage durchgeführt werden");
-                    put(203, "Warnung 203: Für eine oder mehrere der ausgewählten Tankstellen konnte keine Vorhersage durchgeführt werden");
+                    put(201, "Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
+                    put(202, "Für die ausgewählte Tankstelle konnte keine Vorhersage durchgeführt werden");
+                    put(203, "Für eine oder mehrere der ausgewählten Tankstellen konnte keine Vorhersage durchgeführt werden");
+                    put(204, "Die Datei postalcode2federalstate.csv wurde nicht gefunden!\n\nDen Tankstellen kann kein Bundesland zugeordnet werden. Feriendaten können bei der Vorhersage nicht benutzt werden.");
+                    put(205, "Falsches Format der Datei postalcode2federalstate.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
+                    put(206, "Feriendaten wurden nicht gefunden und können bei der Vorhersage nicht benutzt werden.");
+                    put(207, "Die Dateinamen der Feriendaten entsprechen nicht dem richtigen Format. Möglicherweise werden Daten fehlerhaft dargestellt.");
+                    put(208, "Falsches Format der Feriendaten. Möglicherweise werden Daten fehlerhaft dargestellt.");
                     //3XX = Errors
-                    put(301, "Error 301: Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
-                    put(302, "Error 302: Die ausgewählte Route konnte nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
-                    put(303, "Error 303: Vorhersagezeitpunkte konnten nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
-                    put(304, "Error 304: Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
+                    put(301, "Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
+                    put(302, "Die ausgewählte Route konnte nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
+                    put(303, "Vorhersagezeitpunkte konnten nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
+                    put(304, "Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
+                    put(305, "Die historischen Benzinpreise wurden nicht gefunden. Es kann keine Vorhersage getätigt werden.");
+                    put(306, "Die Preise konnten für keinen Tankstop innerhalb der Route vorhergesagt werden. Möglicherweise konnten keine Preise importiert werden.");
     
 		};
 	};
-    
-    
     
     public static void displayMessage(int textId) {
         //Verhindert, dass die selbe Meldung durch z.B. Schleifen mehrfach übereinander angezeigt wird
@@ -71,7 +78,7 @@ public class PopupBox {
                 infoAlert.setContentText(messages.get(textId));
             else
                 infoAlert.setContentText(messages.get(0));
-            infoAlert.show();
+            infoAlert.showAndWait();
         }
     }
 
@@ -84,10 +91,10 @@ public class PopupBox {
         	warnAlert.setTitle("Warnung");
             warnAlert.setHeaderText(null);
             if(messages.containsKey(textId))
-                warnAlert.setContentText(messages.get(textId));
+                warnAlert.setContentText("Warnung " + textId + ": " + messages.get(textId));
             else
                 warnAlert.setContentText(messages.get(0));
-            warnAlert.show();
+            warnAlert.showAndWait();
         }
     }
 
@@ -100,10 +107,10 @@ public class PopupBox {
         	errorAlert.setTitle("Error");
             errorAlert.setHeaderText(null);
             if(messages.containsKey(textId))
-                errorAlert.setContentText(messages.get(textId));
+                errorAlert.setContentText("Error " + textId + ": " + messages.get(textId));
             else
                 errorAlert.setContentText(messages.get(0));
-            errorAlert.show();
+            errorAlert.showAndWait();
         }
     }
     
@@ -143,9 +150,10 @@ public class PopupBox {
     }
     
     public static void displayRouteWarnings(List<String> warnings) {
+//    	boolean test = Math.random() < 0.5;
     	if(warnings == null || warnings.isEmpty()) return;
     	Alert a = new Alert(AlertType.WARNING);
-        a.setTitle("Routenwarnungen");
+        a.setTitle("Routenwarnungen" /*+ (test? " s":" s&w")*/);
         a.setHeaderText(null);
         PopupBox.setIcon(a);
         String res = "";
@@ -153,7 +161,19 @@ public class PopupBox {
         	res += e + "\n";
         }
         a.setContentText(res);
-        a.showAndWait();
+        a.show();
+    }
+    
+    public static void displayImportWarnings() {
+    	for(int f : CSVManager.getOccuredFailures()) {
+    		if (f < 200) { // Nachricht
+    			displayMessage(f);
+    		} else if (f < 300) { // Warnung
+    			displayWarning(f);
+    		} else if (f < 400) { // Error
+    			displayError(f);
+    		}
+    	}
     }
 
     private static void setIcon(Alert a) {

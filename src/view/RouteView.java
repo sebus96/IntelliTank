@@ -7,9 +7,11 @@ package view;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -19,10 +21,13 @@ import com.sun.javafx.tk.Toolkit;
 
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -44,30 +49,82 @@ public class RouteView extends ScrollPane {
 
 	private Canvas canvas;
 	private GraphicsContext gc;
-	private Map<Integer, Double> indexWithYCoordinate = new HashMap<>();
+	private Map<Integer, Double> indexWithYCoordinate;
+	private List<Tooltip> stationTooltips;
+	private List<String> stationnames;
 	private SwitchButton switchButton;
 	private Stage parent;
 	private Route route;
+	private Image imageDecline;
     
     public RouteView(Stage parent, Route route) {
         super();
         this.parent = parent;
         this.route=route;
         this.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        imageDecline = new Image(getClass().getResourceAsStream("/img/external-link.png"));
         init();
     }
     
     private void init() {
-    	canvas = new Canvas(0, 150 + 100 * route.getLength());//Canvas dimensions scale with the length of the route
-        canvas.widthProperty().bind(parent.widthProperty());
-        this.setContent(canvas);
+    	canvas = new Canvas(1000, 150 + 100 * route.getLength());//Canvas dimensions scale with the length of the route
+//        canvas.widthProperty().bind(parent.widthProperty());
+    	this.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
         switchButton = new SwitchButton(route, gc,800 - 140, 10);
         //Erstellt einen Button, mit dem man zwischen den Tankstrategien wechseln kann
         //Iterates through the entire list
+        indexWithYCoordinate = new HashMap<>();
+        stationTooltips = new ArrayList<>();
+    	stationnames = new ArrayList<>();
         for (int i = 0; i < route.getLength(); i++) {
             displayGasStation(i);
         }
+        canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent me) {
+            	int index = decideStationnameClick(me.getX(), me.getY(), imageDecline.getWidth());
+                if(index >= 0 && index < route.getLength()) {
+                	if(me.getButton() == MouseButton.PRIMARY)
+                		PriceDiagram.displayGasStation(route.get(index));
+                	else if(me.getButton() == MouseButton.SECONDARY)
+                		new ValidationContextMenu(route.get(index)).show(parent, me.getScreenX(), me.getScreenY());
+                }
+                //Falls der Button zum switchen der Tankstrategie gedrückt wurde
+                if (switchButton.wasClicked((int) me.getX(), (int)me.getY())) {
+                    switchButton.buttonPressed();
+                    init();//mainView.displayRoute(gsc.getRoute());
+                }
+            }
+        });
+        canvas.setOnMouseMoved(new EventHandler<MouseEvent>() {
+        	private int lastIndex = -1;
+        	
+			@Override
+			public void handle(MouseEvent event) {
+				int index = decideStationnameClick(event.getX(), event.getY(), imageDecline.getWidth());
+				// set cursor
+				if (index >= 0 && index < route.getLength() || switchButton.wasClicked((int) event.getX(), (int)event.getY())) {
+					((Node)event.getSource()).setCursor(Cursor.HAND);
+                } else {
+                	((Node)event.getSource()).setCursor(Cursor.DEFAULT);
+                }
+				if(index >= 0 && index < route.getLength()) {
+					Tooltip t = stationTooltips.get(index);
+					if(t != null){
+						t.show(canvas, event.getScreenX(), event.getScreenY()+10);
+						lastIndex = index;
+					}
+				} else {
+					if(lastIndex >= 0 && lastIndex < stationTooltips.size()) {
+						Tooltip t = stationTooltips.get(lastIndex);
+						if(t != null && t.isShowing()) t.hide();
+						lastIndex = -1;
+					}
+				}
+			}
+        	
+        });
         displayResult();
     }
 
@@ -94,12 +151,12 @@ public class RouteView extends ScrollPane {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         double priceForStation = (double) route.get(index).getPredictedPrice() / 1000;
-        if (route.get(index).isPriceGuessed() == true) {
+        if (route.get(index).isPriceGuessed()) {
             gc.setFill(Color.RED);
             gc.fillText((double) route.get(index).getGuessedPrice() / 1000 + "", 180, circleStart + circleHeight / 2);
             gc.setFill(Color.BLACK);
         } else {
-            gc.fillText(priceForStation + "", 180, circleStart + circleHeight / 2);
+            gc.fillText((priceForStation < 0? "-.---" : priceForStation) + "", 180, circleStart + circleHeight / 2);
         }
     }
 
@@ -142,95 +199,44 @@ public class RouteView extends ScrollPane {
         GasStation s = rs.getStation();
 //        String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation() + " (echter Preis: " + (s.getHistoricPrice(rs.getTime()) / 1000.0) + " Eur)";
         String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation();
+//        stationName = "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"; // 100 W's (breitester Buchstabe)
         if(stationName.length() > 50) {
-        	stationName.substring(0, 50);
+        	this.stationTooltips.add(new Tooltip(stationName));
+        	stationName = stationName.substring(0, 48);
         	stationName += "...";
+        } else {
+        	this.stationTooltips.add(null);
         }
         gc.fillText(stationName, 220, circleStart + circleHeight / 2);
         gc.setFill(Color.BLACK);
         //füge die Verlinkung zum Preisdiagramm ein
-        Image imageDecline = new Image(getClass().getResourceAsStream("/img/external-link.png"));
         double yCoordinate = circleStart + circleHeight / 2;
         indexWithYCoordinate.put(index, yCoordinate);
+        this.stationnames.add(stationName);
         //Implementierung mit der DrawImage-Methode. �ffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
         //das rechte Zeichen
         gc.drawImage(imageDecline, 220 + 10 + getTextWidth(stationName), circleStart + circleHeight / 2 - imageDecline.getHeight() / 2);
-        canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent me) {
-                Set<Integer> indexSet = indexWithYCoordinate.keySet();
-                Iterator<Integer> iter = indexSet.iterator();
-                while (iter.hasNext()) {
-                    int indexTmp = iter.next();
-                    if (route.get(indexTmp) == null) {
-                        continue;
-                    }
-                    double yCoordinate = indexWithYCoordinate.get(indexTmp);
-                    //System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
-                    //System.out.println(gsc.getRoute().get(indexTmp) == null);// (gsc.getRoute().get(indexTmp) == null) + (gsc.getRoute().get(indexTmp).getStation() == null) + (gsc.getRoute().get(indexTmp).getStation().getName() == null));
-                    String gasStationName = route.get(indexTmp).getStation().getName() + ", " + route.get(indexTmp).getStation().getPostcode() + " " + route.get(indexTmp).getStation().getLocation();
-                    if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()) && (me.getY() > yCoordinate - (gc.getFont().getSize()+4) / 2) && (me.getY() < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
-                        //System.out.println("index von methode: " + index);
-                        //System.out.println("index gespeichert: " + indexTmp);
-
-                    	if(me.getButton() == MouseButton.PRIMARY)
-                    		PriceDiagram.displayGasStation(route.get(indexTmp));
-                    	else if(me.getButton() == MouseButton.SECONDARY)
-                    		new ValidationContextMenu(route.get(indexTmp)).show(parent, me.getScreenX(), me.getScreenY());
-                        /*PriceDiagram diagramm = new PriceDiagram(gs);
-            			diagramm.generateDiagramm();*/
-
-                        break;
-                    }
-                }
-                //Falls der Button zum switchen der Tankstrategie gedrückt wurde
-                if (switchButton.wasClicked((int) me.getX(), (int)me.getY())) {
-                    switchButton.buttonPressed();
-                    init();//mainView.displayRoute(gsc.getRoute());
-                }
+    }
+    
+    private int decideStationnameClick(double x, double y, double imageWidth) {
+    	Set<Integer> indexSet = indexWithYCoordinate.keySet();
+        Iterator<Integer> iter = indexSet.iterator();
+        while (iter.hasNext()) {
+            int indexTmp = iter.next();
+            if (route.get(indexTmp) == null) {
+                continue;
             }
-        });
-        
-        /*setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent me) {
-//                if (!(border.getCenter() instanceof ScrollPane)) {
-//                    return;
-//                }
-                //System.out.println("POSS: " + me.getY() + " " + sp.getVvalue() + " CANVAS HEIGHT" + canvas.getHeight());
-                int offsetPosition = (int) Math.round((canvas.getHeight() - getHeight()) * getVvalue());
-                //System.out.println("Viewable: min: " + offsetPosition + " max: " + (offsetPosition + scene.getHeight()) + " Total pos: " + ((int)me.getY() + offsetPosition) + " " + ((int)me.getSceneY() + offsetPosition));
-                int yPosition = (int) me.getY() + offsetPosition;
-                Set<Integer> indexSet = indexWithYCoordinate.keySet();
-                Iterator<Integer> iter = indexSet.iterator();
-                while (iter.hasNext()) {
-                    int indexTmp = iter.next();
-                    if (route.get(indexTmp) == null) {
-                        continue;
-                    }
-                    double yCoordinate = indexWithYCoordinate.get(indexTmp);
-                    //System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
-                    //System.out.println(gsc.getRoute().get(indexTmp) == null);// (gsc.getRoute().get(indexTmp) == null) + (gsc.getRoute().get(indexTmp).getStation() == null) + (gsc.getRoute().get(indexTmp).getStation().getName() == null));
-                    String gasStationName = route.get(indexTmp).getStation().getName() + ", " + route.get(indexTmp).getStation().getPostcode() + " " + route.get(indexTmp).getStation().getLocation();
-                    if ((me.getX() > 220) && (me.getX() < 220 + getTextWidth(gasStationName) + 10 + imageDecline.getWidth()) && (yPosition > yCoordinate - (gc.getFont().getSize()+4) / 2) && (yPosition < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
-                        //System.out.println("index von methode: " + index);
-                        //System.out.println("index gespeichert: " + indexTmp);
-
-                    	if(me.getButton() == MouseButton.PRIMARY)
-                    		PriceDiagram.displayGasStation(route.get(indexTmp));
-                    	else if(me.getButton() == MouseButton.SECONDARY)
-                    		System.out.println(route.get(indexTmp).getStation().getName() + ": " + route.get(indexTmp).getValidation());
-                       
-                        break;
-                    }
-                }
-                //Falls der Button zum switchen der Tankstrategie gedrückt wurde
-                if (switchButton.wasClicked((int) me.getX(), yPosition)) {
-                    switchButton.buttonPressed();
-                    //mainView.displayRoute(gsc.getRoute());
-                }
+            double yCoordinate = indexWithYCoordinate.get(indexTmp);
+            //System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
+            //System.out.println(gsc.getRoute().get(indexTmp) == null);// (gsc.getRoute().get(indexTmp) == null) + (gsc.getRoute().get(indexTmp).getStation() == null) + (gsc.getRoute().get(indexTmp).getStation().getName() == null));
+            String gasStationName = stationnames.get(indexTmp);
+            if ((x > 220) && (x < 220 + getTextWidth(gasStationName) + 10 + imageWidth) && (y > yCoordinate - (gc.getFont().getSize()+4) / 2) && (y < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
+                //System.out.println("index von methode: " + index);
+                //System.out.println("index gespeichert: " + indexTmp);
+            	return indexTmp;
             }
-        });*/
+        }
+        return -1;
     }
 
     private void drawLineBetweenNodes( int index, int circleHeight) {

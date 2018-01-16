@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import controller.PredictionUnit.Mode;
@@ -31,17 +32,18 @@ public class GasStationController {
     private ProgressView pw;
 
     public GasStationController(Stage primaryStage) {
-        allStations = CSVManager.importGasStations();
-        CSVManager.importHolidays();
+        allStations = CSVManager.initialImport();
         if (allStations == null) {
             PopupBox.displayError(301);
             return;
         }
-        PopupBox.displayRouteWarnings(CSVManager.checkRoutes(allStations));
+        List<String> warnings = CSVManager.checkRoutes(allStations);
         //route = CSVManager.importStandardRoute(allStations);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();
         mainView.show();
+        PopupBox.displayImportWarnings();
+        PopupBox.displayRouteWarnings(warnings);
         /*if (route == null) {
             PopupBox.displayWarning("Die Standartroute konnte nicht geöffnet werden.");
             mainView.show();
@@ -130,9 +132,10 @@ public class GasStationController {
             mainView.displayPredictionPoints((PredictionPoints) stations);
             pw.close();
         } else if (stations instanceof Route) {
-            refillStrategies.calculateGasUsage((Route) stations);
+            boolean res = refillStrategies.calculateGasUsage((Route) stations);
             mainView.displayRoute((Route) stations);
             pw.close();
+            if(!res) PopupBox.displayError(306);
         }
     }
 

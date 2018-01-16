@@ -18,6 +18,7 @@ public class Postalcodes {
     }
 
     public static FederalState getState(int postalCode) {
+    	if(post2state == null) return null;
         for (PostcodeRange pc : post2state) {
             if (pc.isInArea(postalCode)) {
                 return pc.getState();

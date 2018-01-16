@@ -43,6 +43,7 @@ public class MainView extends BorderPane {
         //Create the foundation: borderPane -> Scrollpane -> Canvas
         mainStage.setTitle("IntelliTank");
         Scene scene = new Scene(this, 800, 600);
+//        primaryStage.setMinWidth(800);
         //Methods to fill each part with content
         displayMenubar();
         Image icon = new Image("/img/gas-station.png");

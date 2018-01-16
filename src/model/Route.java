@@ -19,6 +19,14 @@ public class Route implements IPredictionStations {
         this.name = name;
     }
     
+    public boolean hasPredictions() {
+    	boolean res = false;
+    	for(RefuelStop rs: route) {
+    		res = res | rs.isPredicted(); // sobald mindestens ein Tankstop vorhergesagt ist gibt die Methode true zurück
+    	}
+    	return res;
+    }
+    
     public String getName() {
         return name;
     }

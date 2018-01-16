@@ -14,7 +14,8 @@ public class Holidays {
 	private static Map<Integer, YearHolidays> holidays;
 	
 	public static boolean addHoliday(int year, FederalState state, String name, String description) {
-		if(description == null || description.equals("-")) return true;
+		if(name == null) return false;
+		if(description == null || description.equals("-") || state == null  || state == FederalState.DEF) return true;
 		/*if(state == null || state == FederalState.DEF) {
 			System.err.println("Invalid state name DEF");
 			return false;
@@ -47,6 +48,7 @@ public class Holidays {
 	}
 	
 	public static boolean isHoliday(Date date, FederalState state) {
+		if(date == null || state == null || state == FederalState.DEF || holidays == null) return false;
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		int year = c.get(Calendar.YEAR);

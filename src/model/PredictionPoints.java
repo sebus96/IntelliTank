@@ -73,6 +73,15 @@ public class PredictionPoints implements IPredictionStations{
 	public String getType() {
     	return "Vorhersagezeitpunkte";
     }
+
+	@Override
+	public boolean hasPredictions() {
+		boolean res = false;
+		for(PredictionPoint pp: predictionPoints) {
+			res = res | pp.isPredicted(); // sobald mindestens ein Vorhersagepunkt vorhergesagt ist gibt die Methode true zurück
+		}
+		return res;
+	}
     
     @Override
     public String toString() {

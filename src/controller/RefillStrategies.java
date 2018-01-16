@@ -19,11 +19,16 @@ public class RefillStrategies {
      *
      * @param route Die route, auf die die Tankstrategien angewendet werden
      * sollen
+     * @return true, wenn eine Strategie erstellt werden konnte, ansonsten false
      */
-    public void calculateGasUsage(Route route) {
-        this.calculateFPGSP(route);
+    public boolean calculateGasUsage(Route route) {
+        if(!route.hasPredictions()) { // kein Element wurde vorhergesagt
+        	return false;
+        }
+    	this.calculateFPGSP(route);
         this.calculateBasicGasUsage(route);
         this.validateStrategy(route);
+        return true;
     }
 
     /**
@@ -331,6 +336,7 @@ public class RefillStrategies {
         for(int i = 0; i<route.getLength();i++) {
             if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
                 PopupBox.displayError(304);
+                return;
             }
             
         }

@@ -23,8 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import model.FederalState;
 import model.GasStation;
@@ -34,11 +36,11 @@ import model.Postalcodes;
 import model.PredictionPoints;
 import model.Price;
 import model.Route;
-import view.PopupBox;
 
 public class CSVManager {
 	
 	private static boolean printMessages = true;
+	private static Set<Integer> failures = new LinkedHashSet<>();
 	
     private static final String inputPath = "Eingabedaten" + File.separator;
     private static final String routeInputPath = inputPath + "Fahrzeugrouten" + File.separator;
@@ -52,9 +54,26 @@ public class CSVManager {
     
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssX");
 
-    public static Map<Integer, GasStation> importGasStations() {
+    public static Map<Integer, GasStation> initialImport() {
+    	importPostalcodes();
+        importHolidays();
+        
+        String[] files = readFilenames(new File(pricePath), ".csv");
+        if(files == null || files.length == 0) {
+        	failures.add(305);
+        }
+        
+        // erstelle Eingabeverzeichnisse
+        new File(routeInputPath).mkdirs();
+		new File(predictionInputPath).mkdirs();
+		new File(pricePath).mkdirs();
+		new File(holidayPath).mkdirs();
+		
+    	return importGasStations();
+    }
+    
+    private static Map<Integer, GasStation> importGasStations() {
         String filename = inputPath + "Tankstellen.csv";
-        importPostalcodes();
         List<String> lines = readFile(filename);
         if (lines == null) {
             System.err.println("Could not import gasstations!");
@@ -65,7 +84,9 @@ public class CSVManager {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 9) {
                 System.err.println("Input stations: Illegal Input row size");
-                PopupBox.displayWarning(201);
+                failures.add(201);
+//                PopupBox.displayWarning(201);
+                continue;
             }
             int postcode = getInteger(lineElements[5]);
             GasStation station = new GasStation(
@@ -84,6 +105,12 @@ public class CSVManager {
         }
         return stations;
     }
+    
+    public static List<Integer> getOccuredFailures() {
+    	List<Integer> res = new ArrayList<>(failures);
+    	failures.clear();
+    	return res;
+    }
 
     private static void importPostalcodes() {
         if (Postalcodes.isImported()) {
@@ -92,14 +119,17 @@ public class CSVManager {
         String filename = inputPath + "postalcode2federalstate.csv";
         List<String> lines = readFile(filename);
         if (lines == null) {
-            System.err.println("Could not import Postalcodes!");
+            //System.err.println("Could not import Postalcodes!");
+            failures.add(204);
+//        	PopupBox.displayWarning(204);
             return;
         }
         for (String line : lines) {
             String[] lineElements = line.split(";");
             if (lineElements.length != 3) {
-                System.out.println(line);
                 System.err.println("Input postalcode: Illegal Input row size");
+                failures.add(205);
+//                PopupBox.displayWarning(205);
                 continue;
             }
             Postalcodes.addPostcodeRange(
@@ -109,11 +139,6 @@ public class CSVManager {
             		);
         }
     }
-    /*
-    public static Route importStandardRoute(Map<Integer, GasStation> stations) {
-    	String[] routes = {"Bertha Benz Memorial Route", "Hildesheim Harz", "Oldenburg Hannover", "Hannover Hildesheim", "Kiel Celle"};
-        return importRoute(stations, routes[4]);
-    }*/
 
     public static Route importRoute(Map<Integer, GasStation> stations, String routeName) {
     	File routeFile = new File(routeInputPath + routeName + (routeName.endsWith(".csv")? "" : ".csv"));
@@ -167,10 +192,6 @@ public class CSVManager {
     public static void exportPredictions(IPredictionStations stations) {
     	writeCSV(stations);
     }
-    
-    public static PredictionPoints importStandardPredictionPoints(Map<Integer, GasStation> stations) {
-        return importPredictionPoints(stations, "Meine Tankstellen");
-    }
 
     public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
         File predictionFile = new File(predictionInputPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
@@ -185,6 +206,7 @@ public class CSVManager {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 3) {
                 System.err.println("Import prediction: Illegal Input row size");
+                continue;
             }
             result.addPredictionElement(stations.get(getInteger(lineElements[2])), getDate(lineElements[0]), getDate(lineElements[1]));
         }
@@ -198,55 +220,74 @@ public class CSVManager {
         }
     }
 
-    public static void importPrice(GasStation gs) {
+    private static boolean importPrice(GasStation gs) {
 //		double start = System.nanoTime();
     	if(gs.hasPriceList()) {
     		System.out.println("Prices for " + gs + " already imported. (size=" + gs.getPriceListSize() + ")");
-    		return;
+    		return true;
     	}
         String filename = pricePath + gs.getID() + ".csv";
         List<String> lines = readFile(new File(filename));
         if (lines == null) {
             System.err.println("Could not import prices for " + gs);
-            return;
+            return false;
         }
         List<Price> prices = new ArrayList<Price>();
         for (String line : lines) {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 2) {
                 System.err.println("Import prices: Illegal Input row size");
+                return false;
             }
             prices.add(new Price(getDate(lineElements[0]), getInteger(lineElements[1])));
         }
         gs.setPriceList(prices);
 //		double time = (System.nanoTime() - start) / 1000 / 1000 / 1000;
 //		System.out.println("time: " + time);
+        return true;
     }
     
-    public static void importHolidays() {
+    private static void importHolidays() {
     	String[] holidayNames = {"Winter","Ostern","Pfingsten","Sommer","Herbst","Weihnachten"};
-    	for(String filename: readFilenames(new File(holidayPath), ".txt")) {
+    	String[] files = readFilenames(new File(holidayPath), ".txt");
+    	if(files == null) {
+    		System.err.println("InputFolder for holidays does not exist.");
+    		failures.add(206);
+    		return;
+    	}
+    	if(files.length == 0) {
+    		failures.add(206);
+    	}
+    	for(String filename: files) {
     		int year = getInteger(filename.substring(0, 4));
-    		if(year < 0) System.err.println("Unecpected holiday filename: " + filename);
+    		if(year < 0) {
+    			System.err.println("Unecpected holiday filename: " + filename);
+        		failures.add(207);
+    			continue;
+    		}
     		List<String> lines = readFile(holidayPath + filename);
     		int ctr = 0;
     		FederalState curState = null;
     		for(String line: lines) {
-    			if(ctr == 0) {
+    			if(ctr == 0) { // jede siebte Zeile ist der Bundeslandname
     				curState = FederalState.getFederalState(line);
     				if(curState == FederalState.DEF) {
     					System.err.println("Illegal federal state: " + line);
+    	        		failures.add(208);
     				}
     			} else if (ctr > 0 && ctr <= holidayNames.length) {
     				if(curState == null) {
     					System.err.println("Current State should not be null: " + line);
+    	        		failures.add(208);
     				}
-    				Holidays.addHoliday(year, curState, holidayNames[ctr-1], line);
+    				if(!Holidays.addHoliday(year, curState, holidayNames[ctr-1], line)) {
+    					failures.add(208);
+    				}
     			} else {
     				System.err.println("Count to high (" + ctr + ")");
     			}
     			ctr++;
-    			ctr %= holidayNames.length + 1;
+    			ctr %= holidayNames.length + 1; // es wird von 0 bis 6 gezählt
     		}
     	}
     	// überprüfe importierte Daten
