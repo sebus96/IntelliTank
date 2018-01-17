@@ -24,50 +24,65 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.PredictionPointList;
 import model.Route;
+
 /**
- *
- * @author Admin
+ * Mithilfe dieser Klasse wird das Hauptfenster modelliert.
+ * @author Axel Claassen, Burak Kadioglu
  */
 public class MainView extends BorderPane {
 
     private MenuBar bar;
     private GasStationController gsc;
     private Stage mainStage;
-    
     private Menu validateMenu;
-        
+    
+    /**
+     * Konstruktor des Hauptfensters.
+     * @param primaryStage Stage des Hauptfensters.
+     * @param gsc Tankstellen, die besucht werden.
+     */
     public MainView(Stage primaryStage,GasStationController gsc) {
         super();
         mainStage = primaryStage;
         this.gsc = gsc;
-        //Create the foundation: borderPane -> Scrollpane -> Canvas
         mainStage.setTitle("IntelliTank");
         Scene scene = new Scene(this, 800, 600);
-//        primaryStage.setMinWidth(800);
-        //Methods to fill each part with content
         displayMenubar();
         Image icon = new Image("/img/gas-station.png");
         mainStage.getIcons().add(icon);
         mainStage.setScene(scene);
         Label l = new Label("Klicken Sie auf einen der oberen Reiter, \num sich eine Route oder Vorhersagepunkte anzeigen zu lassen.");
         l.setTextAlignment(TextAlignment.CENTER);
+        l.setStyle("-fx-font-weight: bold;"
+        		+ "-fx-font-size: 16");
         setCenter(l);
         mainStage.show();
     }
-       
+    
+    /**
+     * Route wird zum Hauptfenster geladen.
+     * @param route Aktuelle Route
+     */
     public void displayRoute(Route route) {
         setCenter(new RouteView(mainStage, route));
         mainStage.show();
         validateMenu.setVisible(true);
     }
-    
+  
+    /**
+     * Vorhersagezeitpunkte werden angezeigt.
+     * @param predictionPoints Vorhersagezeitpunkte
+     */
     public void displayPredictionPoints(PredictionPointList predictionPoints) {
         setCenter(new PredictionPointView(mainStage, predictionPoints));
         mainStage.show();
         validateMenu.setVisible(true);
     }
-       
-    //displays menu bar on the top
+    
+    /**
+     * MenuBar wird auf dem Hauptfenster angezeigt.
+     * MenuItems werden zur MenuBar hinzugefügt: Route, Vorhersagezeitpunkte, Validieren und Über.
+     */
     private void displayMenubar() {
         bar = new MenuBar();
         setTop(bar);
@@ -77,6 +92,10 @@ public class MainView extends BorderPane {
     	setUpAboutTab();
     }
     
+    /**
+     * Das MenuItem Route wird zum Hauptfenster hinzugefügt.
+     * Neue Routen können importiert werden und interne Routen können angezeigt werden.
+     */
     private void setUpRouteTab() {
         Menu routes = new Menu("Routen");
         //Wenn der "Route"-Reiter gedrueckt wird, aktualisiere die Liste der Routen in dem Ordner (evtl setOnShowing?)
@@ -96,7 +115,6 @@ public class MainView extends BorderPane {
                             routes.getItems().add(mi);
                         }
                     }});
-    	
         MenuItem itemImportRoute = new MenuItem("Importieren");
     	itemImportRoute.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -114,15 +132,18 @@ public class MainView extends BorderPane {
                             } catch (IOException ex) {
                                 Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                        } else {
-                        	System.out.println("Keine Datei ausgewaehlt.");
-                        }
+                        } else 
+                        	System.out.println("Keine Datei ausgew\u00e4hlt.");
                     }
                 });
         routes.getItems().addAll(itemImportRoute,new SeparatorMenuItem(),new SeparatorMenuItem());
         bar.getMenus().add(routes);
     }
 
+    /**
+     * Das MenuItem Vorhersagezeitpunkte wird zum Hauptfenster hinzugefügt.
+     * Es können interne Vorhersagepunkte angezeigt wernden und externe Vorhersagezeitpunkte importiert werden.
+     */
     private void setUpPredictionPointTab() {
         Menu predictionPoints = new Menu("Vorhersagezeitpunkte");
         //Wenn der "Vorhersagezeitpunkt"-Reiter gedrueckt wird, aktualisiere die Liste der Routen in dem Ordner (evtl setOnShowing?)
@@ -160,23 +181,34 @@ public class MainView extends BorderPane {
                             } catch (IOException ex) {
                                 Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                        } else {
-                        	System.out.println("Keine Datei ausgewaehlt.");
-                        }
+                        } else 
+                        	System.out.println("Keine Datei ausgew\u00e4hlt.");
                     }
                 });
         predictionPoints.getItems().addAll(itemImportPredictionPoint,new SeparatorMenuItem(),new SeparatorMenuItem());
         bar.getMenus().add(predictionPoints);
     }
     
+    /**
+     * Hauptfenster wird gecleant.
+     * Nach dem Start wird die Route manuell vom Benutzer geladen, um das Hauptfenster zu füllen. 
+     */
     public void hide() {
         setCenter(null);
         this.mainStage.hide();
     }
+    
+    /**
+     * Hauptfenster wird angezeigt.
+     */
     public void show() {
         this.mainStage.show();
     }
 
+    /**
+     * Das MenuItem Über wird zum Hauptfenster hinzugefügt.
+     * Porjektteilnehmer werden per PopupBox angezeigt.
+     */
     private void setUpAboutTab() {
         Menu about = new Menu("\u00dcber");
     	MenuItem itemUeber = new MenuItem("Mitwirkende");
@@ -190,21 +222,23 @@ public class MainView extends BorderPane {
         bar.getMenus().add(about);
     }
 
+    /**
+     * Das MenuItem Validieren wird zum Hauptfenster hinzugefügt.
+     * Der Grad der Genauigkeit der Vorhersage wird angezeigt.
+     */
     private void setUpValidateButton() {
     	Label menuLabel = new Label("Validieren");
     	menuLabel.setOnMouseClicked(new EventHandler<Event>() {
                     @Override
                     public void handle(Event e) {
-                        //PopupBox.displayMessage(102);
                         if(getCenter() instanceof RouteView) {
                         	Route r = gsc.getRoute();
                         	PopupBox.displayValidation(r);
                         } else if(getCenter() instanceof PredictionPointView) {
                         	PredictionPointList p = gsc.getPredictionPoints();
                         	PopupBox.displayValidation(p);
-                        } else {
-                        	System.out.println("Nothing loaded");
-                        }
+                        } else 
+                        	System.out.println("Es konnte nichts geladen werden.");
                     }
                 });
     	
