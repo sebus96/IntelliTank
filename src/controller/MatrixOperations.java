@@ -4,11 +4,11 @@ public class MatrixOperations {
 
 
     /**
-     * Matrix Multiplication
+     * Matrix Multiplikation
      *
-     * @param mA First Input Matrix
-     * @param mB Second Input Matrix
-     * @return The result of the operation
+     * @param mA erste Matrix
+     * @param mB zweite Matrix
+     * @return Ergebnis
      */
     public static Matrix matMult(Matrix mA, Matrix mB) {
 
@@ -20,10 +20,6 @@ public class MatrixOperations {
         int rowsB = matrixB.length;
         int columnsB = matrixB[0].length;
 
-        /**
-         * Compares if the number of columns of the first matrix is different to the number of lines of the second Matrix. If yes, throws an IllegalException as it's
-         * not possible to multiply the two matrixes.
-         */
         if (columnsA != rowsB) {
             throw new IllegalArgumentException("The dimensions have to be equal!");
         }
@@ -58,17 +54,12 @@ public class MatrixOperations {
         int rowsB = matrixB.length;
         int columnsB = matrixB[0].length;
 
-        /**
-         * Compares if the dimensions of the matrixes are not exactly the same. If they aren't, throws an exception informing this.
-         */
         if (columnsA != columnsB || rowsA != rowsB) {
             throw new IllegalArgumentException("The dimensions have to be equal!");
         }
 
         double[][] matrixRes = new double[rowsA][columnsB];
-        /**
-         * Walks through the matrixes, summing the elements and putting them on the resultant Matrix matrixRes
-         */
+        
         for (int i = 0; i < rowsA; i++) { // aRow
             for (int j = 0; j < columnsB; j++) { // bColumn
 
