@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
 import java.text.DecimalFormat;
@@ -37,13 +32,14 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+
 import model.GasStation;
 import model.RefuelStop;
 import model.Route;
 
 /**
- *
- * @author Admin
+ * Füllt das Hauptfenster mit der Routenansicht
+ * @author Axel Claassen, Burak Kadioglu
  */
 public class RouteView extends ScrollPane {
 

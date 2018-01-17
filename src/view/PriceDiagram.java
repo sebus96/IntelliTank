@@ -19,6 +19,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+
 import model.GasStation;
 import model.IPredictionStation;
 import model.Price;
@@ -35,7 +36,7 @@ public class PriceDiagram {
     private static RadioMenuItem predictionItem;
 
     /**
-     * Pop-Up-Meldung als Warnung für Preise einer Tankstelle.
+     * Öffnet ein neues Fenster mit den historischen Preisen der Tankstelle. Ist das Fenster bereits offen, wird die Kurve in anderer Farbe hinzugefügt.
      * @param gs IPredictionStation der Tankstelle
      */
     public static void displayGasStation(IPredictionStation gs) {
@@ -73,7 +74,7 @@ public class PriceDiagram {
     /**
      * Generiert einen Graphen für die Anzeige der Preise einer Tankstelle der Route. 
      */
-    public static void generateDiagram() {
+    private static void generateDiagram() {
     	double xMin = Double.MAX_VALUE;
     	double xMax = Double.MIN_VALUE;
     	boolean unPredictedStations = false;
@@ -189,9 +190,9 @@ public class PriceDiagram {
     }
     
     /**
-     * 
-     * @param lc
-     * @param gs
+     * Fügt die Daten der angeklickten Tankstelle(Series) dem Linechart hinzu, um sie anzeigen zu lassen.
+     * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
+     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
      */
     private static void addSeries(LineChart<Number, Number> lc ,GasStation gs) {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -223,9 +224,9 @@ public class PriceDiagram {
         lc.getData().add(series);
     }
     /**
-     * 
-     * @param lc
-     * @param ps
+     * Fügt die Vorhergesagten Preise dem Linechart hinzu, um sie darzustellen
+     * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
+     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
      */
     private static void addPredictedSeries(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
@@ -244,9 +245,9 @@ public class PriceDiagram {
     }
     
     /**
-     * 
-     * @param lc
-     * @param ps
+     * Fügt die Vorhergesagten Preise dem Linechart hinzu, um sie darzustellen (in Tagesabständen)
+     * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
+     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
      */
     private static void addPredictedSeriesDaySteps(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
@@ -308,8 +309,8 @@ public class PriceDiagram {
     }
     
     /**
-     * 
-     * @param scene
+     * Zeigt ein Kontextmenü, das per rechtsklick auf eine Tankstelle angezeigt wird. 
+     * @param scene Die Szene, in der das Kontextmenü geöffnet wurde
      */
     private static void setContextMenu(Scene scene) {
         ContextMenu contextMenu = new ContextMenu();

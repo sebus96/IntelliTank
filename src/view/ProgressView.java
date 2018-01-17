@@ -16,16 +16,19 @@ import javafx.stage.WindowEvent;
 import model.IPredictionStationList;
 
 /**
- *
- * @author Admin
+ * Ein Kleines Fenster, dass den Vorhersagefortschritt darstellt mit Hilfe eines Ladebalkens
+ * @author Axel Claassen, Sebastian Drath
  */
 public class ProgressView {
 
     private ProgressBar progressBar;
-
     private Stage progressStage;
     private Label l;
 
+    /**
+     * Initialisiert und füllt das Fenster mit allen relevanten Daten
+     * @param predictionStations Liste von Tankstellen, die vorhergesagt werden
+     */
     public ProgressView(IPredictionStationList predictionStations) {
         progressStage = new Stage();
         progressStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
@@ -50,14 +53,24 @@ public class ProgressView {
         progressStage.setAlwaysOnTop(true);
     }
 
+    /**
+     * Setzt den Wert des Ladebalkens
+     * @param progress Fortschritt des Ladebalkens zwischen 0 und 1
+     */
     public void setProgress(double progress) {
         progressBar.setProgress(progress);
     }
 
+    /**
+     * Schließt das Fenster
+     */
     public void close() {
         progressStage.close();
     }
-
+    /**
+     * Gibt das Progressbar-Objekt zurück
+     * @return Progressbar Objekt, das den aktuellen Fortschritt der vorhersage beinhaltet
+     */
     public ProgressBar getProgressBar() {
         return progressBar;
     }
