@@ -19,14 +19,19 @@ import view.MainView;
 import view.PopupBox;
 import view.ProgressView;
 
-public class GasStationController {
+/**
+ * Der Controller im MVC. 
+ * @author Axel Claassen, Sebastian Drath
+ */
 
-//    private static final boolean initialImportRoute = true;
+/**
+ * Initialisiert den GasStationController
+ */
+public class GasStationController {
 
     private Map<Integer, GasStation> allStations;
     private Route route;
     private PredictionPointList predictionPoints;
-//    private List<PredictionUnit> predictions;
     private RefillStrategies refillStrategies;
     private MainView mainView;
     private ProgressView pw;
@@ -38,40 +43,15 @@ public class GasStationController {
             return;
         }
         List<String> warnings = CSVManager.checkRoutes(allStations);
-        //route = CSVManager.importStandardRoute(allStations);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();
         mainView.show();
         PopupBox.displayImportWarnings();
         PopupBox.displayRouteWarnings(warnings);
-        /*if (route == null) {
-            PopupBox.displayWarning("Die Standartroute konnte nicht geöffnet werden.");
-            mainView.show();
-        } else {
-            predictionPoints = CSVManager.importStandardPredictionPoints(allStations);
-            CSVManager.importPrices(route);
-            CSVManager.importPrices(predictionPoints);
-            if (initialImportRoute) {
-                pw = new ProgressView(route);
-                this.trainPrediction(route);
-            } else {
-                pw = new ProgressView(predictionPoints);
-                this.trainPrediction(predictionPoints);
-            }
-        }*/
-        
+
     }
 
-//    public void addGasStation(GasStation station) {
-//        if (allStations.containsKey(station.getID())) {
-//            System.err.println("Warning: Station with same ID will be inserted.");
-//        }
-//        allStations.put(station.getID(), station);
-//    }
-/*
-    public GasStation getStation(int id) {
-        return allStations.get(id);
-    }*/
+    
     public Route getRoute() {
         return route;
     }
@@ -80,9 +60,10 @@ public class GasStationController {
         return predictionPoints;
     }
 
-    /*public RefillStrategies getMainModel() {
-        return refillStrategies;
-    }*/
+    /**
+     * Startet die Vorhersage der einzelnen Tankstellen in einem anderen Thread
+     * @param stations die zu vorhersagenden Tankstellen
+     */
     public void trainPrediction(IPredictionStationList stations) {
         Task<Void> predictionThread = new Task<Void>() {
             @Override
@@ -103,11 +84,9 @@ public class GasStationController {
                     	until = ((PredictionPoint)station).getPriceKnownUntil();
                     }
                     PredictionUnit pu = new PredictionUnit(station, until, Mode.SINGLE_LAYER);
-//                    predictions.add(pu);
                     boolean trainSuccess = pu.train();
                     if (trainSuccess) {
                     	station.setPrediction(pu);
-//                        station.setPredictedPrices(pu.testAndSetHourSteps());
                     }
                     updateProgress((i + 1) * 100 / stations.getLength(), 100);
                 }
@@ -121,12 +100,15 @@ public class GasStationController {
                 });
                 return null;
             }
-
         };
         pw.getProgressBar().progressProperty().bind(predictionThread.progressProperty());
         new Thread(predictionThread).start();
     }
     
+    /**
+     * Sagt der entsprechenden Ansicht die vorhergesagten Tankstellen anzuzeigen
+     * @param stations Anzuzeigende Tankstellen
+     */
     private void showPredictedStations(IPredictionStationList stations) {
     	if (stations instanceof PredictionPointList) {
             mainView.displayPredictionPoints((PredictionPointList) stations);
@@ -139,6 +121,10 @@ public class GasStationController {
         }
     }
 
+    /**
+     * Die neu angeklickte Route wird geöffnet
+     * @param routeName Name der ausgewählten Route
+     */
     public void switchToRoute(String routeName) {
         Route routeTest = CSVManager.importRoute(allStations, routeName);
         if (routeTest == null) {
@@ -151,10 +137,13 @@ public class GasStationController {
         }
         mainView.hide();
         pw = new ProgressView(route);
-//        this.predictions = new ArrayList<>();
         this.trainPrediction(route);
     }
 
+    /**
+     * Die neu angeklickte Route wird geöffnet
+     * @param predictionPointName Name des ausgewählten vorhersagezeitpunktes
+     */
     public void switchToPredictionPoints(String predictionPointName) {
         PredictionPointList predictionPointsTest = CSVManager.importPredictionPoints(allStations, predictionPointName);
         if (predictionPointsTest == null) {
@@ -167,7 +156,6 @@ public class GasStationController {
         }
         mainView.hide();
         pw = new ProgressView(predictionPoints);
-//        this.predictions = new ArrayList<>();
         this.trainPrediction(predictionPoints);
     }
 }

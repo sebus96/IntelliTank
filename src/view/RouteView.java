@@ -39,7 +39,7 @@ import model.Route;
 
 /**
  * Füllt das Hauptfenster mit der Routenansicht
- * @author Axel Claassen, Burak Kadioglu
+ * @author Axel Claassen, Burak Kadioglu, Sebastian Drath
  */
 public class RouteView extends ScrollPane {
 
@@ -53,6 +53,11 @@ public class RouteView extends ScrollPane {
 	private Route route;
 	private Image imageDecline;
     
+    /**
+     * Initialisiert das Routenfenster
+     * @param parent Stage, auf der die Route dargestellt wird
+     * @param route route, die angezeigt werden soll
+     */
     public RouteView(Stage parent, Route route) {
         super();
         this.parent = parent;
@@ -61,21 +66,24 @@ public class RouteView extends ScrollPane {
         imageDecline = new Image(getClass().getResourceAsStream("/img/external-link.png"));
         init();
     }
-    
+    /**
+     * Darstellung der Routenansicht auf dem Hauptfenster
+     */
     private void init() {
-    	canvas = new Canvas(1000, 150 + 100 * route.getLength());//Canvas dimensions scale with the length of the route
-//        canvas.widthProperty().bind(parent.widthProperty());
+        //Canvas-größe ist abhängig von der Routenlänge
+    	canvas = new Canvas(1000, 150 + 100 * route.getLength());
     	this.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
-        switchButton = new SwitchButton(route, gc,800 - 140, 10);
         //Erstellt einen Button, mit dem man zwischen den Tankstrategien wechseln kann
-        //Iterates through the entire list
+        switchButton = new SwitchButton(route, gc,800 - 140, 10);
         indexWithYCoordinate = new HashMap<>();
         stationTooltips = new ArrayList<>();
     	stationnames = new ArrayList<>();
+        //Geht durch die Liste aller Tankstellen, um sie einzeln darzustellen
         for (int i = 0; i < route.getLength(); i++) {
             displayGasStation(i);
         }
+        //Listener der schaut, um auf eine der Tankstellen geklickt wurde
         canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent me) {
@@ -89,17 +97,18 @@ public class RouteView extends ScrollPane {
                 //Falls der Button zum switchen der Tankstrategie gedrückt wurde
                 if (switchButton.wasClicked((int) me.getX(), (int)me.getY())) {
                     switchButton.buttonPressed();
-                    init();//mainView.displayRoute(gsc.getRoute());
+                    init();
                 }
             }
         });
+        //Falls über den Tankstellentext ge-hovert wurde, mache den Cursor zu einem Hand-Symbol
         canvas.setOnMouseMoved(new EventHandler<MouseEvent>() {
         	private int lastIndex = -1;
         	
 			@Override
 			public void handle(MouseEvent event) {
 				int index = decideStationnameClick(event.getX(), event.getY(), imageDecline.getWidth());
-				// set cursor
+				// setze cursor
 				if (index >= 0 && index < route.getLength() || switchButton.wasClicked((int) event.getX(), (int)event.getY())) {
 					((Node)event.getSource()).setCursor(Cursor.HAND);
                 } else {
@@ -125,7 +134,10 @@ public class RouteView extends ScrollPane {
     }
 
     
-    //gets repeatedly called by the displayroute function. Creates an elipse and a line for a specific gas station
+    /**
+     * Stelle jede einzelne Tankstelle Grafisch dar
+     * @param index Der index der Tankstelle innerhalb der Route
+     */
     private void displayGasStation(int index) {
 
         int circleStart = 100 + 100 * index;
@@ -138,8 +150,14 @@ public class RouteView extends ScrollPane {
         createHyperlinkStationText(index, circleStart, circleHeight);
     }
 
+    /**
+     * Erstellt den Kreis, der den Tankstellenpreis umschließt
+     * @param index Der index der Tankstelle innerhalb der Route
+     * @param circleStart Position, ab der der Kreis gezeichnet werden soll
+     * @param circleWidth Breite des Tankstellen-Kreises
+     * @param circleHeight Höhe des Tankstellen-Kreises
+     */
     private void createGasPriceNode( int index, int circleStart, int circleWidth, int circleHeight) {
-        //Create an elipse with gas price in it(position dependent on counter)
         gc.setFill(Color.WHITE);
         gc.fillOval(180 - circleWidth / 2, circleStart, circleWidth, circleHeight);
         gc.setFill(Color.BLACK);
@@ -156,15 +174,18 @@ public class RouteView extends ScrollPane {
         }
     }
 
+    /**
+     * Erstellt die Tankanzeige die zeigt, wie viel Tank nur vorhanden ist
+     * @param index Der index der Tankstelle innerhalb der Route
+     * @param circleStart Position, ab der der Kreis gezeichnet werden soll
+     * @param circleHeight Höhe des Tankstellen-Kreises
+     */
     private void createFuelStatusRectangle( int index, int circleStart, int circleHeight) {
         RefuelStop rs = route.get(index);
         double currentGasPercentage = rs.getFuelAmount(route) / route.getTankCapacity() * 100;
         double currentRefillPercentage = rs.getRefillAmount(route) / route.getTankCapacity() * 100;
-        //System.out.println(rs.getFuelAmount() + " " + rs.getRefillAmount());
         DecimalFormat f2 = new DecimalFormat("#0.00");
         DecimalFormat f1 = new DecimalFormat("#0.0");
-        //f.setRoundingMode(RoundingMode.UP);
-        //create a rectangle which shows the current gas status
         gc.setFill(Color.WHITE);
         gc.fillRect(30, circleStart, 100, circleHeight);
         gc.setFill(Color.BLACK);
@@ -187,15 +208,19 @@ public class RouteView extends ScrollPane {
         gc.strokeRect(30, circleStart, 100, circleHeight);
     }
 
+    /**
+     * Erzeugt den klickbaren Tankstellen-Namen rechts
+     * @param index Der index der Tankstelle innerhalb der Route
+     * @param circleStart Position, ab der der Kreis gezeichnet werden soll
+     * @param circleHeight Höhe des Tankstellen-Kreises
+     */
     private void createHyperlinkStationText( int index, int circleStart, int circleHeight) {
 
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLUE);
         RefuelStop rs = route.get(index);
         GasStation s = rs.getStation();
-//        String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation() + " (echter Preis: " + (s.getHistoricPrice(rs.getTime()) / 1000.0) + " Eur)";
         String stationName = s.getName() + ", " + s.getPostcode() + " " + s.getLocation();
-//        stationName = "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"; // 100 W's (breitester Buchstabe)
         if(stationName.length() > 50) {
         	this.stationTooltips.add(new Tooltip(stationName));
         	stationName = stationName.substring(0, 48);
@@ -205,15 +230,19 @@ public class RouteView extends ScrollPane {
         }
         gc.fillText(stationName, 220, circleStart + circleHeight / 2);
         gc.setFill(Color.BLACK);
-        //füge die Verlinkung zum Preisdiagramm ein
         double yCoordinate = circleStart + circleHeight / 2;
         indexWithYCoordinate.put(index, yCoordinate);
         this.stationnames.add(stationName);
-        //Implementierung mit der DrawImage-Methode. �ffnet immer den letzten Graphen, da index am Ende auf Maximum eingestellt ist
-        //das rechte Zeichen
         gc.drawImage(imageDecline, 220 + 10 + getTextWidth(stationName), circleStart + circleHeight / 2 - imageDecline.getHeight() / 2);
     }
     
+    /**
+     * Überprüft, ob auf eine der Tankstellennamen geklickt wurde
+     * @param x der x-Wert der Position, die angeklickt wurde
+     * @param y der y-Wert der Position, die angeklickt wurde
+     * @param imageWidth Breite des Icons hinter dem Tankstellennamen
+     * @return Den Index der Tankstelle auf die geklickt wurde. -1, falls auf keine geklickt wurde.
+     */
     private int decideStationnameClick(double x, double y, double imageWidth) {
     	Set<Integer> indexSet = indexWithYCoordinate.keySet();
         Iterator<Integer> iter = indexSet.iterator();
@@ -223,20 +252,20 @@ public class RouteView extends ScrollPane {
                 continue;
             }
             double yCoordinate = indexWithYCoordinate.get(indexTmp);
-            //System.out.println((yCoordinate-5) + " < " + yPosition + " < " + (yCoordinate+5) + " ? X= " + me.getX());
-            //System.out.println(gsc.getRoute().get(indexTmp) == null);// (gsc.getRoute().get(indexTmp) == null) + (gsc.getRoute().get(indexTmp).getStation() == null) + (gsc.getRoute().get(indexTmp).getStation().getName() == null));
             String gasStationName = stationnames.get(indexTmp);
             if ((x > 220) && (x < 220 + getTextWidth(gasStationName) + 10 + imageWidth) && (y > yCoordinate - (gc.getFont().getSize()+4) / 2) && (y < yCoordinate + (gc.getFont().getSize()+4) / 2)) {
-                //System.out.println("index von methode: " + index);
-                //System.out.println("index gespeichert: " + indexTmp);
             	return indexTmp;
             }
         }
         return -1;
     }
 
-    private void drawLineBetweenNodes( int index, int circleHeight) {
-        //If this is the first entry, dont add a line + Add distance next to it
+    /**
+     * Zeichnet eine Verbindungslinie zwischen den Tankstellenkreisen sowie die Enternung in Km und die Dauer in Minuten
+     * @param index Der index der Tankstelle innerhalb der Route
+     * @param circleHeight Höhe des Tankstellen-Kreises
+     */
+    private void drawLineBetweenNodes(int index, int circleHeight) {
         if (index != 0) {
             int lineStart = 100 + circleHeight + (index - 1) * 100;
             int lineEnd = 200 + (index - 1) * 100;
@@ -244,13 +273,16 @@ public class RouteView extends ScrollPane {
             GasStation a = route.get(index - 1).getStation();
             GasStation b = route.get(index).getStation();
             long diff = Math.abs(route.get(index).getTime().getTime() - route.get(index-1).getTime().getTime());
-            String time = Long.toString(TimeUnit.MILLISECONDS.toMinutes(diff));//.substring(0,1); //TODO Warum Substring?
+            String time = Long.toString(TimeUnit.MILLISECONDS.toMinutes(diff));
             if(time.equals("0"))
                 time = "<1";
             gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km\t" + time + " min", 200, (lineStart + lineEnd) / 2);
         }
     }
 
+    /**
+     * Erstellt das Zusammenfassungsfenster mit Informationen über die Route
+     */
     private void displayResult() {
         gc.setFill(Color.WHITE);
         gc.fillRect(30, 42, 288, 32);
@@ -303,32 +335,34 @@ public class RouteView extends ScrollPane {
         gc.setFill(Color.BLACK);
     }
 
-    //gibt entfernung zwischen zwei Punkten auf der Karte (längen+breitengrad) zurück
+    /**
+     * Gibt die Entfernung in km zurück, die zwei Punkte voneinander haben
+     * @param latA Breitengrad Punkt 1
+     * @param longA Längengrad Punkt 1
+     * @param latB Breitengrad Punkt 2
+     * @param longB Längengrad Punkt 2
+     * @return Abstand in km
+     */
     private double calculateDistance(double latA, double longA, double latB, double longB) {
         double latitudeA = Math.toRadians(latA);
         double longitudeA = Math.toRadians(longA);
         double latitudeB = Math.toRadians(latB);
         double longitudeB = Math.toRadians(longB);
-        //DecimalFormat f = new DecimalFormat("#0.00"); 
-        //f.setRoundingMode(RoundingMode.DOWN);
         double dist = 6378.388 * Math.acos((Math.sin(latitudeA) * Math.sin(latitudeB)) + (Math.cos(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA)));
         dist *= 100;
         int distance = (int) dist;
-        //String output = f.format(dist) + " km" + " / ";	
-        //double consumption = 5.6*dist/100;
-        //output += f.format(consumption) + " L verbraucht"; 
         return (double) distance / 100;
     }
 
-    //gibt die länge eines Texts in pixel zurück
+    /**
+     * Gibt die Länge in Pixel zurück, die die Schrift auf dem Canvas haben wird
+     * @param stationName Darzustellender Name der Tankstelle
+     * @return Länge des Tankstellennamens in Pixel
+     */
     private int getTextWidth(String stationName) {
-        //System.out.println(gc.getFont().getName() + " nn " + gc.getFont().getStyle() + " nn "+ gc.getFont().getSize());
-        //java.awt.Font f = new java.awt.Font();
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         Label label = new Label(stationName);
         label.setFont(Font.font(gc.getFont().getName(), FontWeight.THIN, FontPosture.REGULAR, gc.getFont().getSize()));
-        //System.out.println(stationName + "'s width is: " + fontLoader.computeStringWidth(label.getText(), label.getFont()));
         return (int) fontLoader.computeStringWidth(label.getText(), label.getFont());
     }
-
 }

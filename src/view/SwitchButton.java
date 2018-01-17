@@ -11,8 +11,8 @@ import javafx.scene.text.TextAlignment;
 import model.Route;
 
 /**
- *
- * @author Admin
+ * Enthält einen Button, mit dem es möglich ist, auf der Routenansicht zwischen der Naiven und intelligenten Tankstrategie zu wechseln
+ * @author Axel Claassen
  */
 public class SwitchButton {
     
@@ -28,9 +28,9 @@ public class SwitchButton {
         return y;
     }
     /**
-     * 
-     * @param r Die Route
-     * @param gc der Grafikkontext
+     * Initialisiert den Switchbutton
+     * @param r Die Route, für die der Switchbutten dargestellt wird
+     * @param gc der Grafikkontext des Canvas
      * @param x die x-Position des Buttons
      * @param y die y-Position des Buttons
      */
@@ -55,9 +55,18 @@ public class SwitchButton {
         gc.strokeRect(x,y,width,height);
         gc.setTextAlign(TextAlignment.LEFT);
     }
+    /**
+     * Legt den Button um, um die Tankstrategie zu wechseln
+     */
     public void buttonPressed() {
         route.setShowBasicStrategy(!route.showBasicStrategy());
     }
+    /**
+     * 
+     * @param posX x-Position des Klicks
+     * @param posY y-Position des Klicks
+     * @return ob der Button angeklickt wurde
+     */
     public boolean wasClicked(int posX, int posY) {
         if(posX > x && posX < x+width && posY > y && posY < y+height)
             return true;
