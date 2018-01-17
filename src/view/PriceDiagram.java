@@ -23,13 +23,21 @@ import model.GasStation;
 import model.IPredictionStation;
 import model.Price;
 
+/**
+ * Erzeugt die Graphen für historische und vorhersagte Preise der einzelnen Tankstellen.
+ * @author Axel Claassen, Burak Kadioglu, Sebastian Drath
+ *
+ */
 public class PriceDiagram {
-
     private static List<IPredictionStation> gasStations = new ArrayList<>();
     private static Stage priceStage;
     private static boolean showHistoric = true;
     private static RadioMenuItem predictionItem;
 
+    /**
+     * Pop-Up-Meldung als Warnung für Preise einer Tankstelle.
+     * @param gs IPredictionStation der Tankstelle
+     */
     public static void displayGasStation(IPredictionStation gs) {
     	boolean showWarning = false;
     	if(!showHistoric && !gs.isPredicted()) {
@@ -61,7 +69,10 @@ public class PriceDiagram {
         }
         if(showWarning) PopupBox.displayWarning(202);
     }
-
+    
+    /**
+     * Generiert einen Graphen für die Anzeige der Preise einer Tankstelle der Route. 
+     */
     public static void generateDiagram() {
     	double xMin = Double.MAX_VALUE;
     	double xMax = Double.MIN_VALUE;
@@ -176,7 +187,12 @@ public class PriceDiagram {
         priceStage.getIcons().add(icon);
         priceStage.setScene(scene);
     }
-
+    
+    /**
+     * 
+     * @param lc
+     * @param gs
+     */
     private static void addSeries(LineChart<Number, Number> lc ,GasStation gs) {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(gs.getName());
@@ -206,7 +222,11 @@ public class PriceDiagram {
         }
         lc.getData().add(series);
     }
-
+    /**
+     * 
+     * @param lc
+     * @param ps
+     */
     private static void addPredictedSeries(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
     	XYChart.Series<Number, Number> seriesPred = new XYChart.Series<>();
@@ -222,8 +242,13 @@ public class PriceDiagram {
         lc.getData().add(seriesPred);
         lc.getData().add(series);
     }
-
-    /*private static void addPredictedSeries(LineChart<Number, Number> lc ,IPredictionStation ps) {
+    
+    /**
+     * 
+     * @param lc
+     * @param ps
+     */
+    private static void addPredictedSeriesDaySteps(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
     	XYChart.Series<Number, Number> seriesPred = new XYChart.Series<>();
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -280,8 +305,12 @@ public class PriceDiagram {
         }
         lc.getData().add(seriesPred);
         lc.getData().add(series);
-    }*/
+    }
     
+    /**
+     * 
+     * @param scene
+     */
     private static void setContextMenu(Scene scene) {
         ContextMenu contextMenu = new ContextMenu();
         ToggleGroup group = new ToggleGroup();
@@ -314,6 +343,9 @@ public class PriceDiagram {
         });
     }
     
+    /**
+     * 
+     */
     private static void setContextMenuSelection() {
     	if(predictionItem == null) return;
     	else predictionItem.setSelected(!showHistoric);
