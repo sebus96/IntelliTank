@@ -39,7 +39,7 @@ import model.Route;
 
 /**
  *
- * @author Axel Claassen, Sebastian Drath
+ * @author Sebastian Drath
  */
 public class CSVManager {
 
