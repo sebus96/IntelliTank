@@ -9,19 +9,14 @@ import model.Price;
 /**
 * einlagiges Perzeptron
 *
-* @author Sebastian
+* @author Sebastian Drath
 */
 public class SingleLayerPerceptron extends Perceptron {
 	
 	private double rate;
 	private double[] weights = new double[7+24+oldPriceNumber+1];
 	
-	/**
-	* Konstruktor zum Perzeptron mit Eingabeparameter Lernrate und Anzahl der Epochen.
-	*
-	* @param lernrate Lernrate
-	* @param anzahlEpoche Anzahl der Epochen
-	*/
+	
 	public SingleLayerPerceptron(GasStation gs, double rate, int epochs) {
 		super(gs, epochs);
 		this.rate = rate;
@@ -30,12 +25,6 @@ public class SingleLayerPerceptron extends Perceptron {
 		}
 	}
 	
-	/**
-	* Perzeptron wird trainiert.
-	*
-	* @param traindata Datensatz zum Training
-	* @return true||false Je nach dem, ob 95% richtig erkannt werden, haengt der Rueckgabewert davon ab
-	*/
 	@Override
 	public boolean train(Date until) {
 		double totalDifference = 0;
@@ -87,10 +76,12 @@ public class SingleLayerPerceptron extends Perceptron {
 	}
 
 	/**
-	* Berechnet das Skalarprodukt zwischen den Gewichten und dem Eingabevektor.
-	* @param input Datum fuer das der Preis bestimmt werden soll
-	* @return berechneter Preis
-	*/
+	 * Berechnet das Skalarprodukt zwischen den Gewichten und dem Eingabevektor.
+	 *
+	 * @param d Datum des zu bestimmenden Preises
+	 * @param lastPrices die letzten Preise
+	 * @return der aktuelle Preis
+	 */
 	private double output(Date d, int[] lastPrices) {
 		if(lastPrices.length != this.oldPriceNumber) System.err.println("wrong input number of old prices");
 		Calendar c = Calendar.getInstance();
@@ -110,12 +101,6 @@ public class SingleLayerPerceptron extends Perceptron {
 		res += isHoliday*weights[24+7+lastPrices.length];
 		return res;
 	}
-	
-	/**
-	* Berechnet das Skalarprodukt zwischen den Gewichten und dem Eingabevektor.
-	* @param input Datum für das der Preis bestimmt werden soll
-	* @return berechneter Preis
-	*/
 	@Override
 	public double feedForward(Date d, List<Double> lastPrices) {
 		if(lastPrices.size() != this.oldPriceNumber) System.err.println("wrong input number of old prices");

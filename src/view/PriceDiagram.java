@@ -12,8 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.Stage;
@@ -27,7 +28,7 @@ public class PriceDiagram {
     private static List<IPredictionStation> gasStations = new ArrayList<>();
     private static Stage priceStage;
     private static boolean showHistoric = true;
-    private static CheckMenuItem predictionItem;
+    private static RadioMenuItem predictionItem;
 
     public static void displayGasStation(IPredictionStation gs) {
     	boolean showWarning = false;
@@ -283,20 +284,27 @@ public class PriceDiagram {
     
     private static void setContextMenu(Scene scene) {
         ContextMenu contextMenu = new ContextMenu();
+        ToggleGroup group = new ToggleGroup();
+        EventHandler<ActionEvent> eh = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	if(predictionItem == null) return;
+        		boolean before = showHistoric;
+            	showHistoric = !predictionItem.isSelected();
+            	if(before != showHistoric) generateDiagram();
+            }
+        };
+        RadioMenuItem r = new RadioMenuItem("Zeige historische Preise");
+        r.setSelected(showHistoric);
+        r.setToggleGroup(group);
+        r.setOnAction(eh);
         if(predictionItem == null) {
-	        predictionItem = new CheckMenuItem("Zeige Vorhersage");
+	        predictionItem = new RadioMenuItem("Zeige vorhergesagte Preise");
 	        predictionItem.setSelected(!showHistoric);
-	        predictionItem.setOnAction(new EventHandler<ActionEvent>() {
-	            @Override
-	            public void handle(ActionEvent event) {
-	            	boolean before = showHistoric;
-	            	showHistoric = !predictionItem.isSelected();
-	            	if(before != showHistoric) generateDiagram();
-	            }
-	        });
+	        predictionItem.setOnAction(eh);
         }
- 
-        contextMenu.getItems().addAll(predictionItem);
+        predictionItem.setToggleGroup(group);
+        contextMenu.getItems().addAll(predictionItem,r);
     	
     	scene.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
             @Override

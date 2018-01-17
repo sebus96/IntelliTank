@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
+/**
+ * Repräsentation einer Tankstelle.
+ * 
+ * @author Sebastian Drath
+ *
+ */
 public class GasStation {
 	private int id;
 	private String name, brand, street, location, houseNumber;
@@ -13,6 +18,20 @@ public class GasStation {
 	private double longitude, latitude; // Laengen- und Breitengrad
 	private List<Price> historicPrices;
 	
+	/**
+	 * Generiert eine Tankstelle mit den übergebenen Attributen.
+	 * 
+	 * @param id die eindeutige ID einer Tankstelle
+	 * @param name der Name einer Tankstelle
+	 * @param brand der Name der Marke der Tankstelle
+	 * @param street die Straße in der die Tankstelle liegt
+	 * @param houseNumber die Hausnummer der Tankstelle
+	 * @param postcode die Postleitzahl der Tankstelle
+	 * @param state das Kürzel des Bundeslandes in dem die Tankstelle liegt
+	 * @param location der Name des Ortes in dem die Tankstelle liegt
+	 * @param longitude Längengrad der Tankstelle
+	 * @param latitude Breitengrad der Tankstelle
+	 */
 	public GasStation(int id, String name, String brand, String street, String houseNumber, int postcode, FederalState state, String location,
 			double longitude, double latitude) {
 		this.id = id;
@@ -27,51 +46,109 @@ public class GasStation {
 		this.historicPrices = new ArrayList<Price>();
 		this.state = state;
 	}
-
+	
+	/**
+	 * Gibt die ID zurück.
+	 * 
+	 * @return Tankstellen ID
+	 */
 	public int getID() {
 		return id;
 	}
 
+	/**
+	 * Gibt den Namen zurück.
+	 * 
+	 * @return Tankstellenname
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Gibt die Marke zurück.
+	 * 
+	 * @return Tankstellenmarke
+	 */
 	public String getBrand() {
 		return brand;
 	}
 	
+	/**
+	 * Gibt das Bundesland zurück.
+	 * 
+	 * @return Bundesland
+	 */
 	public FederalState getState() {
 		return state;
 	}
-
+	
+	/**
+	 * Gibt den Straßennamen zurück.
+	 *
+	 * @return Straßenname
+	 */
 	public String getStreet() {
 		return street;
 	}
 
+	/**
+	 * Gibt den Ort zurück.
+	 *
+	 * @return Ort
+	 */
 	public String getLocation() {
 		return location;
 	}
 
+	/**
+	 * Gibt die Hausnummer zurück.
+	 *
+	 * @return Hausnummer
+	 */
 	public String getHouseNumber() {
 		return houseNumber;
 	}
 
+	/**
+	 * Gibt die Postleitzahl zurück.
+	 *
+	 * @return Postleitzahl
+	 */
 	public int getPostcode() {
 		return postcode;
 	}
-
+	
+	/**
+	 * Gibt den Längengrad zurück.
+	 *
+	 * @return Längengrad
+	 */
 	public double getLongitude() {
 		return longitude;
 	}
 
+	/**
+	 * Gibt den Breitengrad zurück.
+	 *
+	 * @return Breitengrad
+	 */
 	public double getLatitude() {
 		return latitude;
 	}
 	
-	public int getHistoricPrice(Date d) {
+	/**
+	 * Bestimmt den Preis an dem übergebenen Datum mit Hilfe der historischen Daten.
+	 * 
+	 * Es wird immer der Preis der letzen Änderung vor dem angefragten Datum ausgegeben.
+	 *
+	 * @param date Datum zu dem ein Preis angefordert wird
+	 * @return Gibt den Preis zu der Zeit zurück, -1, falls kein Preis gefunden wurde
+	 */
+	public int getHistoricPrice(Date date) {
 		int prevPrice = -1;
 		for(Price p: this.historicPrices) {
-			if(p.getTime().after(d)) {
+			if(p.getTime().after(date)) {
 				return prevPrice;
 			}
 			prevPrice = p.getPrice();
@@ -79,20 +156,41 @@ public class GasStation {
 		return -1;//prevPrice;
 	}
 	
+	/**
+	 * Gibt die Größe der importierten historischen Preisliste zurück.
+	 *
+	 * @return Preislistengröße
+	 */
 	public int getPriceListSize() {
 		return this.historicPrices.size();
 	}
 	
+	/**
+	 * Überprüft, ob Preise importiert wurden und gibt den Status zurück.
+	 *
+	 * @return true, wenn importierte Preis vorliegen, false ansonsten
+	 */
 	public boolean hasPriceList() {
 		return this.historicPrices != null && this.historicPrices.size() > 0;
 	}
 	
-	public Price getPriceListElement(int i) {
-		if(i < this.historicPrices.size() && i >= 0)
-			return this.historicPrices.get(i);
+	/**
+	 * Gibt den Preislisteneintrag an der übergebenen Position zurück.
+	 *
+	 * @param index Index des Preislisteneintrags
+	 * @return Gibt den Preis zurück, oder null wenn dieses Element nicht existiert
+	 */
+	public Price getPriceListElement(int index) {
+		if(index < this.historicPrices.size() && index >= 0)
+			return this.historicPrices.get(index);
 		return null;
 	}
 	
+	/**
+	 * Setzt die Liste der historischen Preis für diese Tankstelle
+	 *
+	 * @param prices Liste der historischen Preise
+	 */
 	public void setPriceList(List<Price> prices) {
 		this.historicPrices = prices;
 	}

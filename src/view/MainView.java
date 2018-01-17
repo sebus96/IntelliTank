@@ -22,7 +22,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.PredictionPoints;
+import model.PredictionPointList;
 import model.Route;
 /**
  *
@@ -61,7 +61,7 @@ public class MainView extends BorderPane {
         validateMenu.setVisible(true);
     }
     
-    public void displayPredictionPoints(PredictionPoints predictionPoints) {
+    public void displayPredictionPoints(PredictionPointList predictionPoints) {
         setCenter(new PredictionPointView(mainStage, predictionPoints));
         mainStage.show();
         validateMenu.setVisible(true);
@@ -200,7 +200,7 @@ public class MainView extends BorderPane {
                         	Route r = gsc.getRoute();
                         	PopupBox.displayValidation(r);
                         } else if(getCenter() instanceof PredictionPointView) {
-                        	PredictionPoints p = gsc.getPredictionPoints();
+                        	PredictionPointList p = gsc.getPredictionPoints();
                         	PopupBox.displayValidation(p);
                         } else {
                         	System.out.println("Nothing loaded");

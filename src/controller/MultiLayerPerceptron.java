@@ -7,6 +7,12 @@ import java.util.List;
 import model.GasStation;
 import model.Price;
 
+/**
+ * Mehrlagiges Perzeptron
+ *
+ * @author Sebastian Drath
+ *
+ */
 public class MultiLayerPerceptron extends Perceptron {
 
 	private final int inputlength = 7 + 24 + oldPriceNumber + 1;
@@ -20,14 +26,6 @@ public class MultiLayerPerceptron extends Perceptron {
 		super(gs, epochs);
     }
 
-    /**
-     * Runs the backpropagation algorithm.
-     * At first it creates two matrices with randomly generated elements.
-     * In every iteration it runs over all train data and it feed the net forwardly.
-     * Then it determines the error and update the weights after a backpropagation.
-     *
-     * @param trainData
-     */
     @Override
     public boolean train(Date until) {
         // trainData: 6 x 144
@@ -85,9 +83,9 @@ public class MultiLayerPerceptron extends Perceptron {
     /**
      * Returns the difference between the expected result and the predicted result.
      *
-     * @param realPrice
-     * @param prediction
-     * @return
+     * @param realPrice echter Preis
+     * @param prediction vorhergesagter Preis
+     * @return Abweichung
      */
     private Matrix calcError(double realPrice, double prediction) {
         Matrix error = new Matrix(1, 1);
@@ -95,12 +93,6 @@ public class MultiLayerPerceptron extends Perceptron {
         return error;
     }
 
-    /**
-     * Predict the class for an input.
-     *
-     * @param input
-     * @return
-     */
     @Override
     public double feedForward(Date date, List<Double> lastPrices){
     	if(lastPrices.size() != this.oldPriceNumber) System.err.println("wrong input number of old prices");

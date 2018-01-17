@@ -13,7 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import model.IPredictionStations;
+import model.IPredictionStationList;
 
 /**
  *
@@ -26,7 +26,7 @@ public class ProgressView {
     private Stage progressStage;
     private Label l;
 
-    public ProgressView(IPredictionStations predictionStations) {
+    public ProgressView(IPredictionStationList predictionStations) {
         progressStage = new Stage();
         progressStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
 			@Override

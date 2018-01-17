@@ -5,7 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import model.IPredictionStation;
-import model.IPredictionStations;
+import model.IPredictionStationList;
 
 public class ValidationContextMenu extends ContextMenu {
 	private String itemText = "Zeige Validierung";
@@ -23,7 +23,7 @@ public class ValidationContextMenu extends ContextMenu {
         getItems().addAll(predictionItem);
 	}
 	
-	public ValidationContextMenu(IPredictionStations stations) {
+	public ValidationContextMenu(IPredictionStationList stations) {
 		super();
         MenuItem predictionItem = new MenuItem(itemText);
         predictionItem.setOnAction(new EventHandler<ActionEvent>() {

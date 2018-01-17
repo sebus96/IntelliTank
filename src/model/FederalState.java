@@ -1,8 +1,21 @@
 package model;
 
+/**
+ * Darstellung des Kürzels eines deutschen Bundeslandes.
+ * 
+ * @author Sebastian Drath
+ *
+ */
 public enum FederalState {
 	BW, BY, BE, BB, HB, HH, HE, MV, NI, NW, RP, SL, SN, ST, SH, TH, DEF;
 	
+	/**
+	 * Parst den übergebenen Namen eines Bundeslandes und gibt das Bundesland zurück.
+	 * 
+	 * @param state Name eines Bundeslandes als Text
+	 * @return Gibt das Kürzel des übergebenen Bundeslandes zurück,
+	 * oder FederalState.DEF, wenn der Name keinem Bundesland zugeordnet werden kann.
+	 */
 	public static FederalState getFederalState(String state) {
 		switch (state) {
         case "Baden-Württemberg":
@@ -39,6 +52,6 @@ public enum FederalState {
             return TH;
         default:
             return DEF;
-    }
+		}
 	}
 }

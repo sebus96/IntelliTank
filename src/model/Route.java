@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Route implements IPredictionStations {
+public class Route implements IPredictionStationList {
 
     private double tankCapacity;
     private String name;

@@ -30,9 +30,6 @@ public class MatrixOperations {
 
         double[][] matrixRes = new double[rowsA][columnsB];
 
-        /**
-         * Walks through the matrixes, multiplying the elements and summing to the result element on the resultant Matrix matrixRes
-         */
         for (int i = 0; i < rowsA; i++) { // aRow
             for (int j = 0; j < columnsB; j++) { // bColumn
                 for (int k = 0; k < columnsA; k++) { // aColumn
@@ -45,11 +42,11 @@ public class MatrixOperations {
     }
 
     /**
-     * Matrix Sum
+     * Matrix Summe
      *
-     * @param mA First Input Matrix
-     * @param mB Second Input Matrix
-     * @return the result of the sum operation
+     * @param mA erste Matrix
+     * @param mB zweite Matrix
+     * @return Summe
      */
     public static Matrix matAdd(Matrix mA, Matrix mB) {
 
@@ -85,11 +82,11 @@ public class MatrixOperations {
     }
 
     /**
-     * Matrix Sum
+     * Multiplikation mit Matrix.
      *
-     * @param mA First Input Matrix
-     * @param mB Second Input Matrix
-     * @return the result of the sum operation
+     * @param a Faktor
+     * @param b Matrix
+     * @return Ergebnis
      */
     public static Matrix matMult(double a, Matrix b) {
 
@@ -110,12 +107,7 @@ public class MatrixOperations {
         return new Matrix(matrixRes);
 
     }
-
-    /**
-     * Shows the matrix as output
-     *
-     * @param m The matrix the user wants to show
-     */
+    
     public static void matOut(Matrix m) {
 
     	double[][] matrix = m.getMatrix();
@@ -135,10 +127,10 @@ public class MatrixOperations {
     }
 
     /**
-     * Calculates for every element in the matrix the sigmoid.
+     * Berechnet den Sigmoid jedes Eintrags
      *
-     * @param matrix
-     * @return
+     * @param matrix Matrix
+     * @return Ergebnis
      */
     public static Matrix sigmoid(Matrix matrix) {
         for (int m = 0; m < matrix.getMatrix().length; m++)
@@ -148,9 +140,10 @@ public class MatrixOperations {
     }
 
     /**
-     * Calculates the sigmoid derivation of a matrix m.
-     * @param m
-     * @return
+     * Berechnet den Sigmoid Ableitung jedes Eintrags
+     * 
+     * @param m Matrix
+     * @return Ergebnis
      */
     public static Matrix sigmoidDerivation(Matrix m){
 

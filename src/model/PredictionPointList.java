@@ -9,13 +9,13 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class PredictionPoints implements IPredictionStations{
+public class PredictionPointList implements IPredictionStationList{
     private String name;
     private List<PredictionPoint> predictionPoints;
     private DateFormat dateFormat = new SimpleDateFormat("EE dd.MM.yyyy HH:mm");
 
     
-    public PredictionPoints(String name) {
+    public PredictionPointList(String name) {
         this.predictionPoints = new ArrayList<>();
         this.name = name;
     }
@@ -105,7 +105,7 @@ public class PredictionPoints implements IPredictionStations{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PredictionPoints other = (PredictionPoints) obj;
+		PredictionPointList other = (PredictionPointList) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;

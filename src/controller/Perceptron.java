@@ -15,23 +15,11 @@ public abstract class Perceptron {
 //	protected final int hourSteps = 1;
 	private GasStation station;
 	
-	/**
-	* Konstruktor zum Perzeptron mit Eingabeparameter Lernrate und Anzahl der Epochen.
-	*
-	* @param lernrate Lernrate
-	* @param anzahlEpoche Anzahl der Epochen
-	*/
 	public Perceptron(GasStation gs, int epochs) {
 		this.station = gs;
 		this.epochs = epochs;
 	}
 	
-	/**
-	* Perzeptron wird trainiert.
-	*
-	* @param traindata Datensatz zum Training
-	* @return true||false Je nach dem, ob 95% richtig erkannt werden, haengt der Rueckgabewert davon ab
-	*/
 	public abstract boolean train(Date until);
 	
 	public abstract double feedForward(Date d, List<Double> lastPrices);
@@ -81,7 +69,7 @@ public abstract class Perceptron {
 	
 	/**
 	* Gibt Anzahl der Epochen zurueck.
-	* @return anzahlEpochen
+	* @return Epochenanzahl
 	*/
 	public int getEpoches() {
 		return this.epochs;

@@ -17,7 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import model.IPredictionStation;
-import model.IPredictionStations;
+import model.IPredictionStationList;
 import model.Validation;
 
 /**
@@ -123,7 +123,7 @@ public class PopupBox {
     	displayValidation(station.getStation().getName() + " (" + station.getStation().getID() +")", station.getValidation());
     }
     
-    public static void displayValidation(IPredictionStations stations) {
+    public static void displayValidation(IPredictionStationList stations) {
     	displayValidation(stations.getType() + " " + stations.getName(), stations.getValidation());
     }
     

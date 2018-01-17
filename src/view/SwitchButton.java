@@ -30,9 +30,9 @@ public class SwitchButton {
     /**
      * 
      * @param r Die Route
-     * @param gc
-     * @param x
-     * @param y 
+     * @param gc der Grafikkontext
+     * @param x die x-Position des Buttons
+     * @param y die y-Position des Buttons
      */
     public SwitchButton(Route r, GraphicsContext gc,int x, int y) {
         this.route = r;

@@ -11,9 +11,9 @@ import javafx.concurrent.Task;
 import javafx.stage.Stage;
 import model.GasStation;
 import model.IPredictionStation;
-import model.IPredictionStations;
+import model.IPredictionStationList;
 import model.PredictionPoint;
-import model.PredictionPoints;
+import model.PredictionPointList;
 import model.Route;
 import view.MainView;
 import view.PopupBox;
@@ -25,7 +25,7 @@ public class GasStationController {
 
     private Map<Integer, GasStation> allStations;
     private Route route;
-    private PredictionPoints predictionPoints;
+    private PredictionPointList predictionPoints;
 //    private List<PredictionUnit> predictions;
     private RefillStrategies refillStrategies;
     private MainView mainView;
@@ -76,14 +76,14 @@ public class GasStationController {
         return route;
     }
 
-    public PredictionPoints getPredictionPoints() {
+    public PredictionPointList getPredictionPoints() {
         return predictionPoints;
     }
 
     /*public RefillStrategies getMainModel() {
         return refillStrategies;
     }*/
-    public void trainPrediction(IPredictionStations stations) {
+    public void trainPrediction(IPredictionStationList stations) {
         Task<Void> predictionThread = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -127,9 +127,9 @@ public class GasStationController {
         new Thread(predictionThread).start();
     }
     
-    private void showPredictedStations(IPredictionStations stations) {
-    	if (stations instanceof PredictionPoints) {
-            mainView.displayPredictionPoints((PredictionPoints) stations);
+    private void showPredictedStations(IPredictionStationList stations) {
+    	if (stations instanceof PredictionPointList) {
+            mainView.displayPredictionPoints((PredictionPointList) stations);
             pw.close();
         } else if (stations instanceof Route) {
             boolean res = refillStrategies.calculateGasUsage((Route) stations);
@@ -156,7 +156,7 @@ public class GasStationController {
     }
 
     public void switchToPredictionPoints(String predictionPointName) {
-        PredictionPoints predictionPointsTest = CSVManager.importPredictionPoints(allStations, predictionPointName);
+        PredictionPointList predictionPointsTest = CSVManager.importPredictionPoints(allStations, predictionPointName);
         if (predictionPointsTest == null) {
             PopupBox.displayError(303);
             return;

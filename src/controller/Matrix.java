@@ -7,8 +7,8 @@ public class Matrix {
     private int row;
 
     /**
-     * @param rows    Number of Matrix' rows
-     * @param columns Number of Matrix' columns
+     * @param rows    Zeilenanzahl
+     * @param columns Spaltenanzahl
      */
     public Matrix(int rows, int columns) {
         this.row = rows;
@@ -23,14 +23,6 @@ public class Matrix {
         this.matrix = matrixRes;
     }
 
-
-    /**
-     * This method feeds the matrix with random values
-     *
-     * @param matrix  The matrix
-     * @param rows    Number of Matrix' rows
-     * @param columns Number of Matrix' columns
-     */
     public void fillRandom() {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
@@ -40,9 +32,9 @@ public class Matrix {
     }
 
     /**
-     * Get a new matrix which is transposed.
+     * Gibt die transponierte Matrix zurück.
      *
-     * @return
+     * @return transponierte Matrix
      */
     public Matrix transpose() {
         double[][] values = new double[column][row];

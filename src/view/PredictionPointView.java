@@ -17,7 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.PredictionPoint;
-import model.PredictionPoints;
+import model.PredictionPointList;
 
 public class PredictionPointView extends BorderPane {
 
@@ -26,7 +26,7 @@ public class PredictionPointView extends BorderPane {
 	private Stage parent;
 //	private PredictionPoints predictionPoints;
 
-    public PredictionPointView(Stage parent, PredictionPoints predictionPoints) {
+    public PredictionPointView(Stage parent, PredictionPointList predictionPoints) {
     	super();
         this.parent = parent;
 //        this.predictionPoints = predictionPoints;

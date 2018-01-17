@@ -31,9 +31,9 @@ import java.util.Set;
 import model.FederalState;
 import model.GasStation;
 import model.Holidays;
-import model.IPredictionStations;
+import model.IPredictionStationList;
 import model.Postalcodes;
-import model.PredictionPoints;
+import model.PredictionPointList;
 import model.Price;
 import model.Route;
 
@@ -189,11 +189,11 @@ public class CSVManager {
     	return routeWarnings;
     }
     
-    public static void exportPredictions(IPredictionStations stations) {
+    public static void exportPredictions(IPredictionStationList stations) {
     	writeCSV(stations);
     }
 
-    public static PredictionPoints importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
+    public static PredictionPointList importPredictionPoints(Map<Integer, GasStation> stations, String predictionName) {
         File predictionFile = new File(predictionInputPath + predictionName + (predictionName.endsWith(".csv")? "" : ".csv"));
     	List<String> lines = readFile(predictionFile);
     	if(printMessages) System.out.println("import predictionpoints: " + predictionName);
@@ -201,7 +201,7 @@ public class CSVManager {
             System.err.println("Could not import Prediction \"" + predictionFile.getName() + "\"!");
             return null;
         }
-        PredictionPoints result = new PredictionPoints(predictionName);
+        PredictionPointList result = new PredictionPointList(predictionName);
         for (String line : lines) {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 3) {
@@ -213,7 +213,7 @@ public class CSVManager {
         return result;
     }
 
-    public static void importPrices(IPredictionStations stations) {
+    public static void importPrices(IPredictionStationList stations) {
         if (stations == null) return;
         for (int i = 0; i < stations.getLength(); i++) {
             importPrice(stations.get(i).getStation());
@@ -266,18 +266,20 @@ public class CSVManager {
     			continue;
     		}
     		List<String> lines = readFile(holidayPath + filename);
-    		int ctr = 0;
+    		int ctr = 0; // Zählt die Zeilen pro Bundeslandeintrag
+    		String readState = null;
     		FederalState curState = null;
     		for(String line: lines) {
     			if(ctr == 0) { // jede siebte Zeile ist der Bundeslandname
+    				readState = line;
     				curState = FederalState.getFederalState(line);
     				if(curState == FederalState.DEF) {
     					System.err.println("Illegal federal state: " + line);
     	        		failures.add(208);
     				}
     			} else if (ctr > 0 && ctr <= holidayNames.length) {
-    				if(curState == null) {
-    					System.err.println("Current State should not be null: " + line);
+    				if(curState == null || curState == FederalState.DEF) {
+    					System.err.println("Current State could not be parsed: " + readState + " (Holidayfile " + filename + ")");
     	        		failures.add(208);
     				}
     				if(!Holidays.addHoliday(year, curState, holidayNames[ctr-1], line)) {
@@ -352,10 +354,10 @@ public class CSVManager {
         return null;
     }
 
-    private static boolean writeCSV(IPredictionStations stations) {
+    private static boolean writeCSV(IPredictionStationList stations) {
         String path = "";
         if(stations instanceof Route) path = routeOutputPath;
-        else if (stations instanceof PredictionPoints) path = predictionOutputPath;
+        else if (stations instanceof PredictionPointList) path = predictionOutputPath;
         new File(path).mkdirs(); // erstellt output ordner
         File file = new File(path + stations.getName() + (stations.getName().endsWith(".csv")? "" : ".csv"));
         
