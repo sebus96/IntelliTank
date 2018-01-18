@@ -38,7 +38,7 @@ import model.RefuelStop;
 import model.Route;
 
 /**
- * Füllt das Hauptfenster mit der Routenansicht
+ * Füllt das Hauptfenster mit der Routenansicht.
  * @author Axel Claassen, Burak Kadioglu, Sebastian Drath
  */
 public class RouteView extends ScrollPane {
@@ -54,7 +54,7 @@ public class RouteView extends ScrollPane {
 	private Image imageDecline;
     
     /**
-     * Initialisiert das Routenfenster
+     * Initialisiert das Routenfenster.
      * @param parent Stage, auf der die Route dargestellt wird
      * @param route route, die angezeigt werden soll
      */
@@ -67,7 +67,7 @@ public class RouteView extends ScrollPane {
         init();
     }
     /**
-     * Darstellung der Routenansicht auf dem Hauptfenster
+     * Darstellung der Routenansicht auf dem Hauptfenster.
      */
     private void init() {
         //Canvas-größe ist abhängig von der Routenlänge
@@ -135,7 +135,7 @@ public class RouteView extends ScrollPane {
 
     
     /**
-     * Stelle jede einzelne Tankstelle Grafisch dar
+     * Stelle jede einzelne Tankstelle Grafisch dar.
      * @param index Der index der Tankstelle innerhalb der Route
      */
     private void displayGasStation(int index) {
@@ -151,7 +151,7 @@ public class RouteView extends ScrollPane {
     }
 
     /**
-     * Erstellt den Kreis, der den Tankstellenpreis umschließt
+     * Erstellt den Kreis, der den Tankstellenpreis umschließt.
      * @param index Der index der Tankstelle innerhalb der Route
      * @param circleStart Position, ab der der Kreis gezeichnet werden soll
      * @param circleWidth Breite des Tankstellen-Kreises
@@ -173,7 +173,7 @@ public class RouteView extends ScrollPane {
     }
 
     /**
-     * Erstellt die Tankanzeige die zeigt, wie viel Tank nur vorhanden ist
+     * Erstellt die Tankanzeige die zeigt, wie viel Tank nur vorhanden ist.
      * @param index Der index der Tankstelle innerhalb der Route
      * @param circleStart Position, ab der der Kreis gezeichnet werden soll
      * @param circleHeight Höhe des Tankstellen-Kreises
@@ -207,7 +207,7 @@ public class RouteView extends ScrollPane {
     }
 
     /**
-     * Erzeugt den klickbaren Tankstellen-Namen rechts
+     * Erzeugt den klickbaren Tankstellen-Namen rechts.
      * @param index Der index der Tankstelle innerhalb der Route
      * @param circleStart Position, ab der der Kreis gezeichnet werden soll
      * @param circleHeight Höhe des Tankstellen-Kreises
@@ -235,11 +235,11 @@ public class RouteView extends ScrollPane {
     }
     
     /**
-     * Überprüft, ob auf eine der Tankstellennamen geklickt wurde
+     * Überprüft, ob auf eine der Tankstellennamen geklickt wurde.
      * @param x der x-Wert der Position, die angeklickt wurde
      * @param y der y-Wert der Position, die angeklickt wurde
      * @param imageWidth Breite des Icons hinter dem Tankstellennamen
-     * @return Den Index der Tankstelle auf die geklickt wurde. -1, falls auf keine geklickt wurde.
+     * @return Den Index der Tankstelle auf die geklickt wurde. -1, falls auf keine geklickt wurde
      */
     private int decideStationnameClick(double x, double y, double imageWidth) {
     	Set<Integer> indexSet = indexWithYCoordinate.keySet();
@@ -259,7 +259,7 @@ public class RouteView extends ScrollPane {
     }
 
     /**
-     * Zeichnet eine Verbindungslinie zwischen den Tankstellenkreisen sowie die Enternung in Km und die Dauer in Minuten
+     * Zeichnet eine Verbindungslinie zwischen den Tankstellenkreisen sowie die Enternung in Km und die Dauer in Minuten.
      * @param index Der index der Tankstelle innerhalb der Route
      * @param circleHeight Höhe des Tankstellen-Kreises
      */
@@ -279,7 +279,7 @@ public class RouteView extends ScrollPane {
     }
 
     /**
-     * Erstellt das Zusammenfassungsfenster mit Informationen über die Route
+     * Erstellt das Zusammenfassungsfenster mit Informationen über die Route.
      */
     private void displayResult() {
         gc.setFill(Color.WHITE);
@@ -326,7 +326,7 @@ public class RouteView extends ScrollPane {
     }
 
     /**
-     * Gibt die Entfernung in km zurück, die zwei Punkte voneinander haben
+     * Gibt die Entfernung in km zurück, die zwei Punkte voneinander haben.
      * @param latA Breitengrad Punkt 1
      * @param longA Längengrad Punkt 1
      * @param latB Breitengrad Punkt 2
@@ -345,7 +345,7 @@ public class RouteView extends ScrollPane {
     }
 
     /**
-     * Gibt die Länge in Pixel zurück, die die Schrift auf dem Canvas haben wird
+     * Gibt die Länge in Pixel zurück, die die Schrift auf dem Canvas haben wird.
      * @param stationName Darzustellender Name der Tankstelle
      * @return Länge des Tankstellennamens in Pixel
      */

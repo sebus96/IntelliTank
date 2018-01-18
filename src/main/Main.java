@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 
 /**
  * 
- * @author Axel Claassen, Sebastian Drath
+ * @author Axel Claassen, Burak Kadioglu, Sebastian Drath
  */
 public class Main extends Application {
 
