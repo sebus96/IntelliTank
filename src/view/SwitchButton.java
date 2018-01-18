@@ -17,7 +17,6 @@ import model.Route;
 public class SwitchButton {
     
     GraphicsContext gc;
-    Route route;
     int x,y,width,height;
 
     public int getX() {
@@ -28,14 +27,13 @@ public class SwitchButton {
         return y;
     }
     /**
+     * Erstellt einen Button auf dem Grafikkontext an der Postion (x,y)
      * 
-     * @param r Die Route
      * @param gc der Grafikkontext
      * @param x die x-Position des Buttons
      * @param y die y-Position des Buttons
      */
-    public SwitchButton(Route r, GraphicsContext gc,int x, int y) {
-        this.route = r;
+    public SwitchButton( GraphicsContext gc,int x, int y) {
         this.gc = gc;
         this.x = x;
         this.y = y;
@@ -43,7 +41,7 @@ public class SwitchButton {
         height = 40;
         
         String buttonText;
-        if(route.showBasicStrategy())
+        if(Route.getStrategy() == Route.Strategy.BASIC)
             buttonText = "Zur intelligenten\nStrategie wechseln";
         else
             buttonText = "Zur Standard-\nStrategie wechseln";
@@ -56,7 +54,7 @@ public class SwitchButton {
         gc.setTextAlign(TextAlignment.LEFT);
     }
     public void buttonPressed() {
-        route.setShowBasicStrategy(!route.showBasicStrategy());
+    	Route.switchStrategy();
     }
     public boolean wasClicked(int posX, int posY) {
         if(posX > x && posX < x+width && posY > y && posY < y+height)

@@ -7,52 +7,59 @@ import java.util.List;
 import controller.PredictionUnit;
 import io.CSVManager;
 
+/**
+ * Repräsentation eines Tankstops innerhalb einer Route. Dieser umfasst eine Tankstelle, an der zu einer bestimmten Zeit getankt
+ * werden soll sowie ein Vorhersageobjekt imklusive der vorhergesagten
+ * Preisliste. Eine Validierung gibt Werte zur Beurteilung der Vorhersage an, wenn eine Vorhersage getätigt wurde und echte
+ * Preise als Referenz vorliegen.
+ * Außerdem werden relevante Variablen eines Tankstops für das Erzeugen der Tankstrategie verwaltet. (siehe Verwendung in {@link controller.RefillStrategies})
+ *
+ * @author Sebastian Drath
+ *
+ */
 public class RefuelStop implements IPredictionStation {
 
     private Date time;
     private GasStation station;
-    private int guessedPrice = 0;
+    private int guessedPrice = -1;
     private boolean priceGuessed;
     
     private List<Price> predictedPrices;
+    private Price predictedPrice;
 	private PredictionUnit predictionUnit;
 	private Validation validation;
 
-    //Variables below are needed for the Fixed Path Gas Station Problem
+    //Variablen für das Fixed Path Gas Station Problem
     private RefuelStop prevStation;
     private RefuelStop nextStation;
     private boolean breakPoint;
     private boolean nextStationBool;
 
-    //Aktuelle Menge an Gas und wieviel an dem jeweiligen RefuelStop aufgefüllt wurde. die unteren beiden sind für die Standart Tankstrategie
+    //Aktuelle Menge an Benzin und wieviel an dem jeweiligen RefuelStop aufgefüllt wurde (intelligente Strategie)
     private double fuelAmount;
     private double refillAmount;
     
+    //Aktuelle Menge an Benzin und wieviel an dem jeweiligen RefuelStop aufgefüllt wurde (naive Standard Strategie)
     private double fuelAmountBasic;
     private double refillAmountBasic;
-
-    public void setFuelAmountBasic(double fuelAmountBasic) {
-        this.fuelAmountBasic = fuelAmountBasic;
-    }
-
-    public void setRefillAmountBasic(double refillAmountBasic) {
-        this.refillAmountBasic = refillAmountBasic;
-    }
-    
 
     public RefuelStop(GasStation station, Date time) {
         this.station = station;
         this.time = time;
 		this.validation = new Validation();
-//        this.predictedPrices = new ArrayList<>();
-    }
-    
-    @Deprecated // normalerweise sollten hier nur die vorhergesagten Preise verwendet werden
-    public int getHistoricPrice(Date d) { // TODO Bedarf?
-    	return station.getHistoricPrice(d);
     }
 
     @Override
+	public Date getTime() {
+	    return time;
+	}
+
+	@Override
+	public GasStation getStation() {
+	    return station;
+	}
+
+	@Override
     public int getPredictedPrice(Date d) {
     	int prevPrice = -1;
     	if(predictedPrices == null || predictedPrices.size() == 0) return -1;
@@ -68,7 +75,10 @@ public class RefuelStop implements IPredictionStation {
 
     @Override
     public int getPredictedPrice() {
-    	return this.getPredictedPrice(this.time);
+    	if(predictedPrice == null || !predictedPrice.getTime().equals(this.time)) {
+    		predictedPrice = new Price(this.time, this.getPredictedPrice(this.time));
+    	}
+    	return predictedPrice.getPrice();
     }
     
     @Override
@@ -88,10 +98,16 @@ public class RefuelStop implements IPredictionStation {
     @Override
 	public void setPrediction(PredictionUnit pu) {
 		this.predictionUnit = pu;
-		this.predictedPrices = this.predictionUnit.testAndSetHourSteps();
+		this.predictedPrices = this.predictionUnit.testAndSetHourSteps(); // setzt die vorhergesagten Preise für 5 Wochen
+		this.predictedPrice = null; // zurücksetzen des gespeicherten Preises, da eine neue Vorhersage hinzugefügt wurde
 	}
 	
     @Override
+	public boolean isPredicted() {
+		return predictionUnit != null;
+	}
+
+	@Override
 	public void setValidation(Validation v) {
 		this.validation = v;
 	}
@@ -101,24 +117,42 @@ public class RefuelStop implements IPredictionStation {
 		return this.validation;
 	}
 
-    @Override
-	public boolean isPredicted() {
-		return predictionUnit != null;
-	}
-
-    public int getGuessedPrice() {
-        return guessedPrice;
-    }
-
+    /**
+     * Setzt einen geratenen Preis. Der Preis wird auf Basis der anderen Tankstops innerhalb einer Route geraten, wenn kein vorhergesagter Preis vorhanden ist.
+     *
+     * @param guessedPrice geratener Preis
+     */
     public void setGuessedPrice(int guessedPrice) {
         this.priceGuessed = true;
         this.guessedPrice = guessedPrice;
     }
+    
+    /**
+     * Gibt den vorhergesagten oder geratenen Preis für diesen Tankstop zurück. Der vorhergesagte Preis wird zurückgegeben, wenn kein geratener Preis gesetzt wurde. Wenn ein geratener Preis gesetzt wurde, weil keine
+     * geeignete Vorhersage existiert, wird der geratene Preis zurückgegeben.
+     *
+     * @return vorhergesagter Preis oder der geratene, wenn dieser gesetzt wurde
+     */
+    public int getPrice() {
+    	if(priceGuessed)
+    		return this.guessedPrice;
+    	else return this.getPredictedPrice();
+    }
 
+    /**
+     * Gibt zurück, ob der Preis für diesen Tankstop geraten wurde.
+     *
+     * @return true, wenn der Preis geraten ist, false ansonsten
+     */
     public boolean isPriceGuessed() {
         return priceGuessed;
     }
 
+    /**
+     * Gibt zurück, ob dieser Tankstop ein nächster günstigster Tankstop eines anderen ist. (siehe Verwendung in {@link controller.RefillStrategies})
+     *
+     * @return true, wenn der Tankstop ein nächster günstigerer eines anderen ist, false ansonsten
+     */
     public boolean isNextStation() {
         return nextStationBool;
     }
@@ -127,39 +161,66 @@ public class RefuelStop implements IPredictionStation {
         this.nextStationBool = nextStationBool;
     }
 
-
-    public double getFuelAmount(Route route) {
-        if(route.showBasicStrategy())
+    /**
+     * Gibt den Tankfüllstand an diesem Tankstop für die momentan eingestellte Tankstrategie aus.
+     *
+     * @return Tankfüllstand
+     */
+    public double getFuelAmount() {
+        if(Route.getStrategy() == Route.Strategy.BASIC)
             return fuelAmountBasic;
         return fuelAmount;
         
     }
 
+    /**
+     * Setzt den Tankfüllstand für die intelligente Tankstrategie.
+     *
+     * @param fuelAmount Tankfüllstand für die intelligente Tankstrategie
+     */
     public void setFuelAmount(double fuelAmount) {
         this.fuelAmount = fuelAmount;
     }
 
-    public double getRefillAmount(Route route) {
-        if(route.showBasicStrategy())
+    /**
+     * Setzt den Tankfüllstand für die einfache Tankstrategie.
+     *
+     * @param fuelAmountBasic Tankfüllstand für die einfache Tankstrategie
+     */
+    public void setFuelAmountBasic(double fuelAmountBasic) {
+	    this.fuelAmountBasic = fuelAmountBasic;
+	}
+
+    /**
+     * Gibt die nachgetankte Benzinmenge an diesem Tankstop für die momentan eingestellte Tankstrategie aus.
+     *
+     * @return nachgetankte Benzinmenge in Litern
+     */
+	public double getRefillAmount() {
+        if(Route.getStrategy() == Route.Strategy.BASIC)
             return refillAmountBasic;
         return refillAmount;
     }
 
+	/**
+     * Setzt die nachgetankte Benzinmenge für die intelligente Tankstrategie.
+     *
+     * @param refillAmount nachgetankte Benzinmenge in Litern für die intelligente Tankstrategie
+     */
     public void setRefillAmount(double refillAmount) {
-        this.refillAmount = refillAmount;
-    }
+	    this.refillAmount = refillAmount;
+	}
 
-    @Override
-    public Date getTime() {
-        return time;
-    }
+    /**
+     * Setzt die nachgetankte Benzinmenge für die einfache Tankstrategie.
+     *
+     * @param refillAmountBasic nachgetankte Benzinmenge in Litern für die einfache Tankstrategie
+     */
+	public void setRefillAmountBasic(double refillAmountBasic) {
+	    this.refillAmountBasic = refillAmountBasic;
+	}
 
-    @Override
-    public GasStation getStation() {
-        return station;
-    }
-
-    public boolean isBreakPoint() {
+	public boolean isBreakPoint() {
         return breakPoint;
     }
 

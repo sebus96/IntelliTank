@@ -2,23 +2,52 @@ package model;
 
 import java.util.Date;
 
+/**
+ * Stellt einen Preis an einem bestimmten Datum dar.
+ *
+ * @author Sebastian Drath
+ *
+ */
 public class Price {
 	private Date time;
 	private int price;
 	
+	/**
+	 * Erzeut einen neuen Preis zum Zeitpunkt des übergebenen Datums.
+	 *
+	 * @param time die Zeit, ab der der Preis gilt
+	 * @param price der Preis
+	 */
 	public Price(Date time, int price) {
 		this.time = time;
-		this.price = roundPrice(price);
+		this.price = roundPrice(price); // der Preis wird so gerundet, dass die dritte Stelle immer eine 9 enthält
 	}
 	
+	/**
+	 * Gibt die Zeit zurück.
+	 *
+	 * @return die Zeit des Preises
+	 */
 	public Date getTime() {
 		return time;
 	}
 	
+	/**
+	 * Gibt den Preis zurück
+	 *
+	 * @return der Preis
+	 */
 	public int getPrice() {
 		return price;
 	}
 	
+	/**
+	 * Rundet den Preis so, dass an der dritten Stelle nach dem Komma immer eine 9 steht. Dies wird gemacht, da
+	 * Benzinpreise üblicherweise eine 9 als letzte Stelle aufweisen.
+	 *
+	 * @param price der ursprüngliche Preis
+	 * @return der neue gerundete Preis
+	 */
 	public static int roundPrice(int price) {
 		return (int)(Math.ceil(( price + 1 ) / 10.0 ) * 10 ) - 1;
 	}

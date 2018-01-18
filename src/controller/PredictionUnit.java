@@ -33,6 +33,10 @@ public class PredictionUnit {
 			System.err.println("No historic prices available for " + gs + "!");
 			return false;
 		}
+		if(trainUntil.after(gs.getPriceListElement(gs.getPriceListSize()-1).getTime())) {
+			System.err.println("Prediction for " + gs + " too far in future!");
+			return false;
+		}
 		if(this.mode == Mode.SINGLE_LAYER)
 			p = new SingleLayerPerceptron(gs,0.08, 120);
 		else

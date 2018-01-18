@@ -21,12 +21,9 @@ import view.ProgressView;
 
 public class GasStationController {
 
-//    private static final boolean initialImportRoute = true;
-
     private Map<Integer, GasStation> allStations;
     private Route route;
     private PredictionPointList predictionPoints;
-//    private List<PredictionUnit> predictions;
     private RefillStrategies refillStrategies;
     private MainView mainView;
     private ProgressView pw;
@@ -44,34 +41,9 @@ public class GasStationController {
         mainView.show();
         PopupBox.displayImportWarnings();
         PopupBox.displayRouteWarnings(warnings);
-        /*if (route == null) {
-            PopupBox.displayWarning("Die Standartroute konnte nicht geöffnet werden.");
-            mainView.show();
-        } else {
-            predictionPoints = CSVManager.importStandardPredictionPoints(allStations);
-            CSVManager.importPrices(route);
-            CSVManager.importPrices(predictionPoints);
-            if (initialImportRoute) {
-                pw = new ProgressView(route);
-                this.trainPrediction(route);
-            } else {
-                pw = new ProgressView(predictionPoints);
-                this.trainPrediction(predictionPoints);
-            }
-        }*/
         
     }
-
-//    public void addGasStation(GasStation station) {
-//        if (allStations.containsKey(station.getID())) {
-//            System.err.println("Warning: Station with same ID will be inserted.");
-//        }
-//        allStations.put(station.getID(), station);
-//    }
-/*
-    public GasStation getStation(int id) {
-        return allStations.get(id);
-    }*/
+    
     public Route getRoute() {
         return route;
     }
@@ -79,10 +51,7 @@ public class GasStationController {
     public PredictionPointList getPredictionPoints() {
         return predictionPoints;
     }
-
-    /*public RefillStrategies getMainModel() {
-        return refillStrategies;
-    }*/
+    
     public void trainPrediction(IPredictionStationList stations) {
         Task<Void> predictionThread = new Task<Void>() {
             @Override

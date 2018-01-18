@@ -6,17 +6,30 @@ import java.util.List;
 
 public class Route implements IPredictionStationList {
 
+	/**
+	 * Die Tankstrategie.
+	 *
+	 * @author Sebastian Drath
+	 *
+	 */
+	public enum Strategy{
+		/** Es wird immer getankt, wenn der Tank leer ist oder wenn er nicht bis zum nächsten Stop reicht. */
+		BASIC,
+		/** Es wird so getankt, dass die Ausgaben minimiert werden. */
+		SMART
+	};
+	
     private double tankCapacity;
     private String name;
     private List<RefuelStop> route;
     private double totalEuros, totalKm, totalLiters, totalEuroBasic;
-    private boolean showBasicStrategy;//entscheidet, welche Tankstrategie gezeigt werden soll: die Standart-Strategie oder die "schlaue"
+    private static Strategy strategy;//entscheidet, welche Tankstrategie gezeigt werden soll: die Standart-Strategie oder die "schlaue"
 
-    
     public Route(String name, int tankCapacity) {
         this.tankCapacity = tankCapacity;
         this.route = new ArrayList<>();
         this.name = name;
+        strategy = Strategy.SMART;
     }
     
     public boolean hasPredictions() {
@@ -31,27 +44,30 @@ public class Route implements IPredictionStationList {
         return name;
     }
 
-    public boolean showBasicStrategy() {
-        return showBasicStrategy;
+    public static Strategy getStrategy() {
+        return strategy;
     }
 
-    public void setShowBasicStrategy(boolean showBasicStrategy) {
-        this.showBasicStrategy = showBasicStrategy;
+    public static void switchStrategy() {
+        if(strategy == Strategy.BASIC) {
+        	strategy = Strategy.SMART;
+        } else {
+        	strategy = Strategy.BASIC;
+        }
     }
 
-    public double getTotalEurosBasic() {
-        return totalEuroBasic;
-    }
-
-    public void setTotalEurosBasic(double totalEuroBasic) {
+    public void setTotalCostsBasic(double totalEuroBasic) {
         this.totalEuroBasic = totalEuroBasic;
     }
 
-    public double getTotalEuros() {
-        return totalEuros;
+    public double getTotalCosts() {
+    	if(strategy == Strategy.BASIC) {
+    		return totalEuroBasic;
+    	}
+    	return totalEuros;
     }
 
-    public void setTotalEuros(double totalEuros) {
+    public void setTotalCosts(double totalEuros) {
         this.totalEuros = totalEuros;
     }
 
@@ -81,7 +97,6 @@ public class Route implements IPredictionStationList {
 
     public RefuelStop get(int i) {
         if (i < 0 || i >= route.size()) {
-            //System.out.println("TT: " + i + " " + this.getLength());
             return null;
         }
         return route.get(i);

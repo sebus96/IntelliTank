@@ -13,6 +13,15 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+/**
+ * Repräsentation eines Vorhersagezeitpunkts. Dieser umfasst eine Tankstelle, bei der bis zu einem bestimmten Datum Preise
+ * für eine Vorhersage verwendet dürfen, ein Datum für diese Vorhersage sowie ein Vorhersageobjekt imklusive der vorhergesagten
+ * Preisliste. Eine Validierung gibt Werte zur Beurteilung der Vorhersage an, wenn eine Vorhersage getätigt wurde und echte
+ * Preise als Referenz vorliegen.
+ *
+ * @author Sebastian Drath
+ *
+ */
 public class PredictionPoint implements IPredictionStation {
 	private GasStation station;
 	private Date priceKnownUntil, predictionTime;
@@ -36,6 +45,11 @@ public class PredictionPoint implements IPredictionStation {
 		return station;
 	}
 
+    /**
+     * Gibt das Datum zurück, bis zu dem die Preise an dieser Tankstelle als bekannt angenommen werden können.
+     *
+     * @return Datum bis zu dem Preise bekannt sind
+     */
 	public Date getPriceKnownUntil() {
 		return priceKnownUntil;
 	}
@@ -43,7 +57,8 @@ public class PredictionPoint implements IPredictionStation {
     @Override
 	public void setPrediction(PredictionUnit pu) {
 		this.predictionUnit = pu;
-		this.predictedPrices = this.predictionUnit.testAndSetHourSteps();
+		this.predictedPrices = this.predictionUnit.testAndSetHourSteps();  // setzt die vorhergesagten Preise für 5 Wochen
+		this.predictedPrice = null; // zurücksetzen des gespeicherten Preises, da eine neue Vorhersage hinzugefügt wurde
 	}
 
     @Override
@@ -89,10 +104,6 @@ public class PredictionPoint implements IPredictionStation {
 			return this.predictedPrices.get(index);
 		return null;
 	}
-    
-//    public void setPredictedPrices( List<Price> predicted) {
-//    	this.predictedPrices = predicted;
-//    }
     
     @Override
     public String toCSVString() {
@@ -156,9 +167,25 @@ public class PredictionPoint implements IPredictionStation {
 		return true;
 	}
 
+	/**
+	 * Klasse für die Anzeige als Zeile innerhalb einer Tabelle in PredictionPointView.
+	 *
+	 * @author Sebastian Drath
+	 *
+	 */
 	public static class TableRow{
 		private PredictionPoint predictionPoint;
 		
+		/**
+		 * Erstellt eine neue Zeile für eine Tabelle
+		 *
+		 * @param id Zeilen ID
+		 * @param pp PredictionPoint Objekt
+		 * @param knownTime bekannte Zeit
+		 * @param predictionTime Vorhersagezeit
+		 * @param price vorhergesagter Preis
+		 * @param realPrice echter Preis
+		 */
 		public TableRow(int id, PredictionPoint pp, String knownTime, String predictionTime, double price, double realPrice) {
 			this.predictionPoint = pp;
 			idProperty().set(id);
@@ -169,41 +196,76 @@ public class PredictionPoint implements IPredictionStation {
 			realPriceProperty().set(realPrice/1000);
 		}
 		
+		/**
+		 * Gibt den Vorhersagezeitpunkt zurück.
+		 *
+		 * @return Vorhersagezeitpunkt dieser Zeile
+		 */
 		public PredictionPoint getPredictionPoint(){
 			return predictionPoint;
 		}
 		
 	    private IntegerProperty id;
+	    /**
+	     * Property für die ID einer Zeile
+	     *
+	     * @return ID-Property
+	     */
 	    public IntegerProperty idProperty() { 
 	        if (id == null) id = new SimpleIntegerProperty(this, "id");
 	        return id;
 	    }
 	    
 		private StringProperty station;
+		/**
+		 * Property für den Tankstellennamen.
+		 *
+		 * @return Tankstellennamen-Property 
+		 */
 	    public StringProperty stationProperty() { 
 	        if (station == null) station = new SimpleStringProperty(this, "station");
 	        return station;
 	    }
 
 		private StringProperty knownTime;
+		/**
+		 * Property für die Zeit, bis zu der historische Daten für die Vorhersage verwendet werden.
+		 *
+		 * @return Property der bekannten Zeit
+		 */
 	    public StringProperty knownTimeProperty() { 
 	        if (knownTime == null) knownTime = new SimpleStringProperty(this, "knownTime");
 	        return knownTime;
 	    }
 
 		private StringProperty predictionTime;
+		/**
+		 * Property für die Vorhersagezeit.
+		 *
+		 * @return Vorhersagezeit-Property
+		 */
 	    public StringProperty predictionTimeProperty() { 
 	        if (predictionTime == null) predictionTime = new SimpleStringProperty(this, "predictionTime");
 	        return predictionTime;
 	    }
 		
 		private DoubleProperty price;
+		/**
+		 * Property für den vorhergesagten Preis.
+		 *
+		 * @return Property des vorhergesagten Preises
+		 */
 	    public DoubleProperty priceProperty() { 
 	        if (price == null) price = new SimpleDoubleProperty(this, "price");
 	        return price;
 	    }
 		
 		private DoubleProperty realPrice;
+		/**
+		 * Property für den echten Preis. Wenn kein echter Preis vorhanden ist, wird -1 gesetzt.
+		 *
+		 * @return Property des echten Preises
+		 */
 	    public DoubleProperty realPriceProperty() { 
 	        if (realPrice == null) realPrice = new SimpleDoubleProperty(this, "realPrice");
 	        return realPrice;

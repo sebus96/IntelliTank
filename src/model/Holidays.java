@@ -25,7 +25,7 @@ public class Holidays {
 	 * Die Beschreibung liegt als Text vor. Beginn und Ende von Ferien wird mit Daten im Format dd.MM. angegeben.
 	 * Einzelne Tage bzw. Ferienbereiche sind durch "/" getrennt.
 	 * Beispiele: "dd.MM.-dd.MM" für Ferienbereiche, "dd.MM." für einzelne Tage oder "dd.MM.-dd.MM./dd.MM." für einen Bereich und einzelnen Tag.
-	 * 
+	 * Das Bundesland und der Name dürfen nicht null entsprechen.
 	 *
 	 * @param year Das Jahr in dem die Ferien liegen
 	 * @param state Das Bundesland in dem die Ferien sind

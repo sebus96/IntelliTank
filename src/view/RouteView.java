@@ -71,7 +71,7 @@ public class RouteView extends ScrollPane {
 //        canvas.widthProperty().bind(parent.widthProperty());
     	this.setContent(canvas);
         gc = canvas.getGraphicsContext2D();
-        switchButton = new SwitchButton(route, gc,800 - 140, 10);
+        switchButton = new SwitchButton( gc,800 - 140, 10);
         //Erstellt einen Button, mit dem man zwischen den Tankstrategien wechseln kann
         //Iterates through the entire list
         indexWithYCoordinate = new HashMap<>();
@@ -150,20 +150,18 @@ public class RouteView extends ScrollPane {
         gc.strokeOval(180 - circleWidth / 2, circleStart, circleWidth, circleHeight);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        double priceForStation = (double) route.get(index).getPredictedPrice() / 1000;
+        double priceForStation = (double) route.get(index).getPrice() / 1000;
         if (route.get(index).isPriceGuessed()) {
             gc.setFill(Color.RED);
-            gc.fillText((double) route.get(index).getGuessedPrice() / 1000 + "", 180, circleStart + circleHeight / 2);
-            gc.setFill(Color.BLACK);
-        } else {
-            gc.fillText((priceForStation < 0? "-.---" : priceForStation) + "", 180, circleStart + circleHeight / 2);
         }
+        gc.fillText((priceForStation < 0? "-.---" : priceForStation) + "", 180, circleStart + circleHeight / 2);
+        gc.setFill(Color.BLACK);
     }
 
     private void createFuelStatusRectangle( int index, int circleStart, int circleHeight) {
         RefuelStop rs = route.get(index);
-        double currentGasPercentage = rs.getFuelAmount(route) / route.getTankCapacity() * 100;
-        double currentRefillPercentage = rs.getRefillAmount(route) / route.getTankCapacity() * 100;
+        double currentGasPercentage = rs.getFuelAmount() / route.getTankCapacity() * 100;
+        double currentRefillPercentage = rs.getRefillAmount() / route.getTankCapacity() * 100;
         //System.out.println(rs.getFuelAmount() + " " + rs.getRefillAmount());
         DecimalFormat f2 = new DecimalFormat("#0.00");
         DecimalFormat f1 = new DecimalFormat("#0.0");
@@ -173,18 +171,18 @@ public class RouteView extends ScrollPane {
         gc.fillRect(30, circleStart, 100, circleHeight);
         gc.setFill(Color.BLACK);
         gc.fillRect(30, circleStart, currentGasPercentage, circleHeight);
-        if (f2.format(Math.abs(rs.getFuelAmount(route))).charAt(3) == '0') {
-            gc.fillText(f1.format(Math.abs(rs.getFuelAmount(route))) + " L", 30, circleStart - 10);
+        if (f2.format(Math.abs(rs.getFuelAmount())).charAt(3) == '0') {
+            gc.fillText(f1.format(Math.abs(rs.getFuelAmount())) + " L", 30, circleStart - 10);
         } else {
-            gc.fillText(f2.format(Math.abs(rs.getFuelAmount(route))) + " L", 30, circleStart - 10);
+            gc.fillText(f2.format(Math.abs(rs.getFuelAmount())) + " L", 30, circleStart - 10);
         }
         gc.setFill(Color.GREEN);
         gc.fillRect(30 + currentGasPercentage, circleStart, currentRefillPercentage, circleHeight);
         gc.setTextAlign(TextAlignment.RIGHT);
-        if (f2.format(rs.getRefillAmount(route)).charAt(3) == '0') {
-            gc.fillText("+ " + f1.format(rs.getRefillAmount(route)) + " L", 130, circleStart - 10);
+        if (f2.format(rs.getRefillAmount()).charAt(3) == '0') {
+            gc.fillText("+ " + f1.format(rs.getRefillAmount()) + " L", 130, circleStart - 10);
         } else {
-            gc.fillText("+ " + f2.format(rs.getRefillAmount(route)) + " L", 130, circleStart - 10);
+            gc.fillText("+ " + f2.format(rs.getRefillAmount()) + " L", 130, circleStart - 10);
         }
         gc.setTextAlign(TextAlignment.LEFT);
         gc.setFill(Color.BLACK);
@@ -287,18 +285,10 @@ public class RouteView extends ScrollPane {
         gc.setFont(new Font(15));
         gc.fillText(outputFuelGauge, 158, 58);
         gc.setFont(Font.getDefault());
-        String outputEuro = "";
-        if (route.showBasicStrategy()) {
-            outputEuro += f.format(route.getTotalEurosBasic()) + " \u20ac";
-            gc.setFont(new Font(15));
-            gc.fillText(outputEuro, 254, 58);
-            gc.setFont(Font.getDefault());
-        } else {
-            outputEuro += f.format(route.getTotalEuros()) + " \u20ac";
-            gc.setFont(new Font(15));
-            gc.fillText(outputEuro, 254, 58);
-            gc.setFont(Font.getDefault());
-        }
+        String outputEuro = f.format(route.getTotalCosts()) + " \u20ac";
+        gc.setFont(new Font(15));
+        gc.fillText(outputEuro, 254, 58);
+        gc.setFont(Font.getDefault());
         String nameAndTimeOfRoute = "Route: \"" + route.getName();
         Date date = route.getPriceKnownUntil();
         nameAndTimeOfRoute += "\" am " + new SimpleDateFormat("dd.MM.yyyy").format(date);

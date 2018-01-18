@@ -69,7 +69,7 @@ public class RefillStrategies {
             }
             currentFuelAmount -= (kmToNextStation * gasUsedPerKm);
         }
-        route.setTotalEurosBasic(totalEuros);
+        route.setTotalCostsBasic(totalEuros);
     }
 
     /**
@@ -109,7 +109,7 @@ public class RefillStrategies {
         // the goal is to go from one breakpoint to the next until you reach the end of the route
         // if you cant reach the next breakpoint, fill tank completely,check next() and go there
         // at next() fill just enough to get to the breakpoint
-        createRefillPlan(route, gasUsedPerKm);
+        createRefillPlan(route);
     }
 
     /**
@@ -191,12 +191,12 @@ public class RefillStrategies {
                     gasPrice = route.get(j).getPredictedPrice();
                 } else {
                     gasPrice = guessPrice(route, j);
-                    continue;
+                    continue;  //TODO continue bei raten?
                 }
                 nextStationNumber = j;
             } //Falls es ein späterer Durchlauf ist, vergleiche den aktuellen mit dem aktuell günstigsten Tankpreis
             else {
-                if (route.get(j).getPredictedPrice() <= gasPrice) {
+                if (route.get(j).getPredictedPrice() <= gasPrice) { //TODO hier kleiner gleich oben nur gleich?
                     //Prüfe, ob es tatsächlich einen Preis gibt
                     if (route.get(j).getPredictedPrice() > 0) {
                         gasPrice = route.get(j).getPredictedPrice();
@@ -238,9 +238,8 @@ public class RefillStrategies {
      *
      * @param route Die route, für die die günstigste Tankstrategie bestimmt
      * werden soll
-     * @param gasUsedPerKm Wieviel Benzin Pro km verbraucht wird
      */
-    private void createRefillPlan(Route route, double gasUsedPerKm) {
+    private void createRefillPlan(Route route) {
 
         double currentTankStatus = 0;
         double totalEuros = 0, totalKm = 0;
@@ -287,14 +286,14 @@ public class RefillStrategies {
             }
             //Addiere den Preis zu den bisherigen Kosten. Nehme dafür entweder den projezierten Preis oder den vermuteten, je nachdem ob er bekannt ist.
             if (route.get(i).getPredictedPrice() > 0) {
-                totalEuros += route.get(i).getRefillAmount(route) * route.get(i).getPredictedPrice() / 1000;
+                totalEuros += route.get(i).getRefillAmount() * route.get(i).getPredictedPrice() / 1000;
             } else {
-                totalEuros += route.get(i).getRefillAmount(route) * guessPrice(route, i) / 1000;
+                totalEuros += route.get(i).getRefillAmount() * guessPrice(route, i) / 1000;
             }
         }
         route.setTotalKm(totalKm);
         route.setTotalLiters(totalKm * gasUsedPerKm);
-        route.setTotalEuros(totalEuros);
+        route.setTotalCosts(totalEuros);
     }
 
     /**
@@ -334,7 +333,7 @@ public class RefillStrategies {
     private void validateStrategy(Route route) {
         
         for(int i = 0; i<route.getLength();i++) {
-            if(route.get(i).getFuelAmount(route) < 0 || route.get(i).getRefillAmount(route) < 0) {
+            if(route.get(i).getFuelAmount() < 0 || route.get(i).getRefillAmount() < 0) {
                 PopupBox.displayError(304);
                 return;
             }
