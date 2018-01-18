@@ -38,6 +38,7 @@ import model.Price;
 import model.Route;
 
 /**
+ * Dateiverwaltung
  *
  * @author Sebastian Drath
  */
@@ -59,8 +60,9 @@ public class CSVManager {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssX");
 
     /**
-     * Lädt alle relevanten Dateien die zukünftig gebraucht werden
-     * @return alle Tankstellen in Tankstellen.csv
+     * Lädt alle relevanten Dateien die zukünftig gebraucht werden. Lädt alle Tankstellen, Feriendaten sowie die Zurordnung
+     * von Postleitzahlen zu Bundesländern. Erstellt die Eingabeordner, wenn sie nicht existieren.
+     * @return alle Tankstellen aus der Datei Tankstellen.csv
      */
     public static Map<Integer, GasStation> initialImport() {
         importPostalcodes();
@@ -118,7 +120,7 @@ public class CSVManager {
     }
 
     /**
-     * Listet alle Fehler, die augetreten sind
+     * Gibt alle Fehler, die während des initialen Imports augetreten sind, als Liste zurück.
      * @return Liste von aufgetretenen Fehlern
      */
     public static List<Integer> getOccuredFailures() {
@@ -128,7 +130,7 @@ public class CSVManager {
     }
 
     /**
-     * Importiert Postleitzahlen der Bundesländer
+     * Importiert die Zuordnung der Postleitzahlen zu Bundesländern
      */
     private static void importPostalcodes() {
         if (Postalcodes.isImported()) {
@@ -171,7 +173,9 @@ public class CSVManager {
             System.err.println("Could not import Route \"" + routeFile.getName() + "\"!");
             return null;
         }
-        Route route = new Route(routeName, getInteger(lines.remove(0)));
+        int capacity = getInteger(lines.remove(0));
+        if(capacity < 0) return null;
+        Route route = new Route(routeName,capacity);
         for (String line : lines) {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 2) {
@@ -187,7 +191,8 @@ public class CSVManager {
     }
 
     /**
-     * Verifiziert Routen
+     * Verifiziert Routen. Überprüft beispielsweise, ob die Tankstops aufsteigende
+     * Zeiten aufweisen und ob die Tankstellen IDs gefunden werden konnten.
      * @param stations Liste aller Tankstellen
      * @return Gibt alle Warnungen zurück, die während der Verifizierung aufgetreten sind
      */
@@ -197,6 +202,10 @@ public class CSVManager {
         printMessages = false;
         for (String filename : readRouteNames()) {
             Route cur = importRoute(stations, filename);
+            if(cur == null) {
+            	routeWarnings.add(filename + ": Formatierung fehlerhaft. Die Datei konnte nicht importiert werden.");
+            	continue;
+            }
             if (cur.getTankCapacity() <= 0) {
                 routeWarnings.add(cur.getName() + ": Tankkapazität zu gering.");
             }
@@ -304,17 +313,17 @@ public class CSVManager {
         String[] holidayNames = {"Winter", "Ostern", "Pfingsten", "Sommer", "Herbst", "Weihnachten"};
         String[] files = readFilenames(new File(holidayPath), ".txt");
         if (files == null) {
-            System.err.println("InputFolder for holidays does not exist.");
+            System.err.println("InputFolder for holidays does not exist."); // Der Ordner exsitiert nicht
             failures.add(206);
             return;
         }
         if (files.length == 0) {
-            failures.add(206);
+            failures.add(206); // Es existieren keine Feriendaten im Ordner
         }
         for (String filename : files) {
-            int year = getInteger(filename.substring(0, 4));
+            int year = getInteger(filename.substring(0, 4)); // setze die ersten vier Zeichen des Dateinames als Jahr
             if (year < 0) {
-                System.err.println("Unecpected holiday filename: " + filename);
+                System.err.println("Unecpected holiday filename: " + filename); // die ersten vier Zeichen sind keine Zahl
                 failures.add(207);
                 continue;
             }
@@ -330,7 +339,7 @@ public class CSVManager {
                         System.err.println("Illegal federal state: " + line);
                         failures.add(208);
                     }
-                } else if (ctr > 0 && ctr <= holidayNames.length) {
+                } else if (ctr > 0 && ctr <= holidayNames.length) { // die Zeilen stehen immer in der selben Reihenfolge für die jeweiligen Ferien
                     if (curState == null || curState == FederalState.DEF) {
                         System.err.println("Current State could not be parsed: " + readState + " (Holidayfile " + filename + ")");
                         failures.add(208);
@@ -339,7 +348,7 @@ public class CSVManager {
                         failures.add(208);
                     }
                 } else {
-                    System.err.println("Count to high (" + ctr + ")");
+                    System.err.println("Count to high (" + ctr + ")"); // der Teil sollte nie erreichbar sein
                 }
                 ctr++;
                 ctr %= holidayNames.length + 1; // es wird von 0 bis 6 gezählt
@@ -348,9 +357,11 @@ public class CSVManager {
     }
 
     /**
-     * Bereite Zeilen-Daten vor für jeden Vorhersagezetpunkt in der Tabelle
-     * @param row Zeile, in der es angezeigt werden soll
-     * @return String array. Jedes Feld enspricht einer Zelle in der Tabelle
+     * Unterteilt die übergebene importierte Zeile in einzelne Spalten und bereitet Zelleninhalt vor.
+     * Das heißt ungültige Zeichen, wie zum Beispiel Anführungsstriche und führende Leerzeichen, werden entfernt
+     * 
+     * @param row Zeile, die vorbereitet werden soll
+     * @return String array. Jedes Feld enspricht einer Zelle in der importierten Tabelle
      */
     private static String[] prepareRowData(String row) {
         String[] res = row.split(";");
@@ -361,18 +372,18 @@ public class CSVManager {
     }
 
     /**
-     * Erstellt eine neue Datei und füllt sie mit Inhalt
+     * Gibt den Inhalt der Datei mit dem übergebenen Dateinamen als Liste mit den gelesenen Zeilen zurück.
      * @param filename Name der Datei, die gelesen werden soll.
-     * @return inhalt der Gelesenen Datei.
+     * @return Inhalt der Gelesenen Datei.
      */
     private static List<String> readFile(String filename) {
         return readFile(new File(filename));
     }
 
     /**
-     * Liest die angegebene Datei
+     * Gibt den Inhalt der angegebenen Datei als Liste mit den gelesenen Zeilen zurück.
      * @param filename Name der Datei, die gelesen werden soll.
-     * @return inhalt der Gelesenen Datei.
+     * @return Inhalt der Gelesenen Datei.
      */
     private static List<String> readFile(File file) {
         List<String> lines = new ArrayList<>();
@@ -494,7 +505,7 @@ public class CSVManager {
     }
 
     /**
-     * Liest alle Dateien, die sich in einem Ordner befinden
+     * Liest alle Dateien mit der angebenen Endung, die sich in einem Ordner befinden
      * @param folder Ort des Ordners
      * @param ending Dateiendung, die gesucht wird
      * @return Array mit allen Dateinamen
@@ -511,8 +522,8 @@ public class CSVManager {
     /**
      * Kopiere Route
      * @param selectedFile Routendatei, die kopiert werden soll
-     * @throws FileNotFoundException Error, falls Datei nicht gefunden werden konnte
-     * @throws IOException IOException Wenn zb. der Pfad nicht gefunden werden konnte
+     * @throws FileNotFoundException Wenn die Datei nicht gefunden werden konnte
+     * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
     public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
         Path path = Paths.get(routeInputPath + selectedFile.getName());
@@ -522,8 +533,8 @@ public class CSVManager {
      /**
      * Kopiere Vorhersagezeitpunkte
      * @param selectedFile Vorhersagezeitpunktdatei, die kopiert werden soll
-     * @throws FileNotFoundException Error, falls Datei nicht gefunden werden konnte
-     * @throws IOException IOException Wenn zb. der Pfad nicht gefunden werden konnte
+     * @throws FileNotFoundException Wenn die Datei nicht gefunden werden konnte
+     * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
     public static void copyPredictionPoints(File selectedFile) throws FileNotFoundException, IOException {
         Path path = Paths.get(predictionInputPath + selectedFile.getName());
@@ -533,8 +544,8 @@ public class CSVManager {
      /**
      * Kopiere Datei
      * @param selectedFile Datei, die kopiert werden soll
-     * @throws FileNotFoundException Error, falls Datei nicht gefunden werden konnte
-     * @throws IOException IOException Wenn zb. der Pfad nicht gefunden werden konnte
+     * @throws FileNotFoundException Wenn die Datei nicht gefunden werden konnte
+     * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
     private static void copyFile(File selectedFile, Path dest) throws FileNotFoundException, IOException {
         InputStream is = new FileInputStream(selectedFile);
@@ -544,7 +555,7 @@ public class CSVManager {
 }
 
 /**
- * Filter für Routennamen
+ * Dateifilter für Routennamen
  * @author Sebastian Drath
  */
 class InputFileFilter implements FilenameFilter {
@@ -553,7 +564,7 @@ class InputFileFilter implements FilenameFilter {
 
     
     /**
-     * Initialisiert den Routefilter
+     * Initialisiert den Dateifilter
      * @param ending Dateinamen-Endung
      */
     public InputFileFilter(String ending) {
@@ -561,10 +572,10 @@ class InputFileFilter implements FilenameFilter {
     }
 
     /**
-     * Akzeptiert Datei
-     * @param dir Pfad an dem gesucht wird
+     * Überprüft, ob eine Datei mit dem Filter angezeigt wird
+     * @param dir Pfad in dem gesucht wird
      * @param name Name der Datei
-     * @return Ob es akzeptiert wurde oder nicht
+     * @return true, wenn die Datei akzeptiert wurde, ansonsten false
      */
     @Override
     public boolean accept(File dir, String name) {
