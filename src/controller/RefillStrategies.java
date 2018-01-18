@@ -3,7 +3,7 @@ package controller;
 /**
  * Diese Klasse enthält Algorithmen für Tankstrategien
  *
- * @author Admin
+ * @author Axel Claassen
  */
 import model.Route;
 import model.RefuelStop;

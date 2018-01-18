@@ -23,22 +23,31 @@ import javafx.beans.property.StringProperty;
  *
  */
 public class PredictionPoint implements IPredictionStation {
-	private GasStation station;
-	private Date priceKnownUntil, predictionTime;
-	private List<Price> predictedPrices;
-	private Price predictedPrice;
-	private PredictionUnit predictionUnit;
-	private Validation validation;
-	
-	public PredictionPoint(GasStation station, Date priceKnownUntil, Date predictionTime) {
-		this.station = station;
-		if (priceKnownUntil.after(predictionTime)) {
-			System.err.println("Prediction unnecessary! Price is known for requested prediction date.");
-		}
-		this.priceKnownUntil = priceKnownUntil;
-		this.predictionTime = predictionTime;
-		this.validation = new Validation();
-	}
+
+    private GasStation station;
+    private Date priceKnownUntil, predictionTime;
+    private List<Price> predictedPrices;
+    private Price predictedPrice;
+    private PredictionUnit predictionUnit;
+    private Validation validation;
+
+    /**
+     * Erstelle ein Voerhersagezeitpunkt-Objekt
+     *
+     * @param station Die Tankstelle, für die es erstellt werden soll
+     * @param priceKnownUntil Die Zeit, bis zu der man die historischen Preise
+     * verwenden darf zur Vorhersage
+     * @param predictionTime Zeit, für die die Vorhersage gemacht werden soll
+     */
+    public PredictionPoint(GasStation station, Date priceKnownUntil, Date predictionTime) {
+        this.station = station;
+        if (priceKnownUntil.after(predictionTime)) {
+            System.err.println("Prediction unnecessary! Price is known for requested prediction date.");
+        }
+        this.priceKnownUntil = priceKnownUntil;
+        this.predictionTime = predictionTime;
+        this.validation = new Validation();
+    }
 
     @Override
 	public GasStation getStation() {
@@ -71,6 +80,11 @@ public class PredictionPoint implements IPredictionStation {
 		return predictionTime;
 	}
 
+    /**
+     * Gibt den vorhergesagten Preis zurück für ein bestimmtes Datum
+     * @param d Datum für den vorhergesagten Preis
+     * @return Der vorhergesagte Preis
+     */
     @Override
 	public int getPredictedPrice(Date d) {
     	int prevPrice = -1;
@@ -97,7 +111,12 @@ public class PredictionPoint implements IPredictionStation {
     public int getPredictedPriceListSize(){
     	return this.predictedPrices.size();
     }
-    
+
+    /**
+     * Gibt ein Preislisten-Element aus der Liste zurück
+     * @param index index des PReiselelemts in der Liste
+     * @return Preiselement, das ausgewählt wurde
+     */
     @Override
 	public Price getPredictedPriceListElement(int index) {
 		if(index < this.predictedPrices.size() && index >= 0)

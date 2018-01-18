@@ -19,17 +19,26 @@ import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+
 import model.GasStation;
 import model.IPredictionStation;
 import model.Price;
 
+/**
+ * Erzeugt die Graphen für historische und vorhersagte Preise der einzelnen Tankstellen.
+ * @author Axel Claassen, Burak Kadioglu, Sebastian Drath
+ *
+ */
 public class PriceDiagram {
-
     private static List<IPredictionStation> gasStations = new ArrayList<>();
     private static Stage priceStage;
     private static boolean showHistoric = true;
     private static RadioMenuItem predictionItem;
 
+    /**
+     * Öffnet ein neues Fenster mit den historischen Preisen der Tankstelle. Ist das Fenster bereits offen, wird die Kurve in anderer Farbe hinzugefügt.
+     * @param gs IPredictionStation der Tankstelle
+     */
     public static void displayGasStation(IPredictionStation gs) {
     	boolean showWarning = false;
     	if(!showHistoric && !gs.isPredicted()) {
@@ -61,8 +70,11 @@ public class PriceDiagram {
         }
         if(showWarning) PopupBox.displayWarning(202);
     }
-
-    public static void generateDiagram() {
+    
+    /**
+     * Generiert einen Graphen für die Anzeige der Preise einer Tankstelle der Route. 
+     */
+    private static void generateDiagram() {
     	double xMin = Double.MAX_VALUE;
     	double xMax = Double.MIN_VALUE;
     	boolean unPredictedStations = false;
@@ -176,7 +188,12 @@ public class PriceDiagram {
         priceStage.getIcons().add(icon);
         priceStage.setScene(scene);
     }
-
+    
+    /**
+     * Fügt die Daten der angeklickten Tankstelle(Series) dem Linechart hinzu, um sie anzeigen zu lassen.
+     * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
+     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
+     */
     private static void addSeries(LineChart<Number, Number> lc ,GasStation gs) {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(gs.getName());
@@ -206,7 +223,11 @@ public class PriceDiagram {
         }
         lc.getData().add(series);
     }
-
+    /**
+     * Fügt die Vorhergesagten Preise dem Linechart hinzu, um sie darzustellen
+     * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
+     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
+     */
     private static void addPredictedSeries(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
     	XYChart.Series<Number, Number> seriesPred = new XYChart.Series<>();
@@ -222,8 +243,13 @@ public class PriceDiagram {
         lc.getData().add(seriesPred);
         lc.getData().add(series);
     }
-
-    /*private static void addPredictedSeries(LineChart<Number, Number> lc ,IPredictionStation ps) {
+    
+    /**
+     * Fügt die Vorhergesagten Preise dem Linechart hinzu, um sie darzustellen (in Tagesabständen)
+     * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
+     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
+     */
+    private static void addPredictedSeriesDaySteps(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
     	XYChart.Series<Number, Number> seriesPred = new XYChart.Series<>();
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -280,8 +306,12 @@ public class PriceDiagram {
         }
         lc.getData().add(seriesPred);
         lc.getData().add(series);
-    }*/
+    }
     
+    /**
+     * Zeigt ein Kontextmenü, das per rechtsklick auf eine Tankstelle angezeigt wird. 
+     * @param scene Die Szene, in der das Kontextmenü geöffnet wurde
+     */
     private static void setContextMenu(Scene scene) {
         ContextMenu contextMenu = new ContextMenu();
         ToggleGroup group = new ToggleGroup();
@@ -314,6 +344,9 @@ public class PriceDiagram {
         });
     }
     
+    /**
+     * 
+     */
     private static void setContextMenuSelection() {
     	if(predictionItem == null) return;
     	else predictionItem.setSelected(!showHistoric);

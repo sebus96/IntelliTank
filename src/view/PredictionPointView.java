@@ -19,17 +19,25 @@ import javafx.stage.Stage;
 import model.PredictionPoint;
 import model.PredictionPointList;
 
+/**
+ * Erzeugt Graphen für die Preise 
+ * @author Axel Claassen, Burak Kadioglu, Sebastian Drath
+ *
+ */
 public class PredictionPointView extends BorderPane {
 
     private static TableView<PredictionPoint.TableRow> table;
     private Label title;
 	private Stage parent;
-//	private PredictionPoints predictionPoints;
 
+	/**
+	 * Konstruktor für die Anzeige der Vorhersagezeitpunkte.
+	 * @param parent Hauptfenster
+	 * @param predictionPoints Vorhersagezeitpunkte
+	 */
     public PredictionPointView(Stage parent, PredictionPointList predictionPoints) {
     	super();
         this.parent = parent;
-//        this.predictionPoints = predictionPoints;
         this.title = new Label();
         this.title.setFont(new Font("Arial", 20));
         this.title.setPadding(new Insets(5, 5, 5, 5));
@@ -40,7 +48,11 @@ public class PredictionPointView extends BorderPane {
         title.setText(predictionPoints.getName());
         table.setItems(predictionPoints.getList());
     }
-
+    
+    /**
+     * Kreierung der Tabelle.
+     * Tooltip-Funktion vorhanden.
+     */
     private void createTable() {
     	if(table != null) return;
         table = new TableView<>();
@@ -67,7 +79,6 @@ public class PredictionPointView extends BorderPane {
                 @Override
                 protected void updateItem(Double item, boolean empty) {
                     super.updateItem(item, empty);
-
                     if (item == null || empty) {
                         setText(null);
                         setStyle("");
@@ -80,7 +91,6 @@ public class PredictionPointView extends BorderPane {
                     	} else {
                     		setText(" -.--- ");
                     		setTextFill(Color.RED);
-//                    		setStyle("-fx-background-color: red");
                     		this.setTooltip(new Tooltip("Es sind keine Daten als Basis für eine Vorhersage vorhanden"));
                     	}
                     }
@@ -88,7 +98,6 @@ public class PredictionPointView extends BorderPane {
             };
         });
         priceColumn.setMinWidth(50);
-        
         TableColumn<PredictionPoint.TableRow, Double> realPriceColumn = new TableColumn<>("Echter Preis");
         realPriceColumn.setCellValueFactory(new PropertyValueFactory<>("realPrice"));
         realPriceColumn.setMinWidth(90);
@@ -114,7 +123,6 @@ public class PredictionPointView extends BorderPane {
                 }
             };
         });
-        
         table.setRowFactory(tv -> {
         	TableRow<PredictionPoint.TableRow> row = new TableRow<>();
         	// MouseListener für das öffnen des Preisdiagramms aus der Vorhersagezeitpunkttabelle
@@ -124,7 +132,6 @@ public class PredictionPointView extends BorderPane {
 				public void handle(MouseEvent event) {
 					if (! row.isEmpty()) {
 	                	PredictionPoint.TableRow rowData = row.getItem();
-	                	
 	                	if(event.getButton() == MouseButton.PRIMARY)
 	                		PriceDiagram.displayGasStation(rowData.getPredictionPoint());
 	                	else if(event.getButton() == MouseButton.SECONDARY)
@@ -133,9 +140,8 @@ public class PredictionPointView extends BorderPane {
 				}
                 
             });
-            return row ;
+            return row;
         });
-        
         table.getColumns().add(nrColumn);
         table.getColumns().add(gasStationColumn);
         table.getColumns().add(knownTimeColumn);
