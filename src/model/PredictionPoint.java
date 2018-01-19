@@ -144,6 +144,16 @@ public class PredictionPoint implements IPredictionStation {
 	}
     
     @Override
+    public String getType() {
+    	return "Vorhersagezeitpunkt";
+    }
+
+	@Override
+	public String getName() {
+		return station.getName() + " (" + station.getID() + ")";
+	};
+    
+    @Override
     public String toString() {
     	return "(" + this.station + ": " + this.predictionTime + ")\n";
     }
@@ -289,5 +299,5 @@ public class PredictionPoint implements IPredictionStation {
 	        if (realPrice == null) realPrice = new SimpleDoubleProperty(this, "realPrice");
 	        return realPrice;
 	    }
-	};
+	}
 }

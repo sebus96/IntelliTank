@@ -120,24 +120,6 @@ public class GasStation {
 	}
 	
 	/**
-	 * Gibt den Längengrad zurück.
-	 *
-	 * @return Längengrad
-	 */
-	public double getLongitude() {
-		return longitude;
-	}
-
-	/**
-	 * Gibt den Breitengrad zurück.
-	 *
-	 * @return Breitengrad
-	 */
-	public double getLatitude() {
-		return latitude;
-	}
-	
-	/**
 	 * Bestimmt den Preis an dem übergebenen Datum mit Hilfe der historischen Daten.
 	 * 
 	 * Es wird immer der Preis der letzen Änderung vor dem angefragten Datum ausgegeben.
@@ -185,6 +167,24 @@ public class GasStation {
 			return this.historicPrices.get(index);
 		return null;
 	}
+	
+	/**
+     * Berechnet den Abstand in km zwischen 2 Tankstellen anhand ihrer Längen- und
+     * Breitengrade. Wenn die übergebene Tankstelle null ist wird 0 zurückgegeben.
+     *
+     * @param station die Tankstelle, zu der der Abstand berechnet werden soll
+     * @return der Abstand zwischen den Tankstellen in km
+     */
+    public double getDistance(GasStation station) {
+    	if(station == null) return 0;
+        double latitudeA = Math.toRadians(this.latitude);
+        double longitudeA = Math.toRadians(this.longitude);
+        double latitudeB = Math.toRadians(station.latitude);
+        double longitudeB = Math.toRadians(station.longitude);
+        double dist = 6378.388 * Math.acos((Math.sin(latitudeA) * Math.sin(latitudeB)) + (Math.cos(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA)));
+        //System.out.println("# " + Math.ceil(Math.pow(10, 10) * dist)/Math.pow(10, 10));
+        return dist;
+    }
 	
 	/**
 	 * Setzt die Liste der historischen Preis für diese Tankstelle

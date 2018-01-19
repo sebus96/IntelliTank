@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import controller.RefillStrategies;
 import model.FederalState;
 import model.GasStation;
 import model.Holidays;
@@ -49,7 +50,9 @@ public class CSVManager {
 
     private static final String inputPath = "Eingabedaten" + File.separator;
     private static final String routeInputPath = inputPath + "Fahrzeugrouten" + File.separator;
+//    private static final String routeTraindataPath = routeInputPath + "Trainingsdaten" + File.separator;
     private static final String predictionInputPath = inputPath + "Vorhersagezeitpunkte" + File.separator;
+//    private static final String predictionTraindataPath = predictionInputPath + "Trainingsdaten" + File.separator;
     private static final String pricePath = inputPath + "Benzinpreise" + File.separator;
     private static final String holidayPath = inputPath + "Ferien" + File.separator;
 
@@ -75,7 +78,9 @@ public class CSVManager {
 
         // erstelle Eingabeverzeichnisse
         new File(routeInputPath).mkdirs();
+//        new File(routeTraindataPath).mkdirs();
         new File(predictionInputPath).mkdirs();
+//        new File(predictionTraindataPath).mkdirs();
         new File(pricePath).mkdirs();
         new File(holidayPath).mkdirs();
 
@@ -213,15 +218,19 @@ public class CSVManager {
                 routeWarnings.add(cur.getName() + ": Keine Elemente enthalten.");
                 continue;
             }
-            Date lastDate = new Date(0);
             for (int i = 0; i < cur.getLength(); i++) {
                 if (cur.get(i).getStation() == null) {
                     routeWarnings.add(cur.getName() + ": Tankstelle in Routenelement " + (i + 1) + " konnte nicht gefunden werden.");
+                    continue;
                 }
-                if (!cur.get(i).getTime().after(lastDate)) {
+                if(i == 0) continue;
+                if (!cur.get(i).getTime().after(cur.get(i-1).getTime())) {
                     routeWarnings.add(cur.getName() + ": Tankstop mit ID " + cur.get(i).getStation().getID() + " liegt zeitlich vor dem vorherigen.");
                 }
-                lastDate = cur.get(i).getTime();
+                double fuelNeed = cur.get(i).getStation().getDistance(cur.get(i-1).getStation()) * RefillStrategies.GAS_USED_PER_KM;
+            	if(fuelNeed > cur.getTankCapacity()) {
+            		routeWarnings.add(cur.getName() + ": Die Strecke zur Tankstelle mit ID " + cur.get(i).getStation().getID() + " ist zu lang für die gewählte Tankkapazität.");
+            	}
             }
         }
         printMessages = backup;
@@ -372,7 +381,7 @@ public class CSVManager {
     }
 
     /**
-     * Gibt den Inhalt der Datei mit dem übergebenen Dateinamen als Liste mit den gelesenen Zeilen zurück.
+     * Gibt den Inhalt der Datei mit dem übergebenen Dateinamen als Liste mit den gelesenen Zeilen zurück. Zeilen die mit "##" beginnen werden ignoriert.
      * @param filename Name der Datei, die gelesen werden soll.
      * @return Inhalt der Gelesenen Datei.
      */
@@ -381,8 +390,8 @@ public class CSVManager {
     }
 
     /**
-     * Gibt den Inhalt der angegebenen Datei als Liste mit den gelesenen Zeilen zurück.
-     * @param filename Name der Datei, die gelesen werden soll.
+     * Gibt den Inhalt der angegebenen Datei als Liste mit den gelesenen Zeilen zurück. Zeilen die mit "##" beginnen werden ignoriert.
+     * @param file Datei, die gelesen werden soll.
      * @return Inhalt der Gelesenen Datei.
      */
     private static List<String> readFile(File file) {
@@ -398,7 +407,7 @@ public class CSVManager {
             br = new BufferedReader(r);
             String line;
             while ((line = br.readLine()) != null) {
-                lines.add(line);
+                if(!line.startsWith("##")) lines.add(line); // ## zum auskommentieren von Zeilen innerhalb einer Datei
             }
             return lines;
         } catch (IOException e) {
@@ -463,6 +472,12 @@ public class CSVManager {
         return false;
     }
 
+    /**
+     * Parst eine ganze Zahl aus einem String und gibt sie zurück. Gibt null zurück, wenn keine ganze Zahl geparst werden konnte.
+     *
+     * @param s Der Text aus dem die ganze Zahl geparst werden soll
+     * @return die ganze Zahl oder -1, wenn keine Zahl geparst werden konnte
+     */
     private static int getInteger(String s) {
         try {
             return Integer.parseInt(s);
@@ -471,6 +486,12 @@ public class CSVManager {
         }
     }
 
+    /**
+     * Parst eine Fließkommazahl aus einem String und gibt sie zurück. Gibt null zurück, wenn keine Fließkommazahl geparst werden konnte.
+     *
+     * @param s Der Text aus dem die Fließkommazahl geparst werden soll
+     * @return die Fließkommazahl oder null, wenn keine Fließkommazahl geparst werden konnte
+     */
     private static double getDouble(String s) {
         try {
             return Double.parseDouble(s);
@@ -479,6 +500,12 @@ public class CSVManager {
         }
     }
 
+    /**
+     * Parst ein Datum aus einem String und gibt es zurück. Gibt null zurück, wenn kein Datum geparst werden konnte.
+     *
+     * @param s Der Text aus dem das Datum geparst werden soll
+     * @return das Datum oder null, wenn kein Datum geparst werden konnte
+     */
     private static Date getDate(String s) {
         try {
             return dateFormat.parse(s);
@@ -515,6 +542,11 @@ public class CSVManager {
         return listOfFiles;
     }
 
+    /**
+     * Gibt das für die Ein- und Ausgabedateien verwendete Datumsformat zurück.
+     *
+     * @return Datumsformat für die Ein- und Ausgabedateien
+     */
     public static DateFormat getDateFormat() {
         return dateFormat;
     }
@@ -544,6 +576,7 @@ public class CSVManager {
      /**
      * Kopiere Datei
      * @param selectedFile Datei, die kopiert werden soll
+     * @param dest Zielordner
      * @throws FileNotFoundException Wenn die Datei nicht gefunden werden konnte
      * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
@@ -552,6 +585,25 @@ public class CSVManager {
         Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
         is.close();
     }
+    
+    /*@Deprecated
+    public static void checkImportPrediction(IPredictionStationList stations) {
+    	String path = "";
+    	if(stations instanceof Route) {
+    		path = routeTraindataPath;
+    	} else if (stations instanceof PredictionPointList) {
+    		path = predictionTraindataPath;
+    	} else {
+    		return;
+    	}
+    	path += stations.getName() + File.separator;
+    	File f = new File(path);
+    	if(!f.isDirectory()) return;
+    	String[] names = readFilenames(f,".train");
+    	for(String name: names) {
+    		System.out.println(name);
+    	}
+    }*/
 }
 
 /**

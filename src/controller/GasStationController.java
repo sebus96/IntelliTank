@@ -34,6 +34,8 @@ public class GasStationController {
 
     /**
      * Initialisiert den GasStationController
+     *
+     * @param primaryStage das Hauptfenster
      */
     public GasStationController(Stage primaryStage) {
         allStations = CSVManager.initialImport();
@@ -142,6 +144,15 @@ public class GasStationController {
         if (!routeTest.equals(route)) {
             route = routeTest;
             CSVManager.importPrices(route);
+        }
+        // checkt, ob die Tankstops zu weit auseinander liegen für die Tankkapazität
+        for(int i = 0; i < route.getLength(); i++) {
+        	if(i == 0) continue;
+        	double fuelNeed = route.get(i).getStation().getDistance(route.get(i-1).getStation()) * RefillStrategies.GAS_USED_PER_KM;
+        	if(fuelNeed > route.getTankCapacity()) {
+        		PopupBox.displayError(307);
+        		return;
+        	}
         }
         mainView.hide();
         pw = new ProgressView(route);

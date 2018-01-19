@@ -21,7 +21,7 @@ public class MatrixOperations {
         int columnsB = matrixB[0].length;
 
         if (columnsA != rowsB) {
-            throw new IllegalArgumentException("The dimensions have to be equal!");
+            throw new IllegalArgumentException("The dimensions have to be equal! (" + columnsA + " " + rowsB + ")");
         }
 
         double[][] matrixRes = new double[rowsA][columnsB];
@@ -98,24 +98,6 @@ public class MatrixOperations {
         return new Matrix(matrixRes);
 
     }
-    
-    public static void matOut(Matrix m) {
-
-    	double[][] matrix = m.getMatrix();
-
-        int rows = matrix.length;
-        int columns = matrix[0].length;
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-
-                System.out.print(matrix[i][j] + "\t");
-
-            }
-            System.out.println();
-
-        }
-    }
 
     /**
      * Berechnet den Sigmoid jedes Eintrags
@@ -138,15 +120,15 @@ public class MatrixOperations {
      */
     public static Matrix sigmoidDerivation(Matrix m){
 
-        Matrix nonlin = sigmoid(m);
-        Matrix m2 = new Matrix(m.getRows(), m.getColumns());
+        Matrix nonlin = sigmoid(m); // axb
+        Matrix m2 = new Matrix(m.getRows(), m.getColumns()); //axb
 
         // 1-x
         for (int i = 0; i < m2.getRows(); i++)
             for (int j = 0; j < m2.getColumns(); j++)
                 m2.setValue(i, j, 1 - nonlin.getValue(i, j));
 
-        return matMult(nonlin, m2.transpose());
+        return matMult(nonlin, m2.transpose()); // axb * bxa = axa
     }
 
 }

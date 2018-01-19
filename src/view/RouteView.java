@@ -274,7 +274,7 @@ public class RouteView extends ScrollPane {
             String time = Long.toString(TimeUnit.MILLISECONDS.toMinutes(diff));
             if(time.equals("0"))
                 time = "<1";
-            gc.fillText(calculateDistance(a.getLatitude(), a.getLongitude(), b.getLatitude(), b.getLongitude()) + " km\t" + time + " min", 200, (lineStart + lineEnd) / 2);
+            gc.fillText(((int)(a.getDistance(b)*100)/100.0) + " km\t" + time + " min", 200, (lineStart + lineEnd) / 2);
         }
     }
 
@@ -305,11 +305,11 @@ public class RouteView extends ScrollPane {
         gc.strokeLine(30, 26, 288, 26);
         gc.strokeLine(30, 74, 318, 74);
         DecimalFormat f = new DecimalFormat("#0.00");
-        String outputKm = f.format(route.getTotalKm()) + " km";
+        String outputKm = f.format(route.getTotalDistance()) + " km";
         gc.setFont(new Font(12));
         gc.fillText(outputKm, 62, 58);
         gc.setFont(Font.getDefault());
-        String outputFuelGauge = f.format(route.getTotalLiters()) + " L";
+        String outputFuelGauge = f.format(route.getTotalFuelConsumption()) + " L";
         gc.setFont(new Font(15));
         gc.fillText(outputFuelGauge, 158, 58);
         gc.setFont(Font.getDefault());
@@ -323,25 +323,6 @@ public class RouteView extends ScrollPane {
         gc.setFill(Color.BROWN);
         gc.fillText(nameAndTimeOfRoute, 46, 34);
         gc.setFill(Color.BLACK);
-    }
-
-    /**
-     * Gibt die Entfernung in km zurück, die zwei Punkte voneinander haben.
-     * @param latA Breitengrad Punkt 1
-     * @param longA Längengrad Punkt 1
-     * @param latB Breitengrad Punkt 2
-     * @param longB Längengrad Punkt 2
-     * @return Abstand in km
-     */
-    private double calculateDistance(double latA, double longA, double latB, double longB) {
-        double latitudeA = Math.toRadians(latA);
-        double longitudeA = Math.toRadians(longA);
-        double latitudeB = Math.toRadians(latB);
-        double longitudeB = Math.toRadians(longB);
-        double dist = 6378.388 * Math.acos((Math.sin(latitudeA) * Math.sin(latitudeB)) + (Math.cos(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA)));
-        dist *= 100;
-        int distance = (int) dist;
-        return (double) distance / 100;
     }
 
     /**

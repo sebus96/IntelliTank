@@ -11,8 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import model.IPredictionStation;
-import model.IPredictionStationList;
+import model.Validateable;
 import model.Validation;
 
 /**
@@ -49,6 +48,7 @@ public class PopupBox {
 			put(304, "Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
 			put(305, "Die historischen Benzinpreise wurden nicht gefunden. Es kann keine Vorhersage getätigt werden.");
 			put(306, "Die Preise konnten für keinen Tankstop innerhalb der Route vorhergesagt werden. Möglicherweise konnten keine Preise importiert werden oder die historischen Daten liegen zu weit zurück.");
+			put(307, "Die Entfernung der Tankstops in der importierten Route ist zu groß für die gewählte Tankkapazität.");
 
 		};
 	};
@@ -124,27 +124,19 @@ public class PopupBox {
 			errorAlert.showAndWait();
 		}
 	}
-
+	
 	/**
-	 * Zeigt die Validierung einer IPredictionStation an.
-	 * @param station Die IPredictionStation zu der die Validierung angezeigt werden soll
+	 * Zeigt die Validierung des übergebenen Objekts an (Route, Vorhersagezeitpunktliste, Tankstop oder Vorhersagezeitpunkt).
+	 * @param validateable Objekt zu dem die Validierung angezeigt werden soll
 	 */
-	public static void displayValidation(IPredictionStation station) {
-		displayValidation(station.getStation().getName() + " (" + station.getStation().getID() + ")",
-				station.getValidation());
-	}
-	/**
-	 * Zeigt die Validierung mehrerer IPredictionStations an.
-	 * @param stations Liste der IPredictionStations zu der die Validierung angezeigt werden soll
-	 */
-	public static void displayValidation(IPredictionStationList stations) {
-		displayValidation(stations.getType() + " " + stations.getName(), stations.getValidation());
+	public static void displayValidation(Validateable validateable) {
+		displayValidation(validateable.getType() + " " + validateable.getName(), validateable.getValidation());
 	}
 	
 	/**
-	 * GUI für das Validierungs-Fenster.
-	 * @param title Name der Fensters
-	 * @param validation Werte der Validierung
+	 * Zeigt die Validierung in einem neuen Fenster mit dem übergebenen Titel an.
+	 * @param title Titel der Fensters
+	 * @param validation die Validierung
 	 */
 	private static void displayValidation(String title, Validation validation) {
 		Alert alert = new Alert(AlertType.INFORMATION);
@@ -160,7 +152,7 @@ public class PopupBox {
 		WebView wv = new WebView();
 		wv.prefHeightProperty().bind(alert.heightProperty());
 		wv.prefWidthProperty().bind(alert.widthProperty());
-		wv.setMinWidth(300);
+		wv.setMinWidth(450);
 		wv.getEngine().loadContent("<body style=\"background:#f4f4f4;font-family:system;font-size:12;\">"
 				+ validation.toHTMLString() + "</body>");
 		alert.getDialogPane().setContent(wv);

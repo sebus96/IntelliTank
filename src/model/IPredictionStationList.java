@@ -6,7 +6,7 @@ package model;
  * @author Sebastian Drath
  *
  */
-public interface IPredictionStationList {
+public interface IPredictionStationList extends Validateable {
 	
 	/**
 	 * Gibt den Namen zurück.
@@ -29,13 +29,6 @@ public interface IPredictionStationList {
      * @return das Element
      */
     public IPredictionStation get(int i);
-    
-    /**
-     * Gibt die Validierung für alle enthaltenen Tankstellen zurück.
-     *
-     * @return Validierung
-     */
-    public Validation getValidation();
     
     /**
      * Überprüft, ob mindestens ein Element eine Vorhersage hat.

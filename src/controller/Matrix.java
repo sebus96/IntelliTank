@@ -75,4 +75,18 @@ public class Matrix {
         return this.matrix[i][j];
     }
 
+    @Override
+    public String toString() {
+    	String res = "";
+        int rows = matrix.length;
+        int columns = matrix[0].length;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                res += (matrix[i][j] + "\t");
+            }
+            res += "\n";
+        }
+        return res;
+    }
 }

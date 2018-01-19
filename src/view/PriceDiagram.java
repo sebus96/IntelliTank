@@ -54,6 +54,8 @@ public class PriceDiagram {
         if (priceStage == null) {
             gasStations = new ArrayList<>();
             priceStage = new Stage();
+            priceStage.setWidth(800);
+            priceStage.setHeight(600);
             priceStage.setTitle("Preisdiagramm");
             priceStage.setOnCloseRequest(event -> {
 	            priceStage = null;
@@ -172,7 +174,7 @@ public class PriceDiagram {
         yAxis.setLabel("Preis");
         final LineChart<Number, Number> lineChart = new LineChart<Number, Number>(xAxis, yAxis);
         lineChart.setTitle("Preisentwicklung");
-        Scene scene = new Scene(lineChart, 640, 600);
+        Scene scene = new Scene(lineChart, priceStage.getWidth(), priceStage.getHeight()); //, 640, 600
         setContextMenu(scene);
         for (IPredictionStation ps : gasStations) {
             if(showHistoric) addSeries(lineChart, ps.getStation());
@@ -226,7 +228,7 @@ public class PriceDiagram {
     /**
      * Fügt die Vorhergesagten Preise dem Linechart hinzu, um sie darzustellen
      * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
-     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
+     * @param ps Die IPredictionStation, für die die Daten angezeigt werden sollen.
      */
     private static void addPredictedSeries(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
@@ -244,11 +246,11 @@ public class PriceDiagram {
         lc.getData().add(series);
     }
     
-    /**
+    /*/**
      * Fügt die Vorhergesagten Preise dem Linechart hinzu, um sie darzustellen (in Tagesabständen)
      * @param lc Darstellung der Punktdaten. Welchem Linechart die Daten hinzugefügt werden sollen
-     * @param gs Die Tankstelle, für die die Daten angezeigt werden sollen.
-     */
+     * @param ps Die IPredictionStation, für die die Daten angezeigt werden sollen.
+     * /
     private static void addPredictedSeriesDaySteps(LineChart<Number, Number> lc ,IPredictionStation ps) {
         if(!ps.isPredicted()) return;
     	XYChart.Series<Number, Number> seriesPred = new XYChart.Series<>();
@@ -306,7 +308,7 @@ public class PriceDiagram {
         }
         lc.getData().add(seriesPred);
         lc.getData().add(series);
-    }
+    }*/
     
     /**
      * Zeigt ein Kontextmenü, das per rechtsklick auf eine Tankstelle angezeigt wird. 

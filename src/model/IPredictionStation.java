@@ -10,7 +10,7 @@ import controller.PredictionUnit;
  * @author Sebastian Drath
  *
  */
-public interface IPredictionStation {
+public interface IPredictionStation extends Validateable {
 	
 	/**
 	 * Gibt die Tankstelle zurück.
@@ -90,9 +90,9 @@ public interface IPredictionStation {
 	public void setValidation(Validation v);
 	
 	/**
-	 * Gibt die gesetzte Validierung zurück.
-	 *
-	 * @return die Validierung oder null, wenn keine gesetzt wurde
-	 */
-	public Validation getValidation();
+     * Gibt den Typ zurück
+     *
+     * @return Typ
+     */
+	public String getType();
 }

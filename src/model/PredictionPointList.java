@@ -10,7 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /**
- * Repräsentation einer Sammlung von Vorhersagezeitpunkten. Die einzelnen
+ * Repräsentation einer Liste von Vorhersagezeitpunkten. Die einzelnen
  * Elemente können in einer {@link view.PredictionPointView} angezeigt werden.
  *
  * @author Sebastian Drath

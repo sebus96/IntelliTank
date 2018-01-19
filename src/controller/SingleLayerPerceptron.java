@@ -12,13 +12,13 @@ import model.Price;
 * @author Sebastian Drath
 */
 public class SingleLayerPerceptron extends Perceptron {
-	
+	private static final long serialVersionUID = 6355246869317323352L;
 	private double rate;
 	private double[] weights = new double[7+24+oldPriceNumber+1];
 	
 	
-	public SingleLayerPerceptron(GasStation gs, double rate, int epochs) {
-		super(gs, epochs);
+	public SingleLayerPerceptron(GasStation gs, double rate, int epochs, Date until) {
+		super(gs, epochs, until);
 		this.rate = rate;
 		for(int i = 0; i < weights.length; i++) {
 			weights[i] = Math.random();
@@ -26,7 +26,7 @@ public class SingleLayerPerceptron extends Perceptron {
 	}
 	
 	@Override
-	public boolean train(Date until) {
+	public boolean train() {
 		double totalDifference = 0;
 		int epochCounter = 0;
 		int listCounter = 0;
@@ -38,7 +38,7 @@ public class SingleLayerPerceptron extends Perceptron {
 //			for(cal.setTime(getStation().getPriceListElement(0).getTime()); cal.getTime().before(getStation().getPriceListElement(getStation().getPriceListSize()-1).getTime()); cal.add(Calendar.HOUR_OF_DAY, 1)) {
 				Price p = getStation().getPriceListElement(i);
 //				Price p = new Price(cal.getTime(),getStation().getHistoricPrice(cal.getTime()));
-				if(p.getTime().after(until)) break;
+				if(p.getTime().after(getUntil())) break;
 				listCounter++;
 				Calendar c = Calendar.getInstance();
 				c.setTime(p.getTime());
@@ -83,7 +83,7 @@ public class SingleLayerPerceptron extends Perceptron {
 	 * @return der aktuelle Preis
 	 */
 	private double output(Date d, int[] lastPrices) {
-		if(lastPrices.length != this.oldPriceNumber) System.err.println("wrong input number of old prices");
+		if(lastPrices.length != oldPriceNumber) System.err.println("wrong input number of old prices");
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
 		int[] hour = getHourVector(c.get(Calendar.HOUR_OF_DAY));
@@ -103,7 +103,7 @@ public class SingleLayerPerceptron extends Perceptron {
 	}
 	@Override
 	public double feedForward(Date d, List<Double> lastPrices) {
-		if(lastPrices.size() != this.oldPriceNumber) System.err.println("wrong input number of old prices");
+		if(lastPrices.size() != oldPriceNumber) throw new IllegalArgumentException("wrong input number of old prices");
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
 		int[] hour = getHourVector(c.get(Calendar.HOUR_OF_DAY));

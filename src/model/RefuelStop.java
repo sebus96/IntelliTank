@@ -265,6 +265,16 @@ public class RefuelStop implements IPredictionStation {
     			+ this.refillAmount;
     }
 
+	@Override
+	public String getName() {
+		return station.getName() + " (" + station.getID() + ")";
+	}
+
+	@Override
+	public String getType() {
+		return "Tankstop";
+	}
+
     @Override
     public String toString() {
         return "(" + time + ": " + station + ")";
