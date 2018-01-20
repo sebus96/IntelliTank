@@ -33,22 +33,22 @@ public class PopupBox {
 			put(101, "Dieses Projekt wurde von Axel Claassen, Burak Kadioglu und Sebastian Drath entwickelt.");
 			put(102, "Hier wird angezeigt, wie gut die Route vorhergesagt wurde. Methodenaufruf in view/MainView setUpValidateButton()");
 			// 2XX = Warnungen
-			put(201, "Warnung 201: Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
-			put(202, "Warnung 202: Für die ausgewählte Tankstelle konnte keine Vorhersage durchgeführt werden");
-			put(203, "Warnung 203: Für eine oder mehrere der ausgewählten Tankstellen konnte keine Vorhersage durchgeführt werden");
-			put(204, "Warnung 204: Die Datei postalcode2federalstate.csv wurde nicht gefunden!\n\nDen Tankstellen kann kein Bundesland zugeordnet werden. Feriendaten können bei der Vorhersage nicht benutzt werden.");
-			put(205, "Warnung 205: Falsches Format der Datei postalcode2federalstate.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
-			put(206, "Warnung 206: Feriendaten wurden nicht gefunden und können bei der Vorhersage nicht benutzt werden.");
-			put(207, "Warnung 207: Die Dateinamen der Feriendaten entsprechen nicht dem richtigen Format. Möglicherweise werden Daten fehlerhaft dargestellt.");
-			put(208, "Warnung 208: Falsches Format der Feriendaten. Möglicherweise werden Daten fehlerhaft dargestellt.");
+			put(201, "Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
+			put(202, "Für die ausgewählte Tankstelle konnte keine Vorhersage durchgeführt werden");
+			put(203, "Für eine oder mehrere der ausgewählten Tankstellen konnte keine Vorhersage durchgeführt werden");
+			put(204, "Die Datei postalcode2federalstate.csv wurde nicht gefunden!\n\nDen Tankstellen kann kein Bundesland zugeordnet werden. Feriendaten können bei der Vorhersage nicht benutzt werden.");
+			put(205, "Falsches Format der Datei postalcode2federalstate.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
+			put(206, "Feriendaten wurden nicht gefunden und können bei der Vorhersage nicht benutzt werden.");
+			put(207, "Die Dateinamen der Feriendaten entsprechen nicht dem richtigen Format. Möglicherweise werden Daten fehlerhaft dargestellt.");
+			put(208, "Falsches Format der Feriendaten. Möglicherweise werden Daten fehlerhaft dargestellt.");
 			// 3XX = Errors
-			put(301, "Error 301: Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
-			put(302, "Error 302: Die ausgewählte Route konnte nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
-			put(303, "Error 303: Vorhersagezeitpunkte konnten nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
-			put(304, "Error 304: Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
-			put(305, "Error 305: Die historischen Benzinpreise wurden nicht gefunden. Es kann keine Vorhersage getätigt werden.");
-			put(306, "Error 306: Die Preise konnten für keinen Tankstop innerhalb der Route vorhergesagt werden. Möglicherweise konnten keine Preise importiert werden oder die historischen Daten liegen zu weit zurück.");
-			put(307, "Error 307: Die Entfernung der Tankstops in der importierten Route ist zu groß für die gewählte Tankkapazität.");
+			put(301, "Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
+			put(302, "Die ausgewählte Route konnte nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
+			put(303, "Vorhersagezeitpunkte konnten nicht geladen werden. Datei möglicherweise fehlerhaft oder nicht mehr vorhanden.");
+			put(304, "Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
+			put(305, "Die historischen Benzinpreise wurden nicht gefunden. Es kann keine Vorhersage getätigt werden.");
+			put(306, "Die Preise konnten für keinen Tankstop innerhalb der Route vorhergesagt werden. Möglicherweise konnten keine Preise importiert werden, die historischen Daten liegen zu weit zurück oder die verfügbaren historischen Preise umfassen weniger als 2 Wochen.");
+			put(307, "Die Entfernung der Tankstops in der importierten Route ist zu groß für die gewählte Tankkapazität.");
 
 		};
 	};

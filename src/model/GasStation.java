@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,13 +11,14 @@ import java.util.List;
  * @author Sebastian Drath
  *
  */
-public class GasStation {
+public class GasStation implements Serializable {
+	private static final long serialVersionUID = 1062502205845799620L;
 	private int id;
 	private String name, brand, street, location, houseNumber;
 	private int postcode;
 	private FederalState state;
 	private double longitude, latitude; // Laengen- und Breitengrad
-	private List<Price> historicPrices;
+	private transient List<Price> historicPrices; // Wird beim serialisieren nicht mitgespeichert
 	
 	/**
 	 * Generiert eine Tankstelle mit den übergebenen Attributen.

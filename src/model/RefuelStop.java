@@ -174,21 +174,23 @@ public class RefuelStop implements IPredictionStation {
     }
 
     /**
-     * Setzt den Tankfüllstand für die intelligente Tankstrategie.
+     * Setzt den Tankfüllstand für die intelligente Tankstrategie. Wenn der Tankfüllstand kleiner als 0 ist, wird 0 gesetzt.
      *
      * @param fuelAmount Tankfüllstand für die intelligente Tankstrategie
      */
     public void setFuelAmount(double fuelAmount) {
-        this.fuelAmount = fuelAmount;
+//        if(fuelAmount<0) fuelAmount = 0;
+    	this.fuelAmount = fuelAmount;
     }
 
     /**
-     * Setzt den Tankfüllstand für die einfache Tankstrategie.
+     * Setzt den Tankfüllstand für die einfache Tankstrategie. Wenn der Tankfüllstand kleiner als 0 ist, wird 0 gesetzt.
      *
      * @param fuelAmountBasic Tankfüllstand für die einfache Tankstrategie
      */
     public void setFuelAmountBasic(double fuelAmountBasic) {
-	    this.fuelAmountBasic = fuelAmountBasic;
+//    	if(fuelAmountBasic<0) fuelAmountBasic = 0;
+    	this.fuelAmountBasic = fuelAmountBasic;
 	}
 
     /**
@@ -203,20 +205,22 @@ public class RefuelStop implements IPredictionStation {
     }
 
 	/**
-     * Setzt die nachgetankte Benzinmenge für die intelligente Tankstrategie.
+     * Setzt die nachgetankte Benzinmenge für die intelligente Tankstrategie. Wenn die Menge kleiner als 0 ist, wird 0 gesetzt.
      *
      * @param refillAmount nachgetankte Benzinmenge in Litern für die intelligente Tankstrategie
      */
     public void setRefillAmount(double refillAmount) {
+//    	if(refillAmount<0) refillAmount = 0;
 	    this.refillAmount = refillAmount;
 	}
 
     /**
-     * Setzt die nachgetankte Benzinmenge für die einfache Tankstrategie.
+     * Setzt die nachgetankte Benzinmenge für die einfache Tankstrategie. Wenn die Menge kleiner als 0 ist, wird 0 gesetzt.
      *
      * @param refillAmountBasic nachgetankte Benzinmenge in Litern für die einfache Tankstrategie
      */
 	public void setRefillAmountBasic(double refillAmountBasic) {
+//		if(refillAmountBasic < 0) refillAmountBasic = 0;
 	    this.refillAmountBasic = refillAmountBasic;
 	}
 

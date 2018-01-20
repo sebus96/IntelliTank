@@ -76,6 +76,7 @@ public class MultiLayerPerceptron extends Perceptron {
         }
 //        MatrixOperations.matOut(weightsHiddenToOutput);
 //        MatrixOperations.matOut(weightsInputToHidden);
+        this.setTrained();
         return totalDifference/listCounter <= precision;
     }
 

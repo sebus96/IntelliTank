@@ -16,7 +16,15 @@ public class SingleLayerPerceptron extends Perceptron {
 	private double rate;
 	private double[] weights = new double[7+24+oldPriceNumber+1];
 	
-	
+	/**
+	 * Erstellt eine einlagiges Perzeptron für eine Tankstelle. Die Rate entspricht dabei der Lernrate mit der pro Iteration die Geiwchte angepasst werden. Das Datum ist der Zeitpunkt, bis zu einschließlich dem
+	 * die historischen Preisdaten für eine Vorhersage verwendet werden.
+	 *
+	 * @param gs Die Tankstelle
+	 * @param rate Die Lernrate
+	 * @param epochs die Anzahl der Iterationen. Ggf wird früher abgebrochen wenn die durchschnittliche Genauigkeit aus {@link controller.Perceptron#precision} erreicht wurde.
+	 * @param until das Datum, bis zu dem die Preise für die Vorhersage verwendet werden.
+	 */
 	public SingleLayerPerceptron(GasStation gs, double rate, int epochs, Date until) {
 		super(gs, epochs, until);
 		this.rate = rate;
@@ -72,6 +80,7 @@ public class SingleLayerPerceptron extends Perceptron {
 			System.out.print(weights[i] + (i < weights.length-1 ? ", ": ""));
 		}
 		System.out.print("]\n");*/
+		this.setTrained();
 		return totalDifference/listCounter <= precision;
 	}
 
@@ -101,6 +110,7 @@ public class SingleLayerPerceptron extends Perceptron {
 		res += isHoliday*weights[24+7+lastPrices.length];
 		return res;
 	}
+	
 	@Override
 	public double feedForward(Date d, List<Double> lastPrices) {
 		if(lastPrices.size() != oldPriceNumber) throw new IllegalArgumentException("wrong input number of old prices");

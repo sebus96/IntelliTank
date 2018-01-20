@@ -10,6 +10,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -28,12 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import controller.MultiLayerPerceptron;
+import controller.Perceptron;
+import controller.PredictionUnit;
 import controller.RefillStrategies;
+import controller.SingleLayerPerceptron;
 import model.FederalState;
 import model.GasStation;
 import model.Holidays;
+import model.IPredictionStation;
 import model.IPredictionStationList;
 import model.Postalcodes;
+import model.PredictionPoint;
 import model.PredictionPointList;
 import model.Price;
 import model.Route;
@@ -50,9 +58,9 @@ public class CSVManager {
 
     private static final String inputPath = "Eingabedaten" + File.separator;
     private static final String routeInputPath = inputPath + "Fahrzeugrouten" + File.separator;
-//    private static final String routeTraindataPath = routeInputPath + "Trainingsdaten" + File.separator;
+    private static final String routeTraindataPath = routeInputPath + "Trainingsdaten" + File.separator;
     private static final String predictionInputPath = inputPath + "Vorhersagezeitpunkte" + File.separator;
-//    private static final String predictionTraindataPath = predictionInputPath + "Trainingsdaten" + File.separator;
+    private static final String predictionTraindataPath = predictionInputPath + "Trainingsdaten" + File.separator;
     private static final String pricePath = inputPath + "Benzinpreise" + File.separator;
     private static final String holidayPath = inputPath + "Ferien" + File.separator;
 
@@ -78,13 +86,40 @@ public class CSVManager {
 
         // erstelle Eingabeverzeichnisse
         new File(routeInputPath).mkdirs();
-//        new File(routeTraindataPath).mkdirs();
+        new File(routeTraindataPath).mkdirs();
         new File(predictionInputPath).mkdirs();
-//        new File(predictionTraindataPath).mkdirs();
+        new File(predictionTraindataPath).mkdirs();
         new File(pricePath).mkdirs();
         new File(holidayPath).mkdirs();
 
+        // Trainingsdaten der Routen aufräumen
+        cleanUpTrainData(routeInputPath,routeTraindataPath );
+        // Trainingsdaten der Vorhersagezeitpunkte aufräumen
+        cleanUpTrainData(predictionInputPath,predictionTraindataPath );
         return importGasStations();
+    }
+    
+    /**
+     * Löscht die Trainingsordner der Routen beziehungsweise Vorhersagezeitpunkte, die nicht mehr in den Eingabeordnern existieren.
+     *
+     * @param inputPath Pfad für die Routen bzw. Vorhersagezeitpunkte
+     * @param traindataInputPath Pfad für die Trainingsdaten der Routen bzw. Vorhersagezeitpunkte
+     */
+    private static void cleanUpTrainData(String inputPath, String traindataInputPath) {
+    	String[] importedItems = readFilenames(new File(inputPath), ".csv");
+    	for(File f : new File(traindataInputPath).listFiles()) {
+    		if(!f.isDirectory()) continue;
+    		if(f.list().length == 0){
+    			deleteDir(f);
+    			continue;
+    		}
+    		boolean routeExists = false;
+    		for(String name: importedItems) {
+    			name = (name.endsWith(".csv")? name.substring(0, name.length()-4): name);
+    			if(name.equals(f.getName())) routeExists = true;
+    		}
+    		if(!routeExists) deleteDir(f);
+    	}
     }
 
     /**
@@ -203,17 +238,21 @@ public class CSVManager {
      */
     public static List<String> checkRoutes(Map<Integer, GasStation> stations) {
         List<String> routeWarnings = new ArrayList<>();
+        // Ausgabe von Texten des Dateimanagers wird deakiviert. Der vorherige Wert wird gespeichert und am Ende wieder gesetzt.
         boolean backup = printMessages;
         printMessages = false;
         for (String filename : readRouteNames()) {
             Route cur = importRoute(stations, filename);
+            // importfehler überprüfen
             if(cur == null) {
             	routeWarnings.add(filename + ": Formatierung fehlerhaft. Die Datei konnte nicht importiert werden.");
             	continue;
             }
+            // kein Tankvolumen?
             if (cur.getTankCapacity() <= 0) {
                 routeWarnings.add(cur.getName() + ": Tankkapazität zu gering.");
             }
+            // mindestens ein Routenelement vorhanden?
             if (cur.getLength() == 0) {
                 routeWarnings.add(cur.getName() + ": Keine Elemente enthalten.");
                 continue;
@@ -581,29 +620,137 @@ public class CSVManager {
      * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
     private static void copyFile(File selectedFile, Path dest) throws FileNotFoundException, IOException {
-        InputStream is = new FileInputStream(selectedFile);
+        if(dest.toFile().getAbsolutePath().equals(selectedFile.getAbsolutePath())) return;
+    	InputStream is = new FileInputStream(selectedFile);
         Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
         is.close();
     }
     
-    /*@Deprecated
-    public static void checkImportPrediction(IPredictionStationList stations) {
+    /**
+     * Löscht die übergebene Datei, wenn ein Ordner übergeben wurde wird dieser rekursiv gelöscht.
+     *
+     * @param dir der Ordner oder die Datei.
+     * @return true, wenn gelöscht werden konnte, false ansonsten
+     */
+	private static boolean deleteDir(File dir) { 
+		if (dir.isDirectory()){
+			File[] children = dir.listFiles();
+			for (int i=0; i<children.length; i++)
+				deleteDir(children[i]);
+		}
+		return dir.delete();
+	} 
+    
+    /**
+     * Importiert eventuell vorhandene Trainingsdaten und gibt das Perceptron, dass dieses Training beinhaltet zurück.
+     * Dabei wird es nur zurückgegeben, wenn die Daten, bis zu denen die Preise als bekannt angenommen wurden, sowie der Modus
+     * identisch sind. Ansonsten wird null zurückgegeben und die zugehörige Trainingsdatei entfernt. In dem Fall muss ein
+     * Perzeptron neu erstellt und trainiert werden.
+     * Der Ordner, aus dem die Trainingsdaten geladen werden, ist in den Eingabeordnern für die Routen bzw. Vohersagezeitpunkte unter dem Routennamen bzw Vorhersagezeitpunktsnamen zu finden.
+     *
+     * @param stations die IPredictionList die gerade vorhergesagt werden soll
+     * @param index der Index des Elements, für das ein Perzeptron geladen werden soll
+     * @param mode der Modus der Vorhersage (einlagig oder mehrlagig)
+     * @return das zugehörige Perzeptron, null wenn kein passendes geladen werden konnte
+     */
+    public static Perceptron importPrediction(IPredictionStationList stations, int index, PredictionUnit.Mode mode) {
     	String path = "";
+    	// wähle richtigen Pfad aus
     	if(stations instanceof Route) {
     		path = routeTraindataPath;
     	} else if (stations instanceof PredictionPointList) {
     		path = predictionTraindataPath;
     	} else {
-    		return;
+    		return null;
     	}
+    	IPredictionStation station = stations.get(index);
     	path += stations.getName() + File.separator;
-    	File f = new File(path);
-    	if(!f.isDirectory()) return;
-    	String[] names = readFilenames(f,".train");
-    	for(String name: names) {
-    		System.out.println(name);
+    	if(!new File(path).isDirectory() || station == null) return null; // wenn kein Ordner mit dem Routen- bzw. Vorhersagezeitpunktsnamen existiert kann nichts geladen werden
+    	File file = new File(path + station.getStation().getID() + ".train"); // Datei <id>.train wird gelesen
+    	if(!file.exists()) return null;
+    	FileInputStream fis = null;
+    	ObjectInputStream ois = null;
+    	Perceptron p = null;
+    	try{
+	    	fis = new FileInputStream(file);
+	        ois = new ObjectInputStream(fis);
+	        Object read = ois.readObject();
+	        if(read instanceof SingleLayerPerceptron && mode == PredictionUnit.Mode.SINGLE_LAYER){ // nur wenn importiertes Perzeptron dem übergebenen Modus entspricht wird es verwendet
+	        	p = (SingleLayerPerceptron)read;
+	        } else if(read instanceof MultiLayerPerceptron && mode == PredictionUnit.Mode.MULTI_LAYER){
+	        	p = (MultiLayerPerceptron)read;
+	        } else {
+	        	return null;
+	        }
+    	} catch(ClassNotFoundException | IOException e) {
+    		e.printStackTrace();
+    	} finally {
+			try {
+				if(ois != null) ois.close();
+				if(fis != null) fis.close();
+			} catch (IOException e) {}
     	}
-    }*/
+    	Date until = null;
+        if (stations instanceof Route) {
+            until = ((Route) stations).getPriceKnownUntil();
+        } else if (station instanceof PredictionPoint) {
+            until = ((PredictionPoint) station).getPriceKnownUntil();
+        }
+        // Perzeptron muss != null sein und die Tankstellen muss mit der aktuellen IPredictionstation übereinstimmen
+        // Außerdem muss das Datum bis zu dem die Preisdaten bekannt sind identisch sein
+        // Ansonten muss neu trainiert werden.
+    	if(p != null && p.getStation().equals(station.getStation()) && p.getUntil().equals(until) && p.isTrained()) {
+    		if(!p.setStation(station.getStation())) {
+    			return null;
+    		}
+    		return p;
+    	} else {
+    		file.delete(); // gelöscht wenn die Tankstelle oder das Datum, bis zu dem Preise angenommen werden durften, geändert wurde
+    		return null;
+    	}
+    }
+    
+    /**
+     * Schreibt eine Trainingsdatei für ein trainiertes Perzeptron in den Traininsordner für Routen bzw Vorhersagezeitpunkte. Im Trainingsordner wird ein Ordner mit dem Routen- bzw. Vorhersagezeitpunktsnamen angelegt
+     * und die Trainingsdaten werden als &lt;ID&gt;.train in diesen Ordner geschrieben.
+     *
+     * @param stations die IPredictionListe die gerade vorhergesagt wurde
+     * @param index der Index des Elements, für das ein Perzeptron gespeichert werden soll
+     * @param perceptron das zu speichernde Perzeptron
+     * @return true, wenn die Datei geschrieben werden konnte und das Perzeptron trainiert wurde, false ansonsten
+     */
+    public static boolean writePrediction(IPredictionStationList stations, int index, Perceptron perceptron) {
+    	if(!perceptron.isTrained()) return false; //Es werden nur trainierte Perzeptron gesichert
+    	String path = "";
+    	// wähle richtigen Pfad aus
+    	if(stations instanceof Route) {
+    		path = routeTraindataPath;
+    	} else if (stations instanceof PredictionPointList) {
+    		path = predictionTraindataPath;
+    	} else {
+    		return false;
+    	}
+    	IPredictionStation station = stations.get(index);
+    	path += stations.getName() + File.separator;
+    	new File(path).mkdirs(); // Erstelle neuen Ordner für die Route/Vorhersagezeitpunktliste, wenn nicht schon existent
+    	if(station == null) return false;
+    	File file = new File(path + station.getStation().getID() + ".train");
+    	FileOutputStream fos = null;
+    	ObjectOutputStream oos = null;
+    	try{
+	    	fos = new FileOutputStream(file);
+	        oos = new ObjectOutputStream(fos);
+	        oos.writeObject(perceptron); // Schreibe Perzeptron in Datei
+    	} catch(IOException e) {
+    		return false;
+    	} finally {
+			try {
+				if(oos != null) oos.close();
+				if(fos != null) fos.close();
+			} catch (IOException e) {}
+    	}
+    	return true;
+    }
 }
 
 /**

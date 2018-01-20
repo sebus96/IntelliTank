@@ -89,10 +89,19 @@ public class GasStationController {
                     } else if (station instanceof PredictionPoint) {
                         until = ((PredictionPoint) station).getPriceKnownUntil();
                     }
-                    PredictionUnit pu = new PredictionUnit(station, until, Mode.SINGLE_LAYER);
+                    Mode mode = Mode.SINGLE_LAYER;
+                    Perceptron importedPerceptron = CSVManager.importPrediction(stations, i, mode);
+                    PredictionUnit pu = null;
+                    if(importedPerceptron == null) pu = new PredictionUnit(station, until,mode );
+                    else pu = new PredictionUnit(station, importedPerceptron );
                     boolean trainSuccess = pu.train();
                     if (trainSuccess) {
                         station.setPrediction(pu);
+                        if(CSVManager.writePrediction(stations, i, pu.getPerceptron())) {
+                        	System.out.println("Perceptron successfully written");
+                        } else {
+                        	System.err.println("Error while writing perceptron");
+                        }
                     }
                     updateProgress((i + 1) * 100 / stations.getLength(), 100);
                 }
@@ -121,7 +130,9 @@ public class GasStationController {
             mainView.displayPredictionPoints((PredictionPointList) stations);
             pw.close();
         } else if (stations instanceof Route) {
-            boolean res = refillStrategies.calculateGasUsage((Route) stations);
+        	boolean res = true;
+        	if(stations.getLength() > 1) // wenn nur ein Routenelement vorhanden ist, wird keine Tankstrategie benötigt.
+        		res = refillStrategies.calculateGasUsage((Route) stations);
             mainView.displayRoute((Route) stations);
             pw.close();
             if (!res) {
@@ -146,13 +157,9 @@ public class GasStationController {
             CSVManager.importPrices(route);
         }
         // checkt, ob die Tankstops zu weit auseinander liegen für die Tankkapazität
-        for(int i = 0; i < route.getLength(); i++) {
-        	if(i == 0) continue;
-        	double fuelNeed = route.get(i).getStation().getDistance(route.get(i-1).getStation()) * RefillStrategies.GAS_USED_PER_KM;
-        	if(fuelNeed > route.getTankCapacity()) {
-        		PopupBox.displayError(307);
-        		return;
-        	}
+        if(!routeTest.checkTankCapacity()) {
+        	PopupBox.displayError(307);
+        	return;
         }
         mainView.hide();
         pw = new ProgressView(route);

@@ -8,7 +8,6 @@ import model.RefuelStop;
  * @author Axel Claassen
  */
 import model.Route;
-import view.PopupBox;
 
 public class RefillStrategies {
 
@@ -214,7 +213,9 @@ public class RefillStrategies {
             if (i > 0) {
                 double distanceFromLastStation = route.get(i).getStation().getDistance( route.get(i - 1).getStation());
                 currentTankStatus -= GAS_USED_PER_KM * distanceFromLastStation;
-                currentTankStatus = Math.ceil(Math.pow(10, 10) * currentTankStatus)/Math.pow(10, 10);
+                // Durch Rundungsfehler kann der Wert im knappen negativen Bereich liegen (in Testläufen 10^-16)
+                if(currentTankStatus > -0.0000001 && currentTankStatus < 0) currentTankStatus = 0;
+//                currentTankStatus = Math.ceil(Math.pow(10, 10) * currentTankStatus)/Math.pow(10, 10);
                 route.get(i).setFuelAmount(currentTankStatus);
                 totalKm += distanceFromLastStation;
             }
@@ -223,11 +224,15 @@ public class RefillStrategies {
             if (!route.get(i).isBreakPoint() && !route.get(i).isNextStation() || i == route.getLength() - 1) {
                 continue;
             }
-            double kmToNextTarget = 0;
+//            double kmToNextTarget = 0;
+            double fuelToNextTarget = 0;
             //Falls die "next" Tankstelle ein Breakpoint ist, bedeutet das, dass sie billiger ist, als die aktuelle. Also hier nur das nötigste tanken
             if (route.get(i).getNextStation().isBreakPoint()) {
                 for (int j = i + 1; j < route.getLength(); j++) {
-                    kmToNextTarget += route.get(j).getStation().getDistance( route.get(j - 1).getStation());
+                	double distance = route.get(j).getStation().getDistance( route.get(j - 1).getStation());
+//                    kmToNextTarget += distance;
+                    fuelToNextTarget += distance * GAS_USED_PER_KM;
+                    assert route.get(j).getStation().getDistance( route.get(j - 1).getStation()) == route.get(j-1).getStation().getDistance( route.get(j).getStation());
                     if (route.get(j).isNextStation() || route.get(j).isBreakPoint()) {
                         break;
                     }
@@ -235,17 +240,23 @@ public class RefillStrategies {
             } //Falls die "next" Tankstelle kein Breakpoint ist, bedeutet das, dass die aktuelle Tankstelle billiger ist. Also volltanken bzw so viel wie nötig, falls kurz vor Ende der Route.
             else {
                 for (int j = i + 1; j < route.getLength(); j++) {
-                    kmToNextTarget += route.get(j).getStation().getDistance( route.get(j - 1).getStation());
+                	double distance = route.get(j).getStation().getDistance( route.get(j - 1).getStation());
+//                    kmToNextTarget += distance;
+                    fuelToNextTarget += distance * GAS_USED_PER_KM;
+                    assert route.get(j).getStation().getDistance( route.get(j - 1).getStation()) == route.get(j-1).getStation().getDistance( route.get(j).getStation());
                 }
             }
+            
             //Hier beginnt das eigentliche Tanken, vorher wurde nur gesetzt, für wieviel km getankt werden muss.
             //Falls das Ziel außerhalb der Reichweite liegt, tanke voll
-            if (kmToNextTarget * GAS_USED_PER_KM > route.getTankCapacity()) {
-                route.get(i).setRefillAmount(route.getTankCapacity() - currentTankStatus);
-                currentTankStatus = route.getTankCapacity();
+            if (fuelToNextTarget > route.getTankCapacity()) {
+                double refillAmount = route.getTankCapacity() - currentTankStatus;
+            	route.get(i).setRefillAmount(refillAmount);
+                currentTankStatus += refillAmount;
             } //Ansonsten Tanke so viel wie benötigt
             else {
-                double refillAmount = kmToNextTarget * GAS_USED_PER_KM - currentTankStatus;
+                double refillAmount = fuelToNextTarget - currentTankStatus;
+                if(refillAmount <= 0) refillAmount = 0; // wenn noch mehr Benzin im Tank vorhanden ist als bis zum nächsten Ziel benötigt wird (-> kein negatives Tanken!)
                 route.get(i).setRefillAmount(refillAmount);
                 currentTankStatus += refillAmount;
             }
@@ -296,7 +307,8 @@ public class RefillStrategies {
         
         for(int i = 0; i<route.getLength();i++) {
             if(route.get(i).getFuelAmount() < 0 || route.get(i).getRefillAmount() < 0) {
-                PopupBox.displayError(304);
+                //PopupBox.displayError(304);
+            	System.err.println("Check route strategy result.");
                 return;
             }
             

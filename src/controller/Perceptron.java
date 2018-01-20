@@ -34,6 +34,7 @@ public abstract class Perceptron implements Serializable {
 	private int epochs;
 	private Date until;
 	private GasStation station;
+	private boolean trained;
 	
 	/**
 	 * Erstellt ein neues Perzeptron für die Vorhersage der Preise für die Tankstelle.
@@ -51,7 +52,7 @@ public abstract class Perceptron implements Serializable {
 	
 	/**
 	 * Trainiert das Perzeptron mit der Preisliste der Tankstelle, damit es später Vorhersagen tätigen kann.
-	 * Gibt zurück, ob eine bestimmte Genauigkeit erreicht werden konnte.
+	 * Gibt zurück, ob die durchschnittliche Genauigkeit aus {@link controller.Perceptron#precision} erreicht werden konnte.
 	 *
 	 * @return true, wenn die definierte Genauigkeit erreicht wurde, false ansonsten
 	 */
@@ -157,11 +158,42 @@ public abstract class Perceptron implements Serializable {
 	}
 	
 	/**
+	 * Setzt die Tankstelle neu. Das Objekt muss allerdings mit dem vorherigen übereinstimmen, da sonst
+	 * die Vorhersage nicht mehr passt. Hierbei geht es darum, dass nach einem import die Referenzen richtig gesetzt werden.
+	 *
+	 * @param gs die Tankstelle die gesetzt werden soll
+	 * @return true, wenn die Station gesetzt werden konnte, weil sie der bisherigen entspricht, false ansonsten
+	 */
+	public boolean setStation(GasStation gs) {
+		if(gs.equals(this.station)) {
+			this.station = gs;
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Gibt das Datum zurück, bis zu dem die historischen Preisdaten zum Training verwendet werden.
 	 *
 	 * @return Datum bis zu dem Preise verwendet werden
 	 */
 	public Date getUntil() {
 		return this.until;
+	}
+	
+	/**
+	 * Gibt zurück, ob das Perzeptron trainiert wurde
+	 *
+	 * @return true, wenn es trainiert wurde, false ansonsten
+	 */
+	public boolean isTrained() {
+		return this.trained;
+	}
+	
+	/**
+	 * Setzt das Perzeptron als trainiert.
+	 */
+	protected void setTrained() {
+		this.trained = true;
 	}
 }

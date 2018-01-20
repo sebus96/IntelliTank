@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import controller.RefillStrategies;
+
 /**
  * Repräsentation einer Route. Diese enthält eine Liste von Tankstops (siehe {@link model.RefuelStop}) und eine Tankkapazität,
  * die für die Berechnung einer intelligenten Tankstrategie verwendet wird. Die Ergebnisse der Tankstrategie werden
@@ -106,6 +108,22 @@ public class Route implements IPredictionStationList {
 	 */
 	public double getTankCapacity() {
 	    return this.tankCapacity;
+	}
+	
+	/**
+	 * Überprüft, ob die Tankkapazität groß genug ist, um die Entfernungen zwischen allen Tankstops zu überbücken
+	 *
+	 * @return true, wenn die Kapazität für die Route ausreicht, false ansonsten
+	 */
+	public boolean checkTankCapacity() {
+		for(int i = 0; i < route.size(); i++) {
+        	if(i == 0) continue;
+        	double fuelNeed = route.get(i).getStation().getDistance(route.get(i-1).getStation()) * RefillStrategies.GAS_USED_PER_KM;
+        	if(fuelNeed > this.tankCapacity) {
+        		return false;
+        	}
+        }
+		return true;
 	}
 
 	/**
