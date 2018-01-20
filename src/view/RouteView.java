@@ -317,7 +317,13 @@ public class RouteView extends ScrollPane {
         gc.setFont(new Font(15));
         gc.fillText(outputEuro, 254, 58);
         gc.setFont(Font.getDefault());
-        String nameAndTimeOfRoute = "Route: \"" + route.getName();
+        String nameAndTimeOfRoute = "Route: \"";
+        String nameOfRoute = route.getName();
+        if(nameOfRoute.length() > 23) {
+        	nameOfRoute = nameOfRoute.substring(0, 23);
+        	nameOfRoute += "...";
+        }
+        nameAndTimeOfRoute += nameOfRoute;
         Date date = route.getPriceKnownUntil();
         nameAndTimeOfRoute += "\" am " + new SimpleDateFormat("dd.MM.yyyy").format(date);
         gc.setFill(Color.BROWN);
