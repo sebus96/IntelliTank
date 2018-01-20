@@ -167,7 +167,7 @@ public class RouteView extends ScrollPane {
         gc.strokeOval(180 - circleWidth / 2, circleStart, circleWidth, circleHeight);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        double priceForStation = (double) route.get(index).getPrice() / 1000;
+        double priceForStation = (double) (route.get(index).getPrice()+1) / 1000;
         if (route.get(index).isPriceGuessed()) {
             gc.setFill(Color.RED);
         }
