@@ -90,7 +90,7 @@ public class RouteView extends ScrollPane {
             	int index = decideStationnameClick(me.getX(), me.getY(), imageDecline.getWidth());
                 if(index >= 0 && index < route.getLength()) {
                 	if(me.getButton() == MouseButton.PRIMARY)
-                		PriceDiagram.displayGasStation(route.get(index));
+                		PriceDiagram.displayGasStation(route.get(index), parent);
                 	else if(me.getButton() == MouseButton.SECONDARY)
                 		new ValidationContextMenu(route.get(index)).show(parent, me.getScreenX(), me.getScreenY());
                 }

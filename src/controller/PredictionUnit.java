@@ -39,7 +39,7 @@ public class PredictionUnit {
 	/**
 	 * Erstellt eine neue Vorhersageeinheit für eine {@link model.IPredictionStation} mit einem Datum, bis zu dem die Preise bekannt sind, und einem Modus (Art des Perzeptrons).
 	 *
-	 * @param station der Tankstop oder der Vorhersagezeitpunkt für den vorhergesagt werden soll
+	 * @param station der Tankstop oder der Vorhersagezeitpunkt, für den vorhergesagt werden soll
 	 * @param trainUntil das Datum bis zu dem die historischen Preise verwendet werden
 	 * @param mode der Modus (einlagig/mehrlagig)
 	 */
@@ -49,6 +49,13 @@ public class PredictionUnit {
 		this.mode = mode;
 	}
 	
+	/**
+	 * Erstellt eine neue Vorhersageeinheit für eine {@link model.IPredictionStation} und einem importierten Perzeptron. Dieses Perzeptron sollte breits trainiert sein, denn ansonsten wird es beim Aufruf von train()
+	 * überschrieben und neu trainiert.
+	 *
+	 * @param station der Tankstop oder der Vorhersagezeitpunkt, für den das Perzeptron erstellt wurde
+	 * @param p das Perzeptron
+	 */
 	public PredictionUnit(IPredictionStation station, Perceptron p) {
 		this(station, p.getUntil(), (p instanceof SingleLayerPerceptron? Mode.SINGLE_LAYER: Mode.MULTI_LAYER));
 		this.perceptron = p;
@@ -88,7 +95,7 @@ public class PredictionUnit {
 	}
 	
 	public List<Price> testAndSetHourSteps() {
-		if(perceptron == null) {
+		if(perceptron == null || !perceptron.isTrained()) {
 			System.err.println("Train before using prediction!");
 			return null;
 		}

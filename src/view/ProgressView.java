@@ -12,6 +12,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import model.IPredictionStationList;
 
@@ -28,9 +29,11 @@ public class ProgressView {
     /**
      * Initialisiert und füllt das Fenster mit allen relevanten Daten
      * @param predictionStations Liste von Tankstellen, die vorhergesagt werden
+     * @param window Hauptfenster
      */
-    public ProgressView(IPredictionStationList predictionStations) {
+    public ProgressView(IPredictionStationList predictionStations, Window window) {
         progressStage = new Stage();
+        progressStage.initOwner(window);
         progressStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
 			@Override
 			public void handle(WindowEvent evt) {

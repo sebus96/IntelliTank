@@ -29,6 +29,8 @@ public class GasStationController {
     private Route route;
     private PredictionPointList predictionPoints;
     private RefillStrategies refillStrategies;
+    
+    private Stage mainStage;
     private MainView mainView;
     private ProgressView pw;
 
@@ -43,10 +45,12 @@ public class GasStationController {
             PopupBox.displayError(301);
             return;
         }
+        this.mainStage = primaryStage;
         List<String> warnings = CSVManager.checkRoutes(allStations);
         mainView = new MainView(primaryStage, this);
         refillStrategies = new RefillStrategies();
         mainView.show();
+        PopupBox.initOwner(primaryStage);
         PopupBox.displayImportWarnings();
         PopupBox.displayRouteWarnings(warnings);
         
@@ -162,7 +166,7 @@ public class GasStationController {
         	return;
         }
         mainView.hide();
-        pw = new ProgressView(route);
+        pw = new ProgressView(route, this.mainStage);
         this.trainPrediction(route);
     }
 
@@ -182,7 +186,7 @@ public class GasStationController {
             CSVManager.importPrices(predictionPoints);
         }
         mainView.hide();
-        pw = new ProgressView(predictionPoints);
+        pw = new ProgressView(predictionPoints, this.mainStage);
         this.trainPrediction(predictionPoints);
     }
 }

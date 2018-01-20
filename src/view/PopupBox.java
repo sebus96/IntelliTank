@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import model.Validateable;
 import model.Validation;
 
@@ -20,6 +21,7 @@ import model.Validation;
  */
 public class PopupBox {
 
+	private static Window owner;
 	private static Alert infoAlert = new Alert(AlertType.INFORMATION);
 	private static Alert warnAlert = new Alert(AlertType.WARNING);
 	private static Alert errorAlert = new Alert(AlertType.ERROR);
@@ -52,6 +54,19 @@ public class PopupBox {
 
 		};
 	};
+	
+	/**
+	 * Initialisiert die Alerts so, dass sie immer relativ zum Hauptfenster angezeigt werden.
+	 *
+	 * @param window Hauptfenster
+	 */
+	public static void initOwner(Window window) {
+		infoAlert.initOwner(window);
+		warnAlert.initOwner(window);
+		errorAlert.initOwner(window);
+		owner = window;
+	}
+	
 	/**
 	 * Erzeugt eine Pop-Up-Meldung als Information.
 	 * Mitwirkende-Pop-Up-Meldung und beliebige Informations-Meldungen werden erzeugt.
@@ -140,6 +155,7 @@ public class PopupBox {
 	 */
 	private static void displayValidation(String title, Validation validation) {
 		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.initOwner(owner);
 		alert.setTitle("Validierung");
 		alert.setHeaderText("Validierung " + title);
 		Image validImg = new Image("/img/validation.png");
@@ -167,6 +183,7 @@ public class PopupBox {
 		if (warnings == null || warnings.isEmpty())
 			return;
 		Alert alert = new Alert(AlertType.WARNING);
+		alert.initOwner(owner);
 		alert.setTitle("Routenwarnungen");
 		alert.setHeaderText(null);
 		PopupBox.setIcon(alert);

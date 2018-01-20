@@ -133,7 +133,7 @@ public class PredictionPointView extends BorderPane {
 					if (! row.isEmpty()) {
 	                	PredictionPoint.TableRow rowData = row.getItem();
 	                	if(event.getButton() == MouseButton.PRIMARY)
-	                		PriceDiagram.displayGasStation(rowData.getPredictionPoint());
+	                		PriceDiagram.displayGasStation(rowData.getPredictionPoint(), parent);
 	                	else if(event.getButton() == MouseButton.SECONDARY)
 	                		new ValidationContextMenu(rowData.getPredictionPoint()).show(parent, event.getScreenX(), event.getScreenY());
 	                }

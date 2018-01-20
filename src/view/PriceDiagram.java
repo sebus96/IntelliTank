@@ -18,8 +18,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.StringConverter;
-
 import model.GasStation;
 import model.IPredictionStation;
 import model.Price;
@@ -38,8 +38,9 @@ public class PriceDiagram {
     /**
      * Öffnet ein neues Fenster mit den historischen Preisen der Tankstelle. Ist das Fenster bereits offen, wird die Kurve in anderer Farbe hinzugefügt.
      * @param gs IPredictionStation der Tankstelle
+     * @param window Hauptfenster
      */
-    public static void displayGasStation(IPredictionStation gs) {
+    public static void displayGasStation(IPredictionStation gs, Window window) {
     	boolean showWarning = false;
     	if(!showHistoric && !gs.isPredicted()) {
     		if(gasStations.isEmpty()) {
@@ -54,6 +55,7 @@ public class PriceDiagram {
         if (priceStage == null) {
             gasStations = new ArrayList<>();
             priceStage = new Stage();
+            priceStage.initOwner(window);
             priceStage.setWidth(800);
             priceStage.setHeight(600);
             priceStage.setTitle("Preisdiagramm");
