@@ -141,21 +141,31 @@ public class Validation {
 	 * @return HTML-String
 	 */
 	public String toHTMLString() {
+		// Anzeige der Abweichung an den Zeiten, an denen die Vorhersage angefordert wurde
 		String currentTimeText = "nur gefragte" + (currentTimeCounter == 1? "r" : "") + " Zeitpunkt" + (currentTimeCounter == 1? "" : "e");
 		String realPriceText = "echte Preise";
 		String tableHeader = "<table style=\"font-size:12;\">";
+		
+		// Zeilen template bei Validierungen ohne echte Preise
 		String row = "<tr><td><b>--name--:</b></td><td>--value--</td><td>€</td></tr>";
+		// Zeilentemplate bei Validierungen mit echten Preisen
 		String rowlong = "<tr><td><b>--name--:</b></td><td>--value--</td><td>€</td><td>(--secondname--: --secondvalue--</td><td>€)</td></tr>";
+		
+		// Werte mit denen die Templates gefüllt werden.
+		// Die Längen aller Arrays sind identisch und der jeweils i-te Eintrag steht für die i-te Zeile in der Tabelle
 		String[] names =	{	"Durchschnittsabweichung"		, "Maximale Abweichung"				, "Durchschnittspreis"			, "Maximalpreis"			, "Minimalpreis"			};
 		String[] names2 =	{	currentTimeText					, currentTimeText					, realPriceText					, realPriceText				, realPriceText				};
 		double[] values =	{((int)avgDiff/1000.0)				, ((int)maxDiff/1000.0)				, ((int)avgPrice/1000.0)		, ((int)maxPrice/1000.0)	, ((int)minPrice/1000.0)	};
 		double[] values2 =	{((int)avgDiffCurrentTime/1000.0)	, ((int)maxDiffCurrentTime/1000.0)	, ((int)realAvgPrice/1000.0)	, ((int)realMaxPrice/1000.0), ((int)realMinPrice/1000.0)};
+		
 		if(this.avgDiff == 0 && this.maxDiff == Double.MIN_VALUE &&
 				this.realAvgPrice == 0 && this.realMinPrice == Double.MAX_VALUE && this.realMaxPrice == Double.MIN_VALUE &&
 				this.avgDiffCurrentTime == 0 && this.currentTimeCounter == 0) {
 			if(this.avgPrice == 0 && this.minPrice == Double.MAX_VALUE && this.maxPrice == Double.MIN_VALUE && this.counter == 0) {
+				// alle Werte sind 0 bzw. der Minimal- oder Maximalwert -> keine Validierung möglich
 				return "Keine Validierung möglich.";
 			} else {
+				// Es sind keine echten Daten vorhanden -> Es wird nur minmal-, maximal- und Durchschnittpreis der Vorhersage angezeigt
 				String res = "Es sind keine Vergleichsdaten vorhanden." + "<br><br>" + tableHeader;
 				for(int i = 2; i < 5; i++) {
 					res += row.replaceAll("--name--",names[i]).replaceAll("--value--", ""+values[i]);
@@ -164,6 +174,7 @@ public class Validation {
 			}
 			
 		}
+		// alle Daten sind verfügbar und werden angezeigt
 		String res = tableHeader;
 		for(int i = 0; i < names.length; i++) {
 			res += rowlong.replaceAll("--name--", names[i]).replaceAll("--value--", ""+values[i]).replaceAll("--secondname--","" + names2[i]).replaceAll("--secondvalue--","" + values2[i]);
