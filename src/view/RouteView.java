@@ -89,6 +89,9 @@ public class RouteView extends ScrollPane {
             public void handle(MouseEvent me) {
             	int index = decideStationnameClick(me.getX(), me.getY(), imageDecline.getWidth());
                 if(index >= 0 && index < route.getLength()) {
+                	Tooltip t = stationTooltips.get(index);
+                	// Blende Tooltip aus, wenn der noch angezeigt wird
+					if(t != null && t.isShowing()) t.hide();
                 	if(me.getButton() == MouseButton.PRIMARY)
                 		PriceDiagram.displayGasStation(route.get(index), parent);
                 	else if(me.getButton() == MouseButton.SECONDARY)
@@ -267,7 +270,7 @@ public class RouteView extends ScrollPane {
         if (index != 0) {
             int lineStart = 100 + circleHeight + (index - 1) * 100;
             int lineEnd = 200 + (index - 1) * 100;
-            gc.strokeLine(180, lineStart, 180, lineEnd/*TODO: Should length depend on distance between stations*/);
+            gc.strokeLine(180, lineStart, 180, lineEnd);
             GasStation a = route.get(index - 1).getStation();
             GasStation b = route.get(index).getStation();
             long diff = Math.abs(route.get(index).getTime().getTime() - route.get(index-1).getTime().getTime());
