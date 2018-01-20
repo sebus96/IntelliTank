@@ -174,7 +174,7 @@ public class RefuelStop implements IPredictionStation {
     }
 
     /**
-     * Setzt den Tankfüllstand für die intelligente Tankstrategie. Wenn der Tankfüllstand kleiner als 0 ist, wird 0 gesetzt.
+     * Setzt den Tankfüllstand für die intelligente Tankstrategie.
      *
      * @param fuelAmount Tankfüllstand für die intelligente Tankstrategie
      */
@@ -184,7 +184,7 @@ public class RefuelStop implements IPredictionStation {
     }
 
     /**
-     * Setzt den Tankfüllstand für die einfache Tankstrategie. Wenn der Tankfüllstand kleiner als 0 ist, wird 0 gesetzt.
+     * Setzt den Tankfüllstand für die einfache Tankstrategie.
      *
      * @param fuelAmountBasic Tankfüllstand für die einfache Tankstrategie
      */
@@ -205,7 +205,7 @@ public class RefuelStop implements IPredictionStation {
     }
 
 	/**
-     * Setzt die nachgetankte Benzinmenge für die intelligente Tankstrategie. Wenn die Menge kleiner als 0 ist, wird 0 gesetzt.
+     * Setzt die nachgetankte Benzinmenge für die intelligente Tankstrategie.
      *
      * @param refillAmount nachgetankte Benzinmenge in Litern für die intelligente Tankstrategie
      */
@@ -215,7 +215,7 @@ public class RefuelStop implements IPredictionStation {
 	}
 
     /**
-     * Setzt die nachgetankte Benzinmenge für die einfache Tankstrategie. Wenn die Menge kleiner als 0 ist, wird 0 gesetzt.
+     * Setzt die nachgetankte Benzinmenge für die einfache Tankstrategie.
      *
      * @param refillAmountBasic nachgetankte Benzinmenge in Litern für die einfache Tankstrategie
      */

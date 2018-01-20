@@ -231,7 +231,7 @@ public class RefillStrategies {
                 	double distance = route.get(j).getStation().getDistance( route.get(j - 1).getStation());
 //                    kmToNextTarget += distance;
                     fuelToNextTarget += distance * GAS_USED_PER_KM;
-                    assert route.get(j).getStation().getDistance( route.get(j - 1).getStation()) == route.get(j-1).getStation().getDistance( route.get(j).getStation());
+//                    assert route.get(j).getStation().getDistance( route.get(j - 1).getStation()) == route.get(j-1).getStation().getDistance( route.get(j).getStation());
                     if (route.get(j).isNextStation() || route.get(j).isBreakPoint()) {
                         break;
                     }
@@ -242,7 +242,7 @@ public class RefillStrategies {
                 	double distance = route.get(j).getStation().getDistance( route.get(j - 1).getStation());
 //                    kmToNextTarget += distance;
                     fuelToNextTarget += distance * GAS_USED_PER_KM;
-                    assert route.get(j).getStation().getDistance( route.get(j - 1).getStation()) == route.get(j-1).getStation().getDistance( route.get(j).getStation());
+//                    assert route.get(j).getStation().getDistance( route.get(j - 1).getStation()) == route.get(j-1).getStation().getDistance( route.get(j).getStation());
                 }
             }
             

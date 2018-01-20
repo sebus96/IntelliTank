@@ -3,6 +3,7 @@ package view;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -123,15 +124,17 @@ public class MainView extends BorderPane {
                         File workingDirectory = new File(System.getProperty("user.dir"));
                         fc.setInitialDirectory(workingDirectory);
                         fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
-                        File selectedFile = fc.showOpenDialog(null);
-                        if (selectedFile != null) {
-                            try {
-                                CSVManager.copyRoute(selectedFile);
-                            } catch (FileNotFoundException ex) {
-                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
-                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                            }
+                        List<File> selectedFiles = fc.showOpenMultipleDialog(mainStage);
+                        if (selectedFiles != null) {
+                        	for(File selectedFile: selectedFiles) {
+	                            try {
+	                                CSVManager.copyRoute(selectedFile);
+	                            } catch (FileNotFoundException ex) {
+	                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+	                            } catch (IOException ex) {
+	                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+	                            }
+                        	}
                         } else 
                         	System.out.println("Keine Datei ausgew\u00e4hlt.");
                     }
@@ -172,15 +175,17 @@ public class MainView extends BorderPane {
                         File workingDirectory = new File(System.getProperty("user.dir"));
                         fc.setInitialDirectory(workingDirectory);
                         fc.getExtensionFilters().addAll(new javafx.stage.FileChooser.ExtensionFilter("CSV-Dateien", "*.csv"));
-                        File selectedFile = fc.showOpenDialog(null);
-                        if (selectedFile != null) {
-                            try {
-                                CSVManager.copyPredictionPoints(selectedFile);
-                            } catch (FileNotFoundException ex) {
-                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
-                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
-                            }
+                        List<File> selectedFiles = fc.showOpenMultipleDialog(mainStage);
+                        if (selectedFiles != null) {
+                        	for(File selectedFile: selectedFiles) {
+	                            try {
+	                                CSVManager.copyPredictionPoints(selectedFile);
+	                            } catch (FileNotFoundException ex) {
+	                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+	                            } catch (IOException ex) {
+	                                Logger.getLogger(MainView.class.getName()).log(Level.SEVERE, null, ex);
+	                            }
+                        	}
                         } else 
                         	System.out.println("Keine Datei ausgew\u00e4hlt.");
                     }

@@ -305,7 +305,7 @@ public class CSVManager {
             String[] lineElements = prepareRowData(line);
             if (lineElements.length != 3) {
                 System.err.println("Import prediction: Illegal Input row size");
-                continue;
+                return null;
             }
             result.addPredictionElement(stations.get(getInteger(lineElements[2])), getDate(lineElements[0]), getDate(lineElements[1]));
         }
@@ -597,7 +597,8 @@ public class CSVManager {
      * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
     public static void copyRoute(File selectedFile) throws FileNotFoundException, IOException {
-        Path path = Paths.get(routeInputPath + selectedFile.getName());
+        if(selectedFile == null) return;
+    	Path path = Paths.get(routeInputPath + selectedFile.getName());
         copyFile(selectedFile, path);
     }
 
@@ -608,6 +609,7 @@ public class CSVManager {
      * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
     public static void copyPredictionPoints(File selectedFile) throws FileNotFoundException, IOException {
+    	if(selectedFile == null) return;
         Path path = Paths.get(predictionInputPath + selectedFile.getName());
         copyFile(selectedFile, path);
     }
@@ -620,6 +622,7 @@ public class CSVManager {
      * @throws IOException IOException Wenn beim Lesen oder Schreiben ein Fehler aufgetreten ist
      */
     private static void copyFile(File selectedFile, Path dest) throws FileNotFoundException, IOException {
+    	if(selectedFile == null) return;
         if(dest.toFile().getAbsolutePath().equals(selectedFile.getAbsolutePath())) return;
     	InputStream is = new FileInputStream(selectedFile);
         Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
