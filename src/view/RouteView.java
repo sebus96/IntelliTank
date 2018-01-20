@@ -1,5 +1,6 @@
 package view;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -167,11 +168,14 @@ public class RouteView extends ScrollPane {
         gc.strokeOval(180 - circleWidth / 2, circleStart, circleWidth, circleHeight);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        double priceForStation = (double) (route.get(index).getPrice()+1) / 1000;
+        double priceForStation = (double) (route.get(index).getPrice()) / 1000;
         if (route.get(index).isPriceGuessed()) {
             gc.setFill(Color.RED);
         }
-        gc.fillText((priceForStation < 0? "-.---" : priceForStation) + "", 180, circleStart + circleHeight / 2);
+        DecimalFormat f = new DecimalFormat("#0.00");
+        f.setRoundingMode(RoundingMode.FLOOR);
+        // hänge eine hochgestellte 9 an, weil die Preise immer auf 9 enden (Unicode 2079 ist die hochgestellte 9)
+        gc.fillText((priceForStation < 0? "-.---" : f.format(priceForStation)) + "\u2079", 180, circleStart + circleHeight / 2);
         gc.setFill(Color.BLACK);
     }
 
