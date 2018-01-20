@@ -215,7 +215,6 @@ public class RefillStrategies {
                 currentTankStatus -= GAS_USED_PER_KM * distanceFromLastStation;
                 // Durch Rundungsfehler kann der Wert im knappen negativen Bereich liegen (in Testläufen 10^-16)
                 if(currentTankStatus > -0.0000001 && currentTankStatus < 0) currentTankStatus = 0;
-//                currentTankStatus = Math.ceil(Math.pow(10, 10) * currentTankStatus)/Math.pow(10, 10);
                 route.get(i).setFuelAmount(currentTankStatus);
                 totalKm += distanceFromLastStation;
             }
