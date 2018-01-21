@@ -10,6 +10,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
@@ -63,6 +64,9 @@ public class CSVManager {
     private static final String predictionTraindataPath = predictionInputPath + "Trainingsdaten" + File.separator;
     private static final String pricePath = inputPath + "Benzinpreise" + File.separator;
     private static final String holidayPath = inputPath + "Ferien" + File.separator;
+    
+    private static final String postcodeFilename = "Postleitzahl2Bundesland.csv";
+    private static final String allGasStationsFilename = "Tankstellen.csv";
 
     private static final String outputPath = "Ausgabedaten" + File.separator;
     private static final String routeOutputPath = outputPath + "Tankstrategien" + File.separator;
@@ -127,7 +131,7 @@ public class CSVManager {
      * @return alle Tankstellen in Tankstellen.csv
      */
     private static Map<Integer, GasStation> importGasStations() {
-        String filename = inputPath + "Tankstellen.csv";
+        String filename = inputPath + allGasStationsFilename;
         List<String> lines = readFile(filename);
         if (lines == null) {
             System.err.println("Could not import gasstations!");
@@ -176,7 +180,7 @@ public class CSVManager {
         if (Postalcodes.isImported()) {
             return;
         }
-        String filename = inputPath + "postalcode2federalstate.csv";
+        String filename = inputPath + postcodeFilename;
         List<String> lines = readFile(filename);
         if (lines == null) {
             failures.add(204);
@@ -685,8 +689,10 @@ public class CSVManager {
 	        } else {
 	        	return null;
 	        }
-    	} catch(ClassNotFoundException | IOException e) {
-    		e.printStackTrace();
+    	} catch(ClassNotFoundException | InvalidClassException e) {
+    		System.err.println("Old perceptron file could not be loaded.");
+    	} catch(IOException e) {
+    		System.err.println("Could not import file \"" + file.getName() + "\".");
     	} finally {
 			try {
 				if(ois != null) ois.close();

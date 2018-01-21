@@ -38,8 +38,8 @@ public class PopupBox {
 			put(201, "Fehler beim Lesen der Datei Tankstellen.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
 			put(202, "Für die ausgewählte Tankstelle konnte keine Vorhersage durchgeführt werden");
 			put(203, "Für eine oder mehrere der ausgewählten Tankstellen konnte keine Vorhersage durchgeführt werden");
-			put(204, "Die Datei postalcode2federalstate.csv wurde nicht gefunden!\n\nDen Tankstellen kann kein Bundesland zugeordnet werden. Feriendaten können bei der Vorhersage nicht benutzt werden.");
-			put(205, "Falsches Format der Datei postalcode2federalstate.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
+			put(204, "Die Datei Postleitzahl2Bundesland.csv wurde nicht gefunden!\n\nDen Tankstellen kann kein Bundesland zugeordnet werden. Feriendaten können bei der Vorhersage nicht benutzt werden.");
+			put(205, "Falsches Format der Datei Postleitzahl2Bundesland.csv. Möglicherweise werden Daten fehlerhaft dargestellt.");
 			put(206, "Feriendaten wurden nicht gefunden und können bei der Vorhersage nicht benutzt werden.");
 			put(207, "Die Dateinamen der Feriendaten entsprechen nicht dem richtigen Format. Möglicherweise werden Daten fehlerhaft dargestellt.");
 			put(208, "Falsches Format der Feriendaten. Möglicherweise werden Daten fehlerhaft dargestellt.");
