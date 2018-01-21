@@ -64,6 +64,9 @@ public class PriceDiagram {
 	            priceStage = null;
 	            gasStations = new ArrayList<>();
             }); 
+
+            Image icon = new Image("/img/gas-station.png");
+            priceStage.getIcons().add(icon);
         }
         //Verhindert, dass die Tankstellen doppelt angezeigt werden. Die alte wird entfernt, damit die zuletzt angeklickte im Vordergrund steht
         if(gasStations.contains(gs))
@@ -77,9 +80,6 @@ public class PriceDiagram {
      * Generiert einen Graphen für die Anzeige der Preise einer Tankstelle der Route. 
      */
     private static void generateDiagram() {
-        if(priceStage.isShowing()) {
-            priceStage.hide();
-        }
     	double xMin = Double.MAX_VALUE;
     	double xMax = Double.MIN_VALUE;
     	boolean unPredictedStations = false;
@@ -201,13 +201,17 @@ public class PriceDiagram {
 	    	if(gasStations.size() == 1) PopupBox.displayWarning(202);
 	    	else PopupBox.displayWarning(203);
     	}
-
-        Image icon = new Image("/img/gas-station.png");
-        priceStage.getIcons().add(icon);
+    	double x_screen = priceStage.getX();
+    	double y_screen = priceStage.getY();
+        if(priceStage.isShowing()) {
+            priceStage.hide();
+        }
         priceStage.setScene(scene);
         if(!priceStage.isShowing()) {
             priceStage.show();
         }
+        priceStage.setX(x_screen);
+        priceStage.setY(y_screen);
     }
     
     /**
