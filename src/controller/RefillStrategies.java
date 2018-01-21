@@ -187,7 +187,7 @@ public class RefillStrategies {
                 continue;
             } //Falls es ein späterer Durchlauf ist, vergleiche den aktuellen mit dem aktuell günstigsten Tankpreis
             else {
-                if (route.get(j).getPrice() <= gasPrice) { //TODO hier kleiner gleich oben nur gleich?
+                if (route.get(j).getPrice() <= gasPrice) {
                     gasPrice = route.get(j).getPrice();
                     nextStationNumber = j;
                 }
