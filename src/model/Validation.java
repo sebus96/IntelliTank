@@ -149,7 +149,7 @@ public class Validation {
 		// Zeilen template bei Validierungen ohne echte Preise
 		String row = "<tr><td><b>--name--:</b></td><td>--value--</td><td>€</td></tr>";
 		// Zeilentemplate bei Validierungen mit echten Preisen
-		String rowlong = "<tr><td><b>--name--:</b></td><td>--value--</td><td>€</td><td>(--secondname--: --secondvalue--</td><td>€)</td></tr>";
+		String rowlong = "<tr><td><b>--name--:</b></td><td>--value--</td><td>€</td><td>(--secondname--:</td><td>--secondvalue--</td><td>€)</td></tr>";
 		
 		// Werte mit denen die Templates gefüllt werden.
 		// Die Längen aller Arrays sind identisch und der jeweils i-te Eintrag steht für die i-te Zeile in der Tabelle
