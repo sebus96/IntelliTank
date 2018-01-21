@@ -290,23 +290,23 @@ public class RouteView extends ScrollPane {
      */
     private void displayResult() {
         gc.setFill(Color.WHITE);
-        gc.fillRect(30, 42, 288, 32);
+        gc.fillRect(30, 42, 318, 32);
         gc.setFill(Color.BLACK);
         gc.setFill(Color.WHITE);
-        gc.fillRect(30, 26, 288, 16);
+        gc.fillRect(30, 26, 318, 16);
         gc.setFill(Color.BLACK);
-        gc.strokeRect(30, 26, 288, 16);
-        gc.strokeRect(30, 42, 288, 32);
-        gc.strokeLine(126, 42, 126, 74);
-        gc.strokeLine(222, 42, 222, 74);
+        gc.strokeRect(30, 26, 318, 16);
+        gc.strokeRect(30, 42, 318, 32);
+        gc.strokeLine(136, 42, 136, 74);
+        gc.strokeLine(232, 42, 232, 74);
         Image imgRoute = new Image(getClass().getResourceAsStream("/img/route.png"));
         gc.drawImage(imgRoute, 31, 27);
         Image imgKm = new Image(getClass().getResourceAsStream("/img/route-a-b.png"));
         gc.drawImage(imgKm, 31, 43);
         Image imgFuelGauge = new Image(getClass().getResourceAsStream("/img/fuel-gauge.png"));
-        gc.drawImage(imgFuelGauge, 127, 41);
+        gc.drawImage(imgFuelGauge, 137, 41);
         Image imgEuro = new Image(getClass().getResourceAsStream("/img/euro.png"));
-        gc.drawImage(imgEuro, 223, 43);
+        gc.drawImage(imgEuro, 233, 43);
         gc.strokeLine(30, 42, 318, 42);
         gc.strokeLine(30, 26, 30, 74);
         gc.strokeLine(30, 26, 288, 26);
@@ -314,20 +314,20 @@ public class RouteView extends ScrollPane {
         DecimalFormat f = new DecimalFormat("#0.00");
         String outputKm = f.format(route.getTotalDistance()) + " km";
         gc.setFont(new Font(12));
-        gc.fillText(outputKm, 62, 58);
+        gc.fillText(outputKm, 72, 58);
         gc.setFont(Font.getDefault());
         String outputFuelGauge = f.format(route.getTotalFuelConsumption()) + " L";
         gc.setFont(new Font(15));
-        gc.fillText(outputFuelGauge, 158, 58);
+        gc.fillText(outputFuelGauge, 168, 58);
         gc.setFont(Font.getDefault());
         String outputEuro = f.format(route.getTotalCosts()) + " \u20ac";
         gc.setFont(new Font(15));
-        gc.fillText(outputEuro, 254, 58);
+        gc.fillText(outputEuro, 264, 58);
         gc.setFont(Font.getDefault());
         String nameAndTimeOfRoute = "Route: \"";
         String nameOfRoute = route.getName();
-        if(nameOfRoute.length() > 23) {
-        	nameOfRoute = nameOfRoute.substring(0, 23);
+        if(nameOfRoute.length() > 50) {
+        	nameOfRoute = nameOfRoute.substring(0, 50);
         	nameOfRoute += "...";
         }
         nameAndTimeOfRoute += nameOfRoute;
