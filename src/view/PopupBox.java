@@ -47,7 +47,7 @@ public class PopupBox {
 			put(301, "Die Datei Tankstellen.csv wurde nicht gefunden!\n\nDas Programm konnte nicht gestartet werden.");
 			put(302, "Die ausgewählte Route konnte nicht geladen werden. Datei möglicherweise fehlerhaft formatiert oder nicht mehr vorhanden.");
 			put(303, "Vorhersagezeitpunkte konnten nicht geladen werden. Datei möglicherweise fehlerhaft formatiert oder nicht mehr vorhanden.");
-			put(304, "Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
+//			put(304, "Fehler in der Routenstrategie: Möglicherweise ist die Tankkapazität zu klein gewählt.");
 			put(305, "Die historischen Benzinpreise wurden nicht gefunden. Es kann keine Vorhersage getätigt werden.");
 			put(306, "Die Preise konnten für keinen Tankstop innerhalb der Route vorhergesagt werden. Möglicherweise konnten keine Preise importiert werden, die historischen Daten liegen zu weit zurück oder die verfügbaren historischen Preise umfassen weniger als 2 Wochen.");
 			put(307, "Die Entfernung der Tankstops in der importierten Route ist zu groß für die gewählte Tankkapazität.");
